@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html' as html;
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 
@@ -418,8 +419,14 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      // Em ambiente web, o navegador baixa automaticamente
-      // O backend já configura os headers corretos
+      // Para web, criar um link de download
+      final bytes = response.bodyBytes;
+      final blob = html.Blob([bytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', 'relatorio_${DateTime.now().millisecondsSinceEpoch}.csv')
+        ..click();
+      html.Url.revokeObjectUrl(url);
       return;
     } else {
       throw Exception('Erro ao exportar relatório');
