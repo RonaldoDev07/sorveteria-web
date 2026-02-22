@@ -18,7 +18,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
   bool _isLoading = true;
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy HH:mm');
   final _searchController = TextEditingController();
-  String _periodoSelecionado = 'hoje'; // 'hoje', 'mensal', 'anual'
+  String _periodoSelecionado = 'hoje'; // 'hoje', 'semanal', 'mensal', 'anual'
 
   @override
   void initState() {
@@ -93,6 +93,10 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
     // Definir data de início baseado no período
     if (_periodoSelecionado == 'hoje') {
       dataInicio = DateTime(hoje.year, hoje.month, hoje.day);
+    } else if (_periodoSelecionado == 'semanal') {
+      // Início da semana (domingo)
+      dataInicio = hoje.subtract(Duration(days: hoje.weekday % 7));
+      dataInicio = DateTime(dataInicio.year, dataInicio.month, dataInicio.day);
     } else if (_periodoSelecionado == 'mensal') {
       dataInicio = DateTime(hoje.year, hoje.month, 1);
     } else { // anual
@@ -299,10 +303,25 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                 labelStyle: TextStyle(
                                   color: _periodoSelecionado == 'hoje' ? Colors.white : Colors.grey[700],
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 13,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: ChoiceChip(
+                                label: const Text('Semanal'),
+                                selected: _periodoSelecionado == 'semanal',
+                                onSelected: (selected) => _alternarPeriodo('semanal'),
+                                selectedColor: Colors.orange,
+                                labelStyle: TextStyle(
+                                  color: _periodoSelecionado == 'semanal' ? Colors.white : Colors.grey[700],
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
                             Expanded(
                               child: ChoiceChip(
                                 label: const Text('Mensal'),
@@ -312,10 +331,11 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                 labelStyle: TextStyle(
                                   color: _periodoSelecionado == 'mensal' ? Colors.white : Colors.grey[700],
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 13,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Expanded(
                               child: ChoiceChip(
                                 label: const Text('Anual'),
@@ -325,6 +345,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                 labelStyle: TextStyle(
                                   color: _periodoSelecionado == 'anual' ? Colors.white : Colors.grey[700],
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 13,
                                 ),
                               ),
                             ),
@@ -368,9 +389,11 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                   Text(
                                     _periodoSelecionado == 'hoje' 
                                       ? 'Vendas de Hoje'
-                                      : _periodoSelecionado == 'mensal'
-                                        ? 'Vendas do Mês'
-                                        : 'Vendas do Ano',
+                                      : _periodoSelecionado == 'semanal'
+                                        ? 'Vendas da Semana'
+                                        : _periodoSelecionado == 'mensal'
+                                          ? 'Vendas do Mês'
+                                          : 'Vendas do Ano',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
