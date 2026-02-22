@@ -284,7 +284,11 @@ _isLoading
                                     Icon(Icons.check_circle_rounded, size: 14, color: Colors.white.withOpacity(0.9)),
                                     const SizedBox(width: 4),
                                     Text(
-                                      '${_produtosFiltrados.where((p) => p['estoque_atual'] > 0).length} disponível',
+                                      '${_produtosFiltrados.where((p) {
+                                        final estoque = p['estoque_atual'];
+                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+                                        return estoqueNum > 0;
+                                      }).length} disponível',
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.9),
                                         fontSize: 13,
@@ -295,7 +299,11 @@ _isLoading
                                     Icon(Icons.warning_rounded, size: 14, color: Colors.white.withOpacity(0.9)),
                                     const SizedBox(width: 4),
                                     Text(
-                                      '${_produtosFiltrados.where((p) => p['estoque_atual'] == 0).length} esgotado',
+                                      '${_produtosFiltrados.where((p) {
+                                        final estoque = p['estoque_atual'];
+                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+                                        return estoqueNum == 0;
+                                      }).length} esgotado',
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.9),
                                         fontSize: 13,
@@ -389,27 +397,39 @@ _isLoading
                                 Row(
                                   children: [
                                     Icon(
-                                      produto['estoque_atual'] == 0 
-                                        ? Icons.warning_rounded 
-                                        : Icons.inventory_rounded, 
+                                      () {
+                                        final estoque = produto['estoque_atual'];
+                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+                                        return estoqueNum == 0 ? Icons.warning_rounded : Icons.inventory_rounded;
+                                      }(), 
                                       size: 16, 
-                                      color: produto['estoque_atual'] == 0 
-                                        ? Colors.red[600] 
-                                        : Colors.grey[600]
+                                      color: () {
+                                        final estoque = produto['estoque_atual'];
+                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+                                        return estoqueNum == 0 ? Colors.red[600] : Colors.grey[600];
+                                      }()
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      produto['estoque_atual'] == 0
-                                        ? 'Estoque esgotado'
-                                        : 'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
+                                      () {
+                                        final estoque = produto['estoque_atual'];
+                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+                                        return estoqueNum == 0
+                                          ? 'Estoque esgotado'
+                                          : 'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}';
+                                      }(),
                                       style: TextStyle(
-                                        color: produto['estoque_atual'] == 0 
-                                          ? Colors.red[700] 
-                                          : Colors.grey[700],
+                                        color: () {
+                                          final estoque = produto['estoque_atual'];
+                                          final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+                                          return estoqueNum == 0 ? Colors.red[700] : Colors.grey[700];
+                                        }(),
                                         fontSize: 14,
-                                        fontWeight: produto['estoque_atual'] == 0 
-                                          ? FontWeight.w600 
-                                          : FontWeight.w500,
+                                        fontWeight: () {
+                                          final estoque = produto['estoque_atual'];
+                                          final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+                                          return estoqueNum == 0 ? FontWeight.w600 : FontWeight.w500;
+                                        }(),
                                       ),
                                     ),
                                   ],
