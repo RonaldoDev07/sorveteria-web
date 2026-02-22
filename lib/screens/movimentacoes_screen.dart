@@ -64,24 +64,38 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
     for (var mov in _movimentacoes) {
       if (mov['tipo'] != 'SAIDA') continue; // Apenas vendas
       
-      final dataMovimentacao = DateTime.parse(mov['data_movimentacao']);
-      if (dataMovimentacao.isBefore(inicioDia)) continue; // Apenas hoje
-      
-      final vendedor = mov['usuario_nome'] ?? 'Desconhecido';
-      final valorTotal = (mov['valor_total'] is num) 
-        ? (mov['valor_total'] as num).toDouble()
-        : double.tryParse(mov['valor_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
-      final lucro = (mov['lucro_total'] is num)
-        ? (mov['lucro_total'] as num).toDouble()
-        : double.tryParse(mov['lucro_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
-      
-      if (!resumo.containsKey(vendedor)) {
-        resumo[vendedor] = {'total': 0, 'lucro': 0, 'quantidade': 0};
+      try {
+        // Tentar diferentes formatos de data
+        DateTime dataMovimentacao;
+        if (mov['data_movimentacao'] != null) {
+          dataMovimentacao = DateTime.parse(mov['data_movimentacao']);
+        } else if (mov['data_hora'] != null) {
+          dataMovimentacao = DateTime.parse(mov['data_hora']);
+        } else {
+          continue; // Pular se não tiver data
+        }
+        
+        if (dataMovimentacao.isBefore(inicioDia)) continue; // Apenas hoje
+        
+        final vendedor = mov['usuario_nome'] ?? 'Desconhecido';
+        final valorTotal = (mov['valor_total'] is num) 
+          ? (mov['valor_total'] as num).toDouble()
+          : double.tryParse(mov['valor_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+        final lucro = (mov['lucro_total'] is num)
+          ? (mov['lucro_total'] as num).toDouble()
+          : double.tryParse(mov['lucro_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+        
+        if (!resumo.containsKey(vendedor)) {
+          resumo[vendedor] = {'total': 0, 'lucro': 0, 'quantidade': 0};
+        }
+        
+        resumo[vendedor]!['total'] = (resumo[vendedor]!['total'] ?? 0) + valorTotal;
+        resumo[vendedor]!['lucro'] = (resumo[vendedor]!['lucro'] ?? 0) + lucro;
+        resumo[vendedor]!['quantidade'] = (resumo[vendedor]!['quantidade'] ?? 0) + 1;
+      } catch (e) {
+        // Ignorar movimentações com erro de data
+        continue;
       }
-      
-      resumo[vendedor]!['total'] = (resumo[vendedor]!['total'] ?? 0) + valorTotal;
-      resumo[vendedor]!['lucro'] = (resumo[vendedor]!['lucro'] ?? 0) + lucro;
-      resumo[vendedor]!['quantidade'] = (resumo[vendedor]!['quantidade'] ?? 0) + 1;
     }
     
     return resumo;
