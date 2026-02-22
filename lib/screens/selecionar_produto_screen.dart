@@ -45,10 +45,21 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
 
   void _filtrarProdutos(String query) {
     setState(() {
+      List<dynamic> produtosBase = _produtos;
+      
+      // Se for SAIDA (venda), usar apenas produtos com estoque > 0
+      if (widget.tipo == 'SAIDA') {
+        produtosBase = _produtos.where((p) {
+          final estoque = p['estoque_atual'];
+          final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+          return estoqueNum > 0;
+        }).toList();
+      }
+      
       if (query.isEmpty) {
-        _produtosFiltrados = _produtos;
+        _produtosFiltrados = produtosBase;
       } else {
-        _produtosFiltrados = _produtos
+        _produtosFiltrados = produtosBase
             .where((produto) =>
                 produto['nome'].toLowerCase().contains(query.toLowerCase()))
             .toList();
@@ -62,7 +73,16 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
       final produtos = await ApiService.getProdutos(auth.token!);
       setState(() {
         _produtos = produtos;
-        _produtosFiltrados = produtos;
+        // Se for SAIDA (venda), filtrar apenas produtos com estoque > 0
+        if (widget.tipo == 'SAIDA') {
+          _produtosFiltrados = produtos.where((p) {
+            final estoque = p['estoque_atual'];
+            final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+            return estoqueNum > 0;
+          }).toList();
+        } else {
+          _produtosFiltrados = produtos;
+        }
         _isLoading = false;
       });
     } catch (e) {
