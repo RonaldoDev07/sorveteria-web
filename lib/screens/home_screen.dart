@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ],
         ),
         content: const Text(
-          'Tem certeza que deseja sair?',
+          'Deseja realmente sair do sistema?',
           style: TextStyle(
             fontSize: 16,
             height: 1.4,
@@ -298,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
                       ),
                     ),
-                    if (auth.isAdmin)
+                    if (auth.canCadastrarProduto)
                       _MenuCard(
                         icon: Icons.arrow_downward_rounded,
                         title: 'Registrar Compra',

@@ -69,7 +69,10 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar produtos: $e')),
+          SnackBar(
+            content: Text('Erro ao carregar produtos: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }

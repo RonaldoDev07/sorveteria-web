@@ -70,7 +70,10 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar produtos: $e')),
+          SnackBar(
+            content: Text('Erro ao carregar produtos: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -101,7 +104,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
           ],
         ),
         content: Text(
-          'Tem certeza que deseja deletar "${produto['nome']}"?\n\nEsta ação não pode ser desfeita.',
+          'Deseja realmente excluir o produto "${produto['nome']}"?\n\nEsta ação não poderá ser desfeita.',
           style: const TextStyle(fontSize: 16, height: 1.4),
         ),
         actions: [
@@ -313,7 +316,7 @@ _isLoading
                                 const SizedBox(height: 6),
                                 Row(
                                   children: [
-                                    Icon(Icons.attach_money_rounded, size: 16, color: Colors.green[600]),
+                                    Icon(Icons.payments_rounded, size: 16, color: Colors.green[600]),
                                     const SizedBox(width: 4),
                                     Text(
                                       BrazilianFormatters.formatCurrency(produto['preco_venda']),
@@ -344,7 +347,7 @@ _isLoading
                                   ],
                                 ),
                               ),
-                              if (auth.isAdmin)
+                              if (auth.canCadastrarProduto)
                                 const PopupMenuItem(
                                   value: 'entrada',
                                   child: Row(

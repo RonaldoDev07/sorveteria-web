@@ -35,7 +35,10 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar usuários: $e')),
+          SnackBar(
+            content: Text('Erro ao carregar usuários: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -47,7 +50,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('${acao[0].toUpperCase()}${acao.substring(1)} Usuário'),
-        content: Text('Deseja $acao o usuário $nome?'),
+        content: Text('Deseja realmente $acao o usuário "$nome"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -97,8 +100,8 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Deletar Usuário'),
         content: Text(
-          'Deseja realmente deletar o usuário $nome?\n\n'
-          'Esta ação não pode ser desfeita!',
+          'Deseja realmente excluir o usuário "$nome"?\n\n'
+          'Esta ação não poderá ser desfeita!',
         ),
         actions: [
           TextButton(
@@ -203,7 +206,22 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     itemBuilder: (context, index) {
                       final usuario = _usuarios[index];
                       final isAtivo = usuario['ativo'] == true;
-                      final isAdmin = usuario['perfil'] == 'ADMIN';
+                      final perfil = usuario['perfil'];
+                      final isAdmin = perfil == 'ADMIN';
+                      final isVendedor = perfil == 'VENDEDOR';
+
+                      // Definir cor e ícone baseado no perfil
+                      final perfilColor = isAdmin 
+                          ? [Colors.deepPurple, Colors.purpleAccent]
+                          : isVendedor
+                              ? [Colors.green, Colors.greenAccent]
+                              : [Colors.blue, Colors.blueAccent];
+                      
+                      final perfilIcon = isAdmin 
+                          ? Icons.admin_panel_settings
+                          : isVendedor
+                              ? Icons.shopping_bag
+                              : Icons.person;
 
                       return Card(
                         elevation: 4,
@@ -228,14 +246,12 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
-                                      colors: isAdmin
-                                          ? [Colors.deepPurple, Colors.purpleAccent]
-                                          : [Colors.blue, Colors.blueAccent],
+                                      colors: perfilColor,
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
-                                    isAdmin ? Icons.admin_panel_settings : Icons.person,
+                                    perfilIcon,
                                     color: Colors.white,
                                     size: 28,
                                   ),
@@ -293,16 +309,24 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                       Row(
                                         children: [
                                           Icon(
-                                            isAdmin ? Icons.star : Icons.work,
+                                            perfilIcon,
                                             size: 16,
-                                            color: isAdmin ? Colors.amber : Colors.blue,
+                                            color: isAdmin 
+                                                ? Colors.amber 
+                                                : isVendedor 
+                                                    ? Colors.green 
+                                                    : Colors.blue,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             'Perfil: ${usuario['perfil']}',
                                             style: TextStyle(
                                               color: isAtivo
-                                                  ? (isAdmin ? Colors.deepPurple : Colors.blue)
+                                                  ? (isAdmin 
+                                                      ? Colors.deepPurple 
+                                                      : isVendedor 
+                                                          ? Colors.green 
+                                                          : Colors.blue)
                                                   : Colors.grey,
                                               fontWeight: FontWeight.bold,
                                             ),

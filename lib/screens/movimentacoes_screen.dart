@@ -47,7 +47,10 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar movimentações: $e')),
+          SnackBar(
+            content: Text('Erro ao carregar movimentações: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -59,7 +62,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Confirmar Cancelamento'),
         content: Text(
-          'Deseja realmente cancelar esta ${tipo == "SAIDA" ? "venda" : "compra"} de $produtoNome?\n\n'
+          'Deseja realmente cancelar esta ${tipo == "SAIDA" ? "venda" : "compra"} do produto "$produtoNome"?\n\n'
           'O estoque será revertido automaticamente.',
         ),
         actions: [
@@ -255,7 +258,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                   _buildInfoRow(
                                     'Valor Unitário',
                                     BrazilianFormatters.formatCurrency(mov['valor_unitario']),
-                                    Icons.attach_money,
+                                    Icons.payments_rounded,
                                   ),
                                   if (!isEntrada && mov['lucro_total'] != null) ...[
                                     const SizedBox(height: 8),

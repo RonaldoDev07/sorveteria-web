@@ -79,10 +79,53 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
       if (e.toString().contains('401') || e.toString().contains('Unauthorized')) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sessão expirada. Faça login novamente.')),
+            const SnackBar(
+              content: Text('Sessão expirada. Por favor, faça login novamente.'),
+              backgroundColor: Colors.orange,
+            ),
           );
           Provider.of<AuthService>(context, listen: false).logout();
         }
+      }
+    }
+  }
+
+  Future<void> _exportarCSV() async {
+    try {
+      final auth = Provider.of<AuthService>(context, listen: false);
+      
+      String? dataInicioStr;
+      String? dataFimStr;
+      
+      if (_dataInicio != null) {
+        dataInicioStr = _dateFormat.format(_dataInicio!);
+      }
+      if (_dataFim != null) {
+        dataFimStr = _dateFormat.format(_dataFim!);
+      }
+
+      await ApiService.exportarRelatorioCSV(
+        auth.token!,
+        dataInicioStr,
+        dataFimStr,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Relatório exportado com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao exportar: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -242,6 +285,30 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 0,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: OutlinedButton.icon(
+                          onPressed: _exportarCSV,
+                          icon: const Icon(Icons.file_download_rounded),
+                          label: const Text(
+                            'Exportar CSV',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF8B5CF6),
+                            side: const BorderSide(color: Color(0xFF8B5CF6), width: 2),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                           ),
                         ),
                       ),
@@ -608,7 +675,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.attach_money,
+                        Icons.account_balance_wallet_rounded,
                         color: Colors.white,
                         size: 20,
                       ),

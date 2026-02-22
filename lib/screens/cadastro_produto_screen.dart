@@ -37,8 +37,8 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
       final auth = Provider.of<AuthService>(context, listen: false);
       
       // Validação adicional no frontend (backend também valida)
-      if (!auth.isAdmin) {
-        throw Exception('Apenas ADMIN pode cadastrar produtos');
+      if (!auth.canCadastrarProduto) {
+        throw Exception('Apenas ADMIN ou VENDEDOR podem cadastrar produtos');
       }
 
       // Converter vírgulas para pontos
@@ -57,7 +57,10 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Produto cadastrado com sucesso')),
+          const SnackBar(
+            content: Text('Produto cadastrado com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pop(context, true); // Retorna true para indicar sucesso
       }
@@ -65,7 +68,10 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro: $e')),
+          SnackBar(
+            content: Text('Erro ao cadastrar produto: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -103,175 +109,178 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
           ),
         ),
       ),
-      body:
-SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _nomeController,
-                  decoration: InputDecoration(
-                    labelText: 'Nome do Produto',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _nomeController,
+                decoration: InputDecoration(
+                  labelText: 'Nome do Produto',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
                   ),
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 ),
-                const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  value: _unidade,
-                  decoration: InputDecoration(
-                    labelText: 'Unidade',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Campo obrigatório' : null,
+              ),
+              const SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _unidade,
+                decoration: InputDecoration(
+                  labelText: 'Unidade',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'UN', child: Text('Unidade (UN)')),
-                    DropdownMenuItem(value: 'KG', child: Text('Quilograma (KG)')),
-                  ],
-                  onChanged: (value) => setState(() => _unidade = value!),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _custoController,
-                  decoration: InputDecoration(
-                    labelText: 'Custo de Compra (Ex: 4,00)',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    helperText: 'Quanto você pagou pela mercadoria',
-                    helperStyle: TextStyle(color: Colors.grey[600]),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                items: const [
+                  DropdownMenuItem(value: 'UN', child: Text('Unidade (UN)')),
+                  DropdownMenuItem(value: 'KG', child: Text('Quilograma (KG)')),
+                ],
+                onChanged: (value) => setState(() => _unidade = value!),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _custoController,
+                decoration: InputDecoration(
+                  labelText: 'Custo de Compra',
+                  hintText: 'Ex: 4,00',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                  prefixText: 'R\$ ',
+                  prefixStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                    final valorLimpo = value!.replaceAll(',', '.');
-                    final custo = double.tryParse(valorLimpo);
-                    if (custo == null || custo <= 0) {
-                      return 'Custo inválido';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _precoController,
-                  decoration: InputDecoration(
-                    labelText: 'Preço de Venda (Ex: 6,00)',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    helperText: 'Quanto você vai vender',
-                    helperStyle: TextStyle(color: Colors.grey[600]),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                    prefixIcon: const Padding(
-                      padding: EdgeInsets.only(left: 20, top: 18),
-                      child: Text(
-                        'R\$',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                    final valorLimpo = value!.replaceAll(',', '.');
-                    final preco = double.tryParse(valorLimpo);
-                    if (preco == null || preco <= 0) {
-                      return 'Preço inválido';
-                    }
-                    return null;
-                  },
+                  helperText: 'Quanto você pagou pela mercadoria',
+                  helperStyle: TextStyle(color: Colors.grey[600]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _estoqueController,
-                  decoration: InputDecoration(
-                    labelText: 'Estoque Inicial (Ex: 50)',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                  final valorLimpo = value!.replaceAll(',', '.');
+                  final custo = double.tryParse(valorLimpo);
+                  if (custo == null || custo <= 0) {
+                    return 'Custo inválido';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _precoController,
+                decoration: InputDecoration(
+                  labelText: 'Preço de Venda',
+                  hintText: 'Ex: 6,00',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                  prefixText: 'R\$ ',
+                  prefixStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                    final valorLimpo = value!.replaceAll(',', '.');
-                    final estoque = double.tryParse(valorLimpo);
-                    if (estoque == null || estoque < 0) {
-                      return 'Estoque inválido';
-                    }
-                    return null;
-                  },
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  helperText: 'Quanto você vai vender',
+                  helperStyle: TextStyle(color: Colors.grey[600]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleCadastro,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6366F1),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                      shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                  final valorLimpo = value!.replaceAll(',', '.');
+                  final preco = double.tryParse(valorLimpo);
+                  if (preco == null || preco <= 0) {
+                    return 'Preço inválido';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _estoqueController,
+                decoration: InputDecoration(
+                  labelText: 'Estoque Inicial',
+                  hintText: 'Ex: 50',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                  final valorLimpo = value!.replaceAll(',', '.');
+                  final estoque = double.tryParse(valorLimpo);
+                  if (estoque == null || estoque < 0) {
+                    return 'Estoque inválido';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleCadastro,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            'Cadastrar Produto',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    elevation: 0,
+                    shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
                           ),
-                  ),
+                        )
+                      : const Text(
+                          'Cadastrar Produto',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }

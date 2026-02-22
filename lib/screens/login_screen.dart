@@ -42,7 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login ou senha inválidos')),
+        const SnackBar(
+          content: Text('Usuário ou senha inválidos. Verifique suas credenciais.'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }

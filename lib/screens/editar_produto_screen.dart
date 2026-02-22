@@ -235,24 +235,20 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
                 TextFormField(
                   controller: _precoController,
                   decoration: InputDecoration(
-                    labelText: 'Preço de Venda (Ex: R\$ 6,00)',
+                    labelText: 'Preço de Venda',
+                    hintText: 'Ex: 6,00',
+                    prefixText: 'R\$ ',
+                    prefixStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     helperText: 'Quanto você vai vender',
                     filled: true,
                     fillColor: Colors.white,
-                    prefixIcon: const Padding(
-                      padding: EdgeInsets.only(left: 16, top: 14),
-                      child: Text(
-                        'R\$',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {

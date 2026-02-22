@@ -54,7 +54,10 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Baixa registrada com sucesso')),
+          const SnackBar(
+            content: Text('Venda registrada com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pop(context, true); // Retorna true para indicar sucesso
       }
@@ -62,7 +65,10 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro: $e')),
+          SnackBar(
+            content: Text('Erro ao registrar venda: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }

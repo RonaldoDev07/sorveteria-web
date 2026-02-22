@@ -45,8 +45,8 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
       final auth = Provider.of<AuthService>(context, listen: false);
       
       // Validação adicional no frontend (backend também valida)
-      if (!auth.isAdmin) {
-        throw Exception('Apenas ADMIN pode registrar entrada');
+      if (!auth.canCadastrarProduto) {
+        throw Exception('Apenas ADMIN ou VENDEDOR podem registrar entrada');
       }
 
       // Converter vírgulas para pontos
@@ -63,7 +63,10 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Entrada registrada com sucesso')),
+          const SnackBar(
+            content: Text('Entrada registrada com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pop(context, true); // Retorna true para indicar sucesso
       }
@@ -71,7 +74,10 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro: $e')),
+          SnackBar(
+            content: Text('Erro ao registrar entrada: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -165,7 +171,14 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
                 TextFormField(
                   controller: _custoController,
                   decoration: InputDecoration(
-                    labelText: 'Custo de Compra (Ex: R\$ 5,50)',
+                    labelText: 'Custo de Compra',
+                    hintText: 'Ex: 5,50',
+                    prefixText: 'R\$ ',
+                    prefixStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

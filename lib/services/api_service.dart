@@ -389,3 +389,40 @@ class ApiService {
     }
   }
 }
+
+  // ========== EXPORTAR CSV ==========
+
+  static Future<void> exportarRelatorioCSV(
+    String token,
+    String? dataInicio,
+    String? dataFim,
+  ) async {
+    var url = '$baseUrl/relatorios/exportar-csv';
+    final params = <String>[];
+
+    if (dataInicio != null && dataInicio.isNotEmpty) {
+      params.add('data_inicio=$dataInicio');
+    }
+    if (dataFim != null && dataFim.isNotEmpty) {
+      params.add('data_fim=$dataFim');
+    }
+
+    if (params.isNotEmpty) {
+      url += '?${params.join('&')}';
+    }
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Em ambiente web, o navegador baixa automaticamente
+      // O backend já configura os headers corretos
+      return;
+    } else {
+      throw Exception('Erro ao exportar relatório');
+    }
+  }

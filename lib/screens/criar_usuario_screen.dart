@@ -217,6 +217,16 @@ class _CriarUsuarioScreenState extends State<CriarUsuarioScreen> {
                               ),
                             ),
                             DropdownMenuItem(
+                              value: 'VENDEDOR',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.shopping_bag, color: Colors.green),
+                                  SizedBox(width: 8),
+                                  Text('VENDEDOR (cadastra e vende)'),
+                                ],
+                              ),
+                            ),
+                            DropdownMenuItem(
                               value: 'OPERADOR',
                               child: Row(
                                 children: [

@@ -201,6 +201,16 @@ class _EditarUsuarioScreenState extends State<EditarUsuarioScreen> {
                               ),
                             ),
                             DropdownMenuItem(
+                              value: 'VENDEDOR',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.shopping_bag, color: Colors.green),
+                                  SizedBox(width: 8),
+                                  Text('VENDEDOR'),
+                                ],
+                              ),
+                            ),
+                            DropdownMenuItem(
                               value: 'OPERADOR',
                               child: Row(
                                 children: [
