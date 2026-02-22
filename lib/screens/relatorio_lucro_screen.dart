@@ -293,7 +293,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                         width: double.infinity,
                         height: 56,
                         child: OutlinedButton.icon(
-                          onPressed: _exportarCSV,
+                          onPressed: () => _exportarCSV(),
                           icon: const Icon(Icons.file_download_rounded),
                           label: const Text(
                             'Exportar CSV',
