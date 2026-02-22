@@ -56,6 +56,37 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
     }
   }
 
+  Map<String, Map<String, double>> _calcularResumoVendedores() {
+    final resumo = <String, Map<String, double>>{};
+    final hoje = DateTime.now();
+    final inicioDia = DateTime(hoje.year, hoje.month, hoje.day);
+    
+    for (var mov in _movimentacoes) {
+      if (mov['tipo'] != 'SAIDA') continue; // Apenas vendas
+      
+      final dataMovimentacao = DateTime.parse(mov['data_movimentacao']);
+      if (dataMovimentacao.isBefore(inicioDia)) continue; // Apenas hoje
+      
+      final vendedor = mov['usuario_nome'] ?? 'Desconhecido';
+      final valorTotal = (mov['valor_total'] is num) 
+        ? (mov['valor_total'] as num).toDouble()
+        : double.tryParse(mov['valor_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+      final lucro = (mov['lucro_total'] is num)
+        ? (mov['lucro_total'] as num).toDouble()
+        : double.tryParse(mov['lucro_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+      
+      if (!resumo.containsKey(vendedor)) {
+        resumo[vendedor] = {'total': 0, 'lucro': 0, 'quantidade': 0};
+      }
+      
+      resumo[vendedor]!['total'] = (resumo[vendedor]!['total'] ?? 0) + valorTotal;
+      resumo[vendedor]!['lucro'] = (resumo[vendedor]!['lucro'] ?? 0) + lucro;
+      resumo[vendedor]!['quantidade'] = (resumo[vendedor]!['quantidade'] ?? 0) + 1;
+    }
+    
+    return resumo;
+  }
+
   Future<void> _cancelarMovimentacao(int movimentacaoId, String tipo, String produtoNome) async {
     final confirmar = await showDialog<bool>(
       context: context,
@@ -164,9 +195,156 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       ],
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _movimentacoes.length,
+                : Column(
+                    children: [
+                      // Card de resumo por vendedor
+                      if (_calcularResumoVendedores().isNotEmpty) ...[
+                        Container(
+                          margin: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.orange.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.leaderboard_rounded, color: Colors.white, size: 20),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Text(
+                                    'Vendas de Hoje',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              ..._calcularResumoVendedores().entries.map((entry) {
+                                final vendedor = entry.key;
+                                final dados = entry.value;
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.person_rounded, color: Colors.white.withOpacity(0.9), size: 18),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: Text(
+                                              vendedor,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              '${dados['quantidade']?.toInt() ?? 0} ${(dados['quantidade']?.toInt() ?? 0) == 1 ? 'venda' : 'vendas'}',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.95),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Total Vendido',
+                                                style: TextStyle(
+                                                  color: Colors.white.withOpacity(0.8),
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              Text(
+                                                BrazilianFormatters.formatCurrency(dados['total'] ?? 0),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                'Lucro',
+                                                style: TextStyle(
+                                                  color: Colors.white.withOpacity(0.8),
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              Text(
+                                                BrazilianFormatters.formatCurrency(dados['lucro'] ?? 0),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        ),
+                      ],
+                      // Lista de movimentações
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: _movimentacoes.length,
                     itemBuilder: (context, index) {
                       final mov = _movimentacoes[index];
                       final isEntrada = mov['tipo'] == 'ENTRADA';
@@ -302,6 +480,9 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       );
                     },
                   ),
+                        ),
+                      ],
+                    ),
       ),
     );
   }
