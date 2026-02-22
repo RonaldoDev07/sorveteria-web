@@ -388,7 +388,6 @@ class ApiService {
       throw Exception(error['detail'] ?? 'Erro ao remover foto');
     }
   }
-}
 
   // ========== EXPORTAR CSV ==========
 
@@ -426,3 +425,5 @@ class ApiService {
       throw Exception('Erro ao exportar relatório');
     }
   }
+
+}
