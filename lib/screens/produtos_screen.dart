@@ -265,13 +265,46 @@ _isLoading
                             child: const Icon(Icons.inventory_2_rounded, color: Colors.white, size: 20),
                           ),
                           const SizedBox(width: 12),
-                          Text(
-                            'Total: ${_produtosFiltrados.length} ${_produtosFiltrados.length == 1 ? 'produto' : 'produtos'}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.3,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Total: ${_produtosFiltrados.length} ${_produtosFiltrados.length == 1 ? 'produto' : 'produtos'}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(Icons.check_circle_rounded, size: 14, color: Colors.white.withOpacity(0.9)),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${_produtosFiltrados.where((p) => p['estoque_atual'] > 0).length} disponível',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.9),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Icon(Icons.warning_rounded, size: 14, color: Colors.white.withOpacity(0.9)),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${_produtosFiltrados.where((p) => p['estoque_atual'] == 0).length} esgotado',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.9),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                           if (_searchController.text.isNotEmpty && _produtosFiltrados.length != _produtos.length) ...[
@@ -355,14 +388,28 @@ _isLoading
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.inventory_rounded, size: 16, color: Colors.grey[600]),
+                                    Icon(
+                                      produto['estoque_atual'] == 0 
+                                        ? Icons.warning_rounded 
+                                        : Icons.inventory_rounded, 
+                                      size: 16, 
+                                      color: produto['estoque_atual'] == 0 
+                                        ? Colors.red[600] 
+                                        : Colors.grey[600]
+                                    ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
+                                      produto['estoque_atual'] == 0
+                                        ? 'Estoque esgotado'
+                                        : 'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
                                       style: TextStyle(
-                                        color: Colors.grey[700],
+                                        color: produto['estoque_atual'] == 0 
+                                          ? Colors.red[700] 
+                                          : Colors.grey[700],
                                         fontSize: 14,
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: produto['estoque_atual'] == 0 
+                                          ? FontWeight.w600 
+                                          : FontWeight.w500,
                                       ),
                                     ),
                                   ],
