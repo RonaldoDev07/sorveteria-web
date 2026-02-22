@@ -79,18 +79,18 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
         
         final vendedor = mov['usuario_nome'] ?? 'Desconhecido';
         
-        // Calcular valor total: quantidade * valor_unitario
+        // Converter valores diretamente sem manipulação de string
         final quantidade = (mov['quantidade'] is num) 
           ? (mov['quantidade'] as num).toDouble()
-          : double.tryParse(mov['quantidade'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+          : double.tryParse(mov['quantidade'].toString()) ?? 0;
         final valorUnitario = (mov['valor_unitario'] is num) 
           ? (mov['valor_unitario'] as num).toDouble()
-          : double.tryParse(mov['valor_unitario'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+          : double.tryParse(mov['valor_unitario'].toString()) ?? 0;
         final valorTotal = quantidade * valorUnitario;
         
         final lucro = (mov['lucro_total'] is num)
           ? (mov['lucro_total'] as num).toDouble()
-          : double.tryParse(mov['lucro_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+          : double.tryParse(mov['lucro_total'].toString()) ?? 0;
         
         if (!resumo.containsKey(vendedor)) {
           resumo[vendedor] = {'total': 0, 'lucro': 0, 'quantidade': 0};
