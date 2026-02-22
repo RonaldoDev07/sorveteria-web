@@ -14,13 +14,22 @@ class MovimentacoesScreen extends StatefulWidget {
 
 class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
   List<dynamic> _movimentacoes = [];
+  List<dynamic> _movimentacoesFiltradas = [];
   bool _isLoading = true;
   final DateFormat _dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+  final _searchController = TextEditingController();
+  String _periodoSelecionado = 'hoje'; // 'hoje', 'mensal', 'anual'
 
   @override
   void initState() {
     super.initState();
     _loadMovimentacoes();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   String _formatarNumero(dynamic valor) {
@@ -41,6 +50,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
       final movimentacoes = await ApiService.getMovimentacoes(auth.token!);
       setState(() {
         _movimentacoes = movimentacoes;
+        _movimentacoesFiltradas = movimentacoes;
         _isLoading = false;
       });
     } catch (e) {
@@ -56,12 +66,40 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
     }
   }
 
+  void _filtrarPorVendedor(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _movimentacoesFiltradas = _movimentacoes;
+      } else {
+        _movimentacoesFiltradas = _movimentacoes
+            .where((mov) =>
+                (mov['usuario_nome'] ?? '').toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
+  void _alternarPeriodo(String periodo) {
+    setState(() {
+      _periodoSelecionado = periodo;
+    });
+  }
+
   Map<String, Map<String, double>> _calcularResumoVendedores() {
     final resumo = <String, Map<String, double>>{};
     final hoje = DateTime.now();
-    final inicioDia = DateTime(hoje.year, hoje.month, hoje.day);
+    DateTime dataInicio;
     
-    for (var mov in _movimentacoes) {
+    // Definir data de início baseado no período
+    if (_periodoSelecionado == 'hoje') {
+      dataInicio = DateTime(hoje.year, hoje.month, hoje.day);
+    } else if (_periodoSelecionado == 'mensal') {
+      dataInicio = DateTime(hoje.year, hoje.month, 1);
+    } else { // anual
+      dataInicio = DateTime(hoje.year, 1, 1);
+    }
+    
+    for (var mov in _movimentacoesFiltradas) {
       if (mov['tipo'] != 'SAIDA') continue; // Apenas vendas
       
       try {
@@ -75,7 +113,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
           continue; // Pular se não tiver data
         }
         
-        if (dataMovimentacao.isBefore(inicioDia)) continue; // Apenas hoje
+        if (dataMovimentacao.isBefore(dataInicio)) continue; // Filtrar por período
         
         final vendedor = mov['usuario_nome'] ?? 'Desconhecido';
         
@@ -218,6 +256,81 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                   )
                 : Column(
                     children: [
+                      // Campo de pesquisa
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: _filtrarPorVendedor,
+                          decoration: InputDecoration(
+                            hintText: 'Pesquisar por vendedor...',
+                            hintStyle: TextStyle(color: Colors.grey[400]),
+                            prefixIcon: const Icon(Icons.search_rounded, color: Colors.orange),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear_rounded),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      _filtrarPorVendedor('');
+                                    },
+                                  )
+                                : null,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          ),
+                        ),
+                      ),
+                      // Chips de período
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ChoiceChip(
+                                label: const Text('Hoje'),
+                                selected: _periodoSelecionado == 'hoje',
+                                onSelected: (selected) => _alternarPeriodo('hoje'),
+                                selectedColor: Colors.orange,
+                                labelStyle: TextStyle(
+                                  color: _periodoSelecionado == 'hoje' ? Colors.white : Colors.grey[700],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ChoiceChip(
+                                label: const Text('Mensal'),
+                                selected: _periodoSelecionado == 'mensal',
+                                onSelected: (selected) => _alternarPeriodo('mensal'),
+                                selectedColor: Colors.orange,
+                                labelStyle: TextStyle(
+                                  color: _periodoSelecionado == 'mensal' ? Colors.white : Colors.grey[700],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ChoiceChip(
+                                label: const Text('Anual'),
+                                selected: _periodoSelecionado == 'anual',
+                                onSelected: (selected) => _alternarPeriodo('anual'),
+                                selectedColor: Colors.orange,
+                                labelStyle: TextStyle(
+                                  color: _periodoSelecionado == 'anual' ? Colors.white : Colors.grey[700],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       // Card de resumo por vendedor
                       if (_calcularResumoVendedores().isNotEmpty) ...[
                         Container(
@@ -252,9 +365,13 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                     child: const Icon(Icons.leaderboard_rounded, color: Colors.white, size: 20),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text(
-                                    'Vendas de Hoje',
-                                    style: TextStyle(
+                                  Text(
+                                    _periodoSelecionado == 'hoje' 
+                                      ? 'Vendas de Hoje'
+                                      : _periodoSelecionado == 'mensal'
+                                        ? 'Vendas do Mês'
+                                        : 'Vendas do Ano',
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -365,9 +482,9 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       Expanded(
                         child: ListView.builder(
                           padding: const EdgeInsets.all(16),
-                          itemCount: _movimentacoes.length,
+                          itemCount: _movimentacoesFiltradas.length,
                     itemBuilder: (context, index) {
-                      final mov = _movimentacoes[index];
+                      final mov = _movimentacoesFiltradas[index];
                       final isEntrada = mov['tipo'] == 'ENTRADA';
                       final cor = isEntrada ? Colors.teal : Colors.green;
                       final icone = isEntrada ? Icons.arrow_downward : Icons.arrow_upward;
