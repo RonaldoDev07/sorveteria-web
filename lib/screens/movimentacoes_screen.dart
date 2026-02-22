@@ -78,9 +78,16 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
         if (dataMovimentacao.isBefore(inicioDia)) continue; // Apenas hoje
         
         final vendedor = mov['usuario_nome'] ?? 'Desconhecido';
-        final valorTotal = (mov['valor_total'] is num) 
-          ? (mov['valor_total'] as num).toDouble()
-          : double.tryParse(mov['valor_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+        
+        // Calcular valor total: quantidade * valor_unitario
+        final quantidade = (mov['quantidade'] is num) 
+          ? (mov['quantidade'] as num).toDouble()
+          : double.tryParse(mov['quantidade'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+        final valorUnitario = (mov['valor_unitario'] is num) 
+          ? (mov['valor_unitario'] as num).toDouble()
+          : double.tryParse(mov['valor_unitario'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+        final valorTotal = quantidade * valorUnitario;
+        
         final lucro = (mov['lucro_total'] is num)
           ? (mov['lucro_total'] as num).toDouble()
           : double.tryParse(mov['lucro_total'].toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0;
