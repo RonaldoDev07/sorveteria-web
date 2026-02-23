@@ -324,6 +324,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
     try {
       final auth = Provider.of<AuthService>(context, listen: false);
       final quantidade = double.parse(quantidadeController.text);
+      // Para ajustes: positivo = adicionar, negativo = remover
       final quantidadeFinal = tipoAjuste == 'adicionar' ? quantidade : -quantidade;
       
       // Criar movimentação de ajuste
