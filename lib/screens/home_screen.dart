@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           Text(
-                            auth.isAdmin ? 'Administrador' : (auth.isVendedor ? 'Vendedor' : 'Operador'),
+                            auth.isAdmin ? 'Administrador' : (auth.isVendedor ? 'Proprietária' : 'Operador'),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],

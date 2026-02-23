@@ -222,7 +222,7 @@ class _CriarUsuarioScreenState extends State<CriarUsuarioScreen> {
                                 children: [
                                   Icon(Icons.shopping_bag, color: Colors.green),
                                   SizedBox(width: 8),
-                                  Text('VENDEDOR (cadastra e vende)'),
+                                  Text('PROPRIETÁRIA (cadastra e vende)'),
                                 ],
                               ),
                             ),

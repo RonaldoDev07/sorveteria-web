@@ -267,7 +267,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                           controller: _searchController,
                           onChanged: _filtrarPorVendedor,
                           decoration: InputDecoration(
-                            hintText: 'Pesquisar por vendedor...',
+                            hintText: 'Pesquisar por pessoa...',
                             hintStyle: TextStyle(color: Colors.grey[400]),
                             prefixIcon: const Icon(Icons.search_rounded, color: Colors.orange),
                             suffixIcon: _searchController.text.isNotEmpty
@@ -610,7 +610,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                   ],
                                   const SizedBox(height: 8),
                                   _buildInfoRow(
-                                    'Vendedor',
+                                    'Responsável',
                                     mov['usuario_nome'] ?? 'Desconhecido',
                                     Icons.person,
                                     valueColor: Colors.indigo,
