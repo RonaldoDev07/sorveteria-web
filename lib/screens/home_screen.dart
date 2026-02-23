@@ -55,12 +55,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFE91E63).withOpacity(0.1),
+                color: const Color(0xFF9C27B0).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.logout_rounded,
-                color: Color(0xFFE91E63),
+                color: Color(0xFF9C27B0),
                 size: 24,
               ),
             ),
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE91E63),
+              backgroundColor: const Color(0xFF9C27B0),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               shape: RoundedRectangleBorder(
@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFE91E63).withOpacity(0.3),
+                    color: const Color(0xFF9C27B0).withOpacity(0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -208,8 +208,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFFE91E63),
-                Color(0xFFFF6090),
+                Color(0xFF9C27B0), // Lilás
+                Color(0xFFBA68C8), // Lilás claro
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -240,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundColor: const Color(0xFFE91E63).withOpacity(0.1),
+                      backgroundColor: const Color(0xFF9C27B0).withOpacity(0.1),
                       backgroundImage: auth.fotoUrl != null ? NetworkImage(auth.fotoUrl!) : null,
                       child: auth.fotoUrl == null
                           ? Text(
@@ -248,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFFE91E63),
+                                color: Color(0xFF9C27B0),
                               ),
                             )
                           : null,
