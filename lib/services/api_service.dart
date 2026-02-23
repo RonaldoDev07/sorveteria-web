@@ -133,7 +133,7 @@ class ApiService {
     int produtoId,
     String tipo,
     double quantidade,
-    {double? custoUnitario}
+    {double? custoUnitario, String? formaPagamento}
   ) async {
     final body = {
       'produto_id': produtoId,
@@ -143,6 +143,10 @@ class ApiService {
     
     if (custoUnitario != null) {
       body['custo_unitario'] = custoUnitario;
+    }
+    
+    if (formaPagamento != null && tipo == 'SAIDA') {
+      body['forma_pagamento'] = formaPagamento;
     }
 
     final response = await http.post(

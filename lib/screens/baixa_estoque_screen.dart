@@ -16,6 +16,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
   final _formKey = GlobalKey<FormState>();
   final _quantidadeController = TextEditingController();
   bool _isLoading = false;
+  String _formaPagamento = 'DINHEIRO'; // Forma de pagamento padrão
 
   @override
   void dispose() {
@@ -50,6 +51,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
         widget.produto['id'],
         'SAIDA',
         double.parse(quantidadeStr),
+        formaPagamento: _formaPagamento,
       );
 
       if (mounted) {
@@ -157,6 +159,45 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 20),
+                // Seletor de forma de pagamento
+                DropdownButtonFormField<String>(
+                  value: _formaPagamento,
+                  decoration: InputDecoration(
+                    labelText: 'Forma de Pagamento',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: Icon(
+                      _formaPagamento == 'DINHEIRO' ? Icons.money_rounded :
+                      _formaPagamento == 'PIX' ? Icons.pix_rounded :
+                      _formaPagamento == 'DEBITO' ? Icons.credit_card_rounded :
+                      Icons.credit_score_rounded,
+                      color: Colors.green,
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'DINHEIRO',
+                      child: Text('💵 Dinheiro'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'PIX',
+                      child: Text('📱 PIX'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'DEBITO',
+                      child: Text('💳 Cartão Débito'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'CREDITO',
+                      child: Text('💳 Cartão Crédito'),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() => _formaPagamento = value!),
                 ),
                 const SizedBox(height: 24),
                 SizedBox(
