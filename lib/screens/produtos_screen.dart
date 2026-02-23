@@ -37,6 +37,45 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
     return numero.toStringAsFixed(3).replaceAll(RegExp(r'\.?0+$'), '');
   }
 
+  // Calcular status da validade
+  Map<String, dynamic>? _calcularStatusValidade(dynamic dataValidade) {
+    if (dataValidade == null) return null;
+    
+    try {
+      final DateTime validade = DateTime.parse(dataValidade.toString());
+      final DateTime hoje = DateTime.now();
+      final diferenca = validade.difference(hoje).inDays;
+      
+      if (diferenca < 0) {
+        // Vencido
+        return {
+          'status': 'vencido',
+          'cor': Colors.red,
+          'icone': Icons.dangerous_rounded,
+          'texto': 'Vencido há ${diferenca.abs()} ${diferenca.abs() == 1 ? 'dia' : 'dias'}',
+        };
+      } else if (diferenca <= 7) {
+        // Próximo do vencimento (7 dias ou menos)
+        return {
+          'status': 'proximo',
+          'cor': Colors.orange,
+          'icone': Icons.warning_rounded,
+          'texto': diferenca == 0 ? 'Vence hoje!' : 'Vence em $diferenca ${diferenca == 1 ? 'dia' : 'dias'}',
+        };
+      } else {
+        // Válido
+        return {
+          'status': 'valido',
+          'cor': Colors.blue,
+          'icone': Icons.calendar_today_rounded,
+          'texto': 'Válido até ${validade.day.toString().padLeft(2, '0')}/${validade.month.toString().padLeft(2, '0')}/${validade.year}',
+        };
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -648,6 +687,35 @@ _isLoading
                                     ),
                                   ],
                                 ),
+                                // Alerta de validade
+                                if (produto['data_validade'] != null) ...[
+                                  const SizedBox(height: 6),
+                                  Builder(
+                                    builder: (context) {
+                                      final statusValidade = _calcularStatusValidade(produto['data_validade']);
+                                      if (statusValidade == null) return const SizedBox.shrink();
+                                      
+                                      return Row(
+                                        children: [
+                                          Icon(
+                                            statusValidade['icone'],
+                                            size: 16,
+                                            color: statusValidade['cor'],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            statusValidade['texto'],
+                                            style: TextStyle(
+                                              color: statusValidade['cor'],
+                                              fontWeight: statusValidade['status'] == 'vencido' ? FontWeight.w700 : FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ],
                               ],
                             ),
                           ),
