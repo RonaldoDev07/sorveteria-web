@@ -43,9 +43,9 @@ class ApiService {
     String unidade,
     double custo,
     double preco,
-    double estoqueAtual,
-    {String? dataValidade}, // Data de validade opcional (formato: YYYY-MM-DD)
-  ) async {
+    double estoqueAtual, {
+    String? dataValidade, // Data de validade opcional (formato: YYYY-MM-DD)
+  }) async {
     final body = {
       'nome': nome,
       'unidade': unidade,
@@ -79,9 +79,9 @@ class ApiService {
     int produtoId,
     String nome,
     String unidade,
-    double preco,
-    {String? dataValidade}, // Data de validade opcional (formato: YYYY-MM-DD)
-  ) async {
+    double preco, {
+    String? dataValidade, // Data de validade opcional (formato: YYYY-MM-DD)
+  }) async {
     final body = {
       'nome': nome,
       'unidade': unidade,
@@ -132,9 +132,10 @@ class ApiService {
     String token,
     int produtoId,
     String tipo,
-    double quantidade,
-    {double? custoUnitario, String? formaPagamento}
-  ) async {
+    double quantidade, {
+    double? custoUnitario,
+    String? formaPagamento,
+  }) async {
     final body = {
       'produto_id': produtoId,
       'tipo': tipo,
