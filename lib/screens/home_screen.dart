@@ -141,8 +141,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
-                    Color(0xFFFF6B9D),
-                    Color(0xFFFFC371),
+                    Color(0xFFBA68C8), // Lilás claro
+                    Color(0xFFE1BEE7), // Lilás bem claro
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
