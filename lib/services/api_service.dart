@@ -148,6 +148,43 @@ class ApiService {
     }
   }
 
+  // Método específico para ajustes de estoque
+  static Future<Map<String, dynamic>> criarMovimentacao(
+    String token,
+    int produtoId,
+    double quantidade,
+    double valorUnitario,
+    String tipo,
+    String? observacao,
+  ) async {
+    final body = {
+      'produto_id': produtoId,
+      'tipo': tipo,
+      'quantidade': quantidade,
+    };
+    
+    // Para ajustes, não enviamos custo_unitario
+    if (tipo != 'AJUSTE' && valorUnitario > 0) {
+      body['custo_unitario'] = valorUnitario;
+    }
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/movimentacoes'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error['detail'] ?? 'Erro ao criar movimentação');
+    }
+  }
+
   static Future<Map<String, dynamic>> getRelatorioLucro(
     String token,
     String? dataInicio,
