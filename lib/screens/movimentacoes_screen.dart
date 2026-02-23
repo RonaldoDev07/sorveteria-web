@@ -615,6 +615,23 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                     Icons.person,
                                     valueColor: Colors.indigo,
                                   ),
+                                  // Mostrar forma de pagamento se for venda
+                                  if (mov['tipo'] == 'SAIDA' && mov['forma_pagamento'] != null) ...[
+                                    const SizedBox(height: 8),
+                                    _buildInfoRow(
+                                      'Pagamento',
+                                      () {
+                                        final forma = mov['forma_pagamento'];
+                                        if (forma == 'DINHEIRO') return '💵 Dinheiro';
+                                        if (forma == 'PIX') return '📱 PIX';
+                                        if (forma == 'DEBITO') return '💳 Débito';
+                                        if (forma == 'CREDITO') return '💳 Crédito';
+                                        return forma ?? 'Não informado';
+                                      }(),
+                                      Icons.payment_rounded,
+                                      valueColor: Colors.green,
+                                    ),
+                                  ],
                                   const Divider(height: 24),
                                   Row(
                                     children: [
