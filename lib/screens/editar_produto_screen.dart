@@ -19,6 +19,7 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
   late TextEditingController _precoController;
   late String _unidade;
   bool _isLoading = false;
+  DateTime? _dataValidade; // Data de validade (opcional)
 
   @override
   void initState() {
@@ -31,6 +32,15 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
     );
     // Garantir que a unidade esteja em maiúsculo
     _unidade = widget.produto['unidade'].toString().toUpperCase();
+    
+    // Inicializar data de validade se existir
+    if (widget.produto['data_validade'] != null) {
+      try {
+        _dataValidade = DateTime.parse(widget.produto['data_validade'].toString());
+      } catch (e) {
+        _dataValidade = null;
+      }
+    }
   }
 
   String _formatarNumero(dynamic valor) {
@@ -67,12 +77,19 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
       final precoStr = _precoController.text.replaceAll(',', '.');
       final preco = double.parse(precoStr);
 
+      // Formatar data de validade se existir (formato: YYYY-MM-DD)
+      String? dataValidadeStr;
+      if (_dataValidade != null) {
+        dataValidadeStr = '${_dataValidade!.year}-${_dataValidade!.month.toString().padLeft(2, '0')}-${_dataValidade!.day.toString().padLeft(2, '0')}';
+      }
+
       await ApiService.atualizarProduto(
         auth.token!,
         widget.produto['id'],
         _nomeController.text,
         _unidade,
         preco,
+        dataValidade: dataValidadeStr,
       );
 
       if (mounted) {
@@ -260,6 +277,72 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 16),
+                // Campo de validade (opcional)
+                InkWell(
+                  onTap: () async {
+                    final data = await showDatePicker(
+                      context: context,
+                      initialDate: _dataValidade ?? DateTime.now().add(const Duration(days: 30)),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 anos
+                      locale: const Locale('pt', 'BR'),
+                      helpText: 'Selecionar data de validade',
+                      cancelText: 'Cancelar',
+                      confirmText: 'OK',
+                    );
+                    if (data != null) {
+                      setState(() => _dataValidade = data);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          color: _dataValidade != null ? Colors.blue : Colors.grey,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Data de Validade (opcional)',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _dataValidade != null
+                                    ? '${_dataValidade!.day.toString().padLeft(2, '0')}/${_dataValidade!.month.toString().padLeft(2, '0')}/${_dataValidade!.year}'
+                                    : 'Nenhuma data selecionada',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: _dataValidade != null ? Colors.black87 : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_dataValidade != null)
+                          IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.red),
+                            onPressed: () => setState(() => _dataValidade = null),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 24),
                 SizedBox(

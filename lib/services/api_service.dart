@@ -80,18 +80,25 @@ class ApiService {
     String nome,
     String unidade,
     double preco,
+    {String? dataValidade}, // Data de validade opcional (formato: YYYY-MM-DD)
   ) async {
+    final body = {
+      'nome': nome,
+      'unidade': unidade,
+      'preco_venda': preco,
+    };
+    
+    if (dataValidade != null) {
+      body['data_validade'] = dataValidade;
+    }
+    
     final response = await http.put(
       Uri.parse('$baseUrl/produtos/$produtoId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({
-        'nome': nome,
-        'unidade': unidade,
-        'preco_venda': preco,
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {
