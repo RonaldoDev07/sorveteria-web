@@ -44,20 +44,27 @@ class ApiService {
     double custo,
     double preco,
     double estoqueAtual,
+    {String? dataValidade}, // Data de validade opcional (formato: YYYY-MM-DD)
   ) async {
+    final body = {
+      'nome': nome,
+      'unidade': unidade,
+      'custo_medio': custo,
+      'preco_venda': preco,
+      'estoque_atual': estoqueAtual,
+    };
+    
+    if (dataValidade != null) {
+      body['data_validade'] = dataValidade;
+    }
+    
     final response = await http.post(
       Uri.parse('$baseUrl/produtos'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({
-        'nome': nome,
-        'unidade': unidade,
-        'custo_medio': custo,
-        'preco_venda': preco,
-        'estoque_atual': estoqueAtual,
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {
