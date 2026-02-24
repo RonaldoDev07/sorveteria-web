@@ -297,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       children: [
                         // Ordem priorizada: ações do dia a dia primeiro
                         _MenuCard(
-                          icon: Icons.arrow_upward_rounded,
+                          emoji: '🛒',
                           title: 'Registrar Venda',
                           color: const Color(0xFF10B981),
                           onTap: () => Navigator.push(
@@ -307,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                         if (auth.canCadastrarProduto)
                           _MenuCard(
-                            icon: Icons.arrow_downward_rounded,
+                            emoji: '📦',
                             title: 'Registrar Compra',
                             color: const Color(0xFF14B8A6),
                             onTap: () => Navigator.push(
@@ -316,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                         _MenuCard(
-                          icon: Icons.inventory_2_rounded,
+                          emoji: '📊',
                           title: 'Produtos',
                           color: const Color(0xFF3B82F6),
                           onTap: () => Navigator.push(
@@ -326,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                         if (auth.canCadastrarProduto)
                           _MenuCard(
-                            icon: Icons.add_box_rounded,
+                            emoji: '➕',
                             title: 'Cadastrar Produto',
                             color: const Color(0xFF6366F1),
                             onTap: () => Navigator.push(
@@ -335,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                         _MenuCard(
-                          icon: Icons.assessment_rounded,
+                          emoji: '💰',
                           title: 'Relatório de Lucro',
                           color: const Color(0xFF8B5CF6),
                           onTap: () => Navigator.push(
@@ -344,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ),
                         ),
                         _MenuCard(
-                          icon: Icons.history_rounded,
+                          emoji: '📜',
                           title: 'Histórico',
                           color: const Color(0xFFF59E0B),
                           onTap: () => Navigator.push(
@@ -354,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                         if (auth.isAdmin)
                           _MenuCard(
-                            icon: Icons.people_rounded,
+                            emoji: '👥',
                             title: 'Gerenciar Usuários',
                             color: const Color(0xFF7C3AED),
                             onTap: () => Navigator.push(
@@ -376,13 +376,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 }
 
 class _MenuCard extends StatefulWidget {
-  final IconData icon;
+  final String emoji;
   final String title;
   final Color color;
   final VoidCallback onTap;
 
   const _MenuCard({
-    required this.icon,
+    required this.emoji,
     required this.title,
     required this.color,
     required this.onTap,
@@ -435,33 +435,34 @@ class _MenuCardState extends State<_MenuCard> {
               splashColor: Colors.white.withOpacity(0.1),
               highlightColor: Colors.white.withOpacity(0.05),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(
-                        widget.icon,
-                        size: 24,
-                        color: Colors.white,
+                      child: Text(
+                        widget.emoji,
+                        style: const TextStyle(
+                          fontSize: 36,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Text(
                       widget.title,
                       textAlign: TextAlign.center,
                       maxLines: 2,
-                      overflow: TextOverflow.visible,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                         color: Colors.white,
-                        height: 1.15,
+                        height: 1.2,
                       ),
                     ),
                   ],

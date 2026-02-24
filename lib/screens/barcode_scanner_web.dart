@@ -86,18 +86,17 @@ class _BarcodeScannerWebState extends State<BarcodeScannerWeb> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Você está acessando pelo navegador.\nPara usar a câmera, instale o aplicativo no celular.',
+                      'Você está acessando pelo NAVEGADOR.\n\nPara usar a CÂMERA:\n1. Baixe e instale o aplicativo APK\n2. Ou use o app Flutter instalado\n\nNo navegador, apenas digite manualmente.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
-                        height: 1.4,
+                        fontSize: 13,
+                        height: 1.5,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
               
               Container(
                 padding: const EdgeInsets.all(24),

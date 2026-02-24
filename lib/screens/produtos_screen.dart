@@ -687,6 +687,42 @@ _isLoading
                                     ),
                                   ],
                                 ),
+                                // Código de barras (se existir)
+                                if (produto['codigo_barras'] != null && produto['codigo_barras'].toString().isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [Colors.purple.shade50, Colors.purple.shade100],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: Colors.purple.shade200,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.qr_code_2, size: 18, color: Colors.purple[700]),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          produto['codigo_barras'],
+                                          style: TextStyle(
+                                            color: Colors.purple[900],
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                            fontFamily: 'monospace',
+                                            letterSpacing: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                                 // Alerta de validade
                                 if (produto['data_validade'] != null) ...[
                                   const SizedBox(height: 6),
