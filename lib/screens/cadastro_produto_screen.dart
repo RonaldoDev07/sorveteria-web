@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import 'barcode_scanner_screen.dart';
 
 class CadastroProdutoScreen extends StatefulWidget {
   const CadastroProdutoScreen({super.key});
@@ -13,6 +14,7 @@ class CadastroProdutoScreen extends StatefulWidget {
 class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
+  final _codigoBarrasController = TextEditingController();
   final _custoController = TextEditingController();
   final _precoController = TextEditingController();
   final _estoqueController = TextEditingController();
@@ -23,10 +25,37 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
   @override
   void dispose() {
     _nomeController.dispose();
+    _codigoBarrasController.dispose();
     _custoController.dispose();
     _precoController.dispose();
     _estoqueController.dispose();
     super.dispose();
+  }
+
+  Future<void> _abrirScanner() async {
+    try {
+      final codigo = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const BarcodeScannerScreen(),
+        ),
+      );
+      
+      if (codigo != null && mounted) {
+        setState(() {
+          _codigoBarrasController.text = codigo;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir scanner: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _handleCadastro() async {
@@ -61,6 +90,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
         double.parse(precoStr),
         double.parse(estoqueStr),
         dataValidade: dataValidadeStr,
+        codigoBarras: _codigoBarrasController.text.isEmpty ? null : _codigoBarrasController.text,
       );
 
       if (mounted) {
@@ -138,6 +168,29 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                 ),
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Campo obrigatório' : null,
+              ),
+              const SizedBox(height: 20),
+              // Campo de código de barras com botão de scanner
+              TextFormField(
+                controller: _codigoBarrasController,
+                decoration: InputDecoration(
+                  labelText: 'Código de Barras (opcional)',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                  hintText: 'Escanear ou digitar',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.qr_code_scanner, color: Color(0xFF6366F1)),
+                    onPressed: _abrirScanner,
+                    tooltip: 'Escanear código de barras',
+                  ),
+                ),
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(

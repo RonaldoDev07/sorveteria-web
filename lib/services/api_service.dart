@@ -55,6 +55,24 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> getProdutoPorCodigoBarras(
+    String token,
+    String codigoBarras,
+  ) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/produtos/barcode/$codigoBarras'),
+      headers: _getHeaders(token),
+    );
+
+    if (response.statusCode == 200) {
+      return _decodeResponse(response);
+    } else if (response.statusCode == 404) {
+      throw Exception('Produto não encontrado com este código de barras');
+    } else {
+      throw Exception('Erro ao buscar produto');
+    }
+  }
+
   static Future<Map<String, dynamic>> criarProduto(
     String token,
     String nome,
@@ -63,6 +81,7 @@ class ApiService {
     double preco,
     double estoqueAtual, {
     String? dataValidade,
+    String? codigoBarras,
   }) async {
     final body = {
       'nome': nome,
@@ -76,6 +95,10 @@ class ApiService {
       body['data_validade'] = dataValidade;
     }
     
+    if (codigoBarras != null && codigoBarras.isNotEmpty) {
+      body['codigo_barras'] = codigoBarras;
+    }
+    
     final response = await http.post(
       Uri.parse('$baseUrl/produtos'),
       headers: _getHeaders(token),
@@ -85,10 +108,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return _decodeResponse(response);
     } else {
-      // Melhorar mensagem de erro
-      final error = _decodeResponse(response);
-      final errorMsg = error['detail'] ?? 'Erro ao criar produto';
-      throw Exception(errorMsg);
+      throw Exception('Erro ao criar produto');
     }
   }
 
