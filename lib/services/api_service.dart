@@ -4,18 +4,39 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 
 class ApiService {
-  // URL da API (configurável em api_config.dart)
   static const String baseUrl = ApiConfig.baseUrl;
+
+  // Headers padrão com UTF-8 explícito
+  static Map<String, String> _getHeaders(String? token) {
+    final headers = {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Accept': 'application/json; charset=utf-8',
+    };
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    return headers;
+  }
+
+  // Decodificar resposta com UTF-8
+  static dynamic _decodeResponse(http.Response response) {
+    return jsonDecode(utf8.decode(response.bodyBytes));
+  }
+
+  // Codificar body com UTF-8
+  static List<int> _encodeBody(Map<String, dynamic> body) {
+    return utf8.encode(jsonEncode(body));
+  }
 
   static Future<Map<String, dynamic>> login(String login, String senha) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login/json'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'login': login, 'senha': senha}),
+      headers: _getHeaders(null),
+      body: _encodeBody({'login': login, 'senha': senha}),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
       throw Exception('Falha no login');
     }
@@ -24,14 +45,11 @@ class ApiService {
   static Future<List<dynamic>> getProdutos(String token) async {
     final response = await http.get(
       Uri.parse('$baseUrl/produtos'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
       throw Exception('Erro ao buscar produtos');
     }
@@ -44,7 +62,7 @@ class ApiService {
     double custo,
     double preco,
     double estoqueAtual, {
-    String? dataValidade, // Data de validade opcional (formato: YYYY-MM-DD)
+    String? dataValidade,
   }) async {
     final body = {
       'nome': nome,
@@ -60,17 +78,17 @@ class ApiService {
     
     final response = await http.post(
       Uri.parse('$baseUrl/produtos'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(body),
+      headers: _getHeaders(token),
+      body: _encodeBody(body),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      throw Exception('Erro ao criar produto');
+      // Melhorar mensagem de erro
+      final error = _decodeResponse(response);
+      final errorMsg = error['detail'] ?? 'Erro ao criar produto';
+      throw Exception(errorMsg);
     }
   }
 
@@ -80,7 +98,7 @@ class ApiService {
     String nome,
     String unidade,
     double preco, {
-    String? dataValidade, // Data de validade opcional (formato: YYYY-MM-DD)
+    String? dataValidade,
   }) async {
     final body = {
       'nome': nome,
@@ -94,15 +112,12 @@ class ApiService {
     
     final response = await http.put(
       Uri.parse('$baseUrl/produtos/$produtoId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(body),
+      headers: _getHeaders(token),
+      body: _encodeBody(body),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
       throw Exception('Erro ao atualizar produto');
     }
@@ -114,16 +129,13 @@ class ApiService {
   ) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/produtos/$produtoId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao deletar produto');
     }
   }
@@ -152,22 +164,18 @@ class ApiService {
 
     final response = await http.post(
       Uri.parse('$baseUrl/movimentacoes'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(body),
+      headers: _getHeaders(token),
+      body: _encodeBody(body),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao registrar movimentação');
     }
   }
 
-  // Método específico para ajustes de estoque
   static Future<Map<String, dynamic>> criarMovimentacao(
     String token,
     int produtoId,
@@ -182,24 +190,20 @@ class ApiService {
       'quantidade': quantidade,
     };
     
-    // Para ajustes, não enviamos custo_unitario
     if (tipo != 'AJUSTE' && valorUnitario > 0) {
       body['custo_unitario'] = valorUnitario;
     }
 
     final response = await http.post(
       Uri.parse('$baseUrl/movimentacoes'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(body),
+      headers: _getHeaders(token),
+      body: _encodeBody(body),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao criar movimentação');
     }
   }
@@ -225,14 +229,11 @@ class ApiService {
 
     final response = await http.get(
       Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else if (response.statusCode == 401) {
       throw Exception('401');
     } else {
@@ -243,14 +244,11 @@ class ApiService {
   static Future<List<dynamic>> getMovimentacoes(String token) async {
     final response = await http.get(
       Uri.parse('$baseUrl/movimentacoes'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
       throw Exception('Erro ao buscar movimentações');
     }
@@ -262,16 +260,13 @@ class ApiService {
   ) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/movimentacoes/$movimentacaoId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao cancelar movimentação');
     }
   }
@@ -281,14 +276,11 @@ class ApiService {
   static Future<List<dynamic>> getUsuarios(String token) async {
     final response = await http.get(
       Uri.parse('$baseUrl/usuarios'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
       throw Exception('Erro ao buscar usuários');
     }
@@ -303,11 +295,8 @@ class ApiService {
   ) async {
     final response = await http.post(
       Uri.parse('$baseUrl/usuarios'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({
+      headers: _getHeaders(token),
+      body: _encodeBody({
         'nome': nome,
         'login': login,
         'senha': senha,
@@ -316,9 +305,9 @@ class ApiService {
     );
 
     if (response.statusCode == 201) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao criar usuário');
     }
   }
@@ -342,17 +331,14 @@ class ApiService {
 
     final response = await http.put(
       Uri.parse('$baseUrl/usuarios/$usuarioId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(body),
+      headers: _getHeaders(token),
+      body: _encodeBody(body),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao atualizar usuário');
     }
   }
@@ -363,16 +349,13 @@ class ApiService {
   ) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/usuarios/$usuarioId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao deletar usuário');
     }
   }
@@ -383,16 +366,13 @@ class ApiService {
   ) async {
     final response = await http.patch(
       Uri.parse('$baseUrl/usuarios/$usuarioId/toggle-ativo'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao alterar status do usuário');
     }
   }
@@ -422,9 +402,9 @@ class ApiService {
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao fazer upload da foto');
     }
   }
@@ -432,16 +412,13 @@ class ApiService {
   static Future<Map<String, dynamic>> removerFoto(String token) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/usuarios/me/foto'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: _getHeaders(token),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return _decodeResponse(response);
     } else {
-      final error = jsonDecode(response.body);
+      final error = _decodeResponse(response);
       throw Exception(error['detail'] ?? 'Erro ao remover foto');
     }
   }
@@ -475,7 +452,6 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      // Para web, criar um link de download
       final bytes = response.bodyBytes;
       final blob = html.Blob([bytes]);
       final url = html.Url.createObjectUrlFromBlob(blob);
@@ -488,5 +464,4 @@ class ApiService {
       throw Exception('Erro ao exportar relatório');
     }
   }
-
 }
