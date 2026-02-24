@@ -359,57 +359,137 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                               final preco = double.parse(produto['preco_venda'].toString());
                               final subtotal = preco * quantidade;
 
-                              return Card(
+                              return Container(
                                 margin: const EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFF10B981).withOpacity(0.05),
+                                      Colors.white,
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xFF10B981).withOpacity(0.2),
+                                    width: 1,
+                                  ),
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Row(
                                     children: [
+                                      Container(
+                                        width: 48,
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                                          ),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(
+                                          Icons.shopping_bag,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               produto['nome'],
-                                              style: const TextStyle(fontWeight: FontWeight.w600),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            Text(
-                                              'R\$ ${_formatarNumero(preco)} × ${_formatarNumero(quantidade)}',
-                                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFF10B981).withOpacity(0.1),
+                                                    borderRadius: BorderRadius.circular(6),
+                                                  ),
+                                                  child: Text(
+                                                    'R\$ ${_formatarNumero(preco)}',
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Color(0xFF10B981),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  '× ${_formatarNumero(quantidade)}',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey[600],
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
                                       ),
-                                      Row(
+                                      Column(
                                         children: [
-                                          IconButton(
-                                            icon: const Icon(Icons.remove_circle_outline),
-                                            onPressed: () => _alterarQuantidade(index, quantidade - 1),
-                                            color: Colors.red,
-                                            iconSize: 20,
-                                          ),
                                           Text(
-                                            _formatarNumero(quantidade),
-                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                            'R\$ ${_formatarNumero(subtotal)}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF10B981),
+                                              fontSize: 16,
+                                            ),
                                           ),
-                                          IconButton(
-                                            icon: const Icon(Icons.add_circle_outline),
-                                            onPressed: () => _alterarQuantidade(index, quantidade + 1),
-                                            color: Colors.green,
-                                            iconSize: 20,
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: IconButton(
+                                                  icon: const Icon(Icons.remove, size: 16),
+                                                  onPressed: () => _alterarQuantidade(index, quantidade - 1),
+                                                  color: Colors.red,
+                                                  padding: EdgeInsets.zero,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFF10B981).withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: IconButton(
+                                                  icon: const Icon(Icons.add, size: 16),
+                                                  onPressed: () => _alterarQuantidade(index, quantidade + 1),
+                                                  color: const Color(0xFF10B981),
+                                                  padding: EdgeInsets.zero,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
-                                      ),
-                                      SizedBox(
-                                        width: 70,
-                                        child: Text(
-                                          'R\$ ${_formatarNumero(subtotal)}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF10B981),
-                                          ),
-                                          textAlign: TextAlign.right,
-                                        ),
                                       ),
                                     ],
                                   ),
@@ -443,23 +523,176 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                 
                 Expanded(
                   child: _produtosFiltrados.isEmpty
-                      ? const Center(child: Text('Nenhum produto disponível'))
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.inventory_2_outlined,
+                                size: 80,
+                                color: Colors.grey[300],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Nenhum produto disponível',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: _produtosFiltrados.length,
                           itemBuilder: (context, index) {
                             final produto = _produtosFiltrados[index];
-                            return Card(
+                            final estoque = double.parse(produto['estoque_atual'].toString());
+                            final preco = double.parse(produto['preco_venda'].toString());
+                            
+                            return Container(
                               margin: const EdgeInsets.only(bottom: 12),
-                              child: ListTile(
-                                title: Text(produto['nome']),
-                                subtitle: Text(
-                                  'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']} • R\$ ${_formatarNumero(produto['preco_venda'])}',
-                                ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.add_shopping_cart),
-                                  color: const Color(0xFF10B981),
-                                  onPressed: () => _adicionarAoCarrinho(produto),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () => _adicionarAoCarrinho(produto),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 56,
+                                          height: 56,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                const Color(0xFF10B981).withOpacity(0.2),
+                                                const Color(0xFF34D399).withOpacity(0.1),
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: const Icon(
+                                            Icons.inventory_2,
+                                            color: Color(0xFF10B981),
+                                            size: 28,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                produto['nome'],
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: estoque < 10
+                                                          ? Colors.orange.withOpacity(0.1)
+                                                          : Colors.blue.withOpacity(0.1),
+                                                      borderRadius: BorderRadius.circular(6),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.inventory,
+                                                          size: 14,
+                                                          color: estoque < 10
+                                                              ? Colors.orange
+                                                              : Colors.blue,
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          '${_formatarNumero(estoque)} ${produto['unidade']}',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            fontWeight: FontWeight.w600,
+                                                            color: estoque < 10
+                                                                ? Colors.orange
+                                                                : Colors.blue,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFF10B981).withOpacity(0.1),
+                                                      borderRadius: BorderRadius.circular(6),
+                                                    ),
+                                                    child: Text(
+                                                      'R\$ ${_formatarNumero(preco)}',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Color(0xFF10B981),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 44,
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                                            ),
+                                            borderRadius: BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(0xFF10B981).withOpacity(0.3),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Icon(
+                                            Icons.add_shopping_cart,
+                                            color: Colors.white,
+                                            size: 22,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             );
