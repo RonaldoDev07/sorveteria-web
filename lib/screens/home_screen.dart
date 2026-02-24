@@ -7,6 +7,7 @@ import 'selecionar_produto_screen.dart';
 import 'relatorio_lucro_screen.dart';
 import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
+import 'carrinho_venda_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -298,11 +299,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         // Ordem priorizada: ações do dia a dia primeiro
                         _MenuCard(
                           emoji: '🛒',
-                          title: 'Registrar Venda',
+                          title: 'Venda Rápida',
                           color: const Color(0xFF10B981),
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
+                          ),
+                        ),
+                        _MenuCard(
+                          emoji: '🛍️',
+                          title: 'Carrinho (Vários Itens)',
+                          color: const Color(0xFF059669),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const CarrinhoVendaScreen()),
                           ),
                         ),
                         if (auth.canCadastrarProduto)
