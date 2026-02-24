@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import 'entrada_estoque_screen.dart';
 import 'baixa_estoque_screen.dart';
+import 'barcode_scanner_screen.dart';
 
 class SelecionarProdutoScreen extends StatefulWidget {
   final String tipo; // 'ENTRADA' ou 'SAIDA'
@@ -98,6 +99,88 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
     }
   }
 
+  Future<void> _escanearCodigoBarras() async {
+    try {
+      final codigo = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const BarcodeScannerScreen(),
+        ),
+      );
+      
+      if (codigo != null && mounted) {
+        // Buscar produto por código de barras
+        setState(() => _isLoading = true);
+        
+        final auth = Provider.of<AuthService>(context, listen: false);
+        try {
+          final produto = await ApiService.getProdutoPorCodigoBarras(auth.token!, codigo);
+          
+          // Verificar se tem estoque (para vendas)
+          if (widget.tipo == 'SAIDA') {
+            final estoque = produto['estoque_atual'];
+            final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
+            
+            if (estoqueNum <= 0) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Produto sem estoque disponível!'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+              }
+              setState(() => _isLoading = false);
+              return;
+            }
+          }
+          
+          // Navegar para tela de entrada/saída
+          setState(() => _isLoading = false);
+          _selecionarProduto(produto);
+          
+        } catch (e) {
+          setState(() => _isLoading = false);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Produto não encontrado com este código: $codigo'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir scanner: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _selecionarProduto(dynamic produto) {
+    if (widget.tipo == 'ENTRADA') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EntradaEstoqueScreen(produto: produto),
+        ),
+      ).then((_) => _carregarProdutos());
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BaixaEstoqueScreen(produto: produto),
+        ),
+      ).then((_) => _carregarProdutos());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final titulo = widget.tipo == 'ENTRADA' ? 'Selecionar Produto - Compra' : 'Selecionar Produto - Venda';
@@ -135,6 +218,11 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _escanearCodigoBarras,
+            tooltip: 'Escanear código de barras',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: _carregarProdutos,
@@ -280,6 +368,18 @@ _isLoading
                   ),
                 ],
               ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _escanearCodigoBarras,
+        backgroundColor: cor,
+        icon: const Icon(Icons.qr_code_scanner, size: 28),
+        label: const Text(
+          'Escanear',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 }
