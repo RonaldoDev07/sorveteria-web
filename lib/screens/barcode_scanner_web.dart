@@ -11,35 +11,11 @@ class BarcodeScannerWeb extends StatefulWidget {
 
 class _BarcodeScannerWebState extends State<BarcodeScannerWeb> {
   final _manualController = TextEditingController();
-  bool _showManualInput = false;
-  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _initCamera();
-  }
-
-  void _initCamera() {
-    try {
-      // Tentar acessar a câmera
-      html.window.navigator.mediaDevices?.getUserMedia({
-        'video': {'facingMode': 'environment'}
-      }).then((stream) {
-        // Câmera acessada com sucesso
-        setState(() => _errorMessage = null);
-      }).catchError((error) {
-        setState(() {
-          _errorMessage = 'Não foi possível acessar a câmera. Use a opção de digitar manualmente.';
-          _showManualInput = true;
-        });
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Câmera não disponível neste dispositivo.';
-        _showManualInput = true;
-      });
-    }
+    // Não precisa tentar acessar câmera no web
   }
 
   @override
@@ -83,36 +59,45 @@ class _BarcodeScannerWebState extends State<BarcodeScannerWeb> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (_errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.orange, width: 2),
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(
-                        Icons.warning_rounded,
-                        color: Colors.orange,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _errorMessage!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.orange, width: 2),
                 ),
-                const SizedBox(height: 32),
-              ],
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.info_outline,
+                      color: Colors.orange,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Scanner por câmera não disponível',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Você está acessando pelo navegador.\nPara usar a câmera, instale o aplicativo no celular.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
               
               Container(
                 padding: const EdgeInsets.all(24),

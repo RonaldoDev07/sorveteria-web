@@ -10,7 +10,19 @@ class BarcodeScannerScreen extends StatefulWidget {
 
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   MobileScannerController cameraController = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
+    detectionSpeed: DetectionSpeed.normal,
+    facing: CameraFacing.back,
+    torchEnabled: false,
+    returnImage: false,
+    formats: [
+      BarcodeFormat.ean13,
+      BarcodeFormat.ean8,
+      BarcodeFormat.code128,
+      BarcodeFormat.code39,
+      BarcodeFormat.code93,
+      BarcodeFormat.upcA,
+      BarcodeFormat.upcE,
+    ],
   );
   bool _isScanning = true;
 
@@ -29,11 +41,24 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
       final barcode = barcodes.first;
       final String? code = barcode.rawValue;
       
-      if (code != null && code.isNotEmpty) {
+      if (code != null && code.isNotEmpty && code.length >= 8) {
         setState(() => _isScanning = false);
         
-        // Retornar o código escaneado
-        Navigator.pop(context, code);
+        // Mostrar feedback visual
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Código detectado: $code'),
+            duration: const Duration(milliseconds: 500),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Aguardar um pouco antes de retornar para dar feedback
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            Navigator.pop(context, code);
+          }
+        });
       }
     }
   }
