@@ -235,25 +235,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             children: [
               // Header com informações do usuário
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 30,
+                      radius: 26,
                       backgroundColor: const Color(0xFF9C27B0).withOpacity(0.1),
                       backgroundImage: auth.fotoUrl != null ? NetworkImage(auth.fotoUrl!) : null,
                       child: auth.fotoUrl == null
                           ? Text(
                               auth.username?.substring(0, 1).toUpperCase() ?? 'U',
                               style: const TextStyle(
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF9C27B0),
                               ),
                             )
                           : null,
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,14 +261,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           Text(
                             'Olá, ${auth.username ?? 'Usuário'}!',
                             style: const TextStyle(
-                              fontSize: 22,
+                              fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                           Text(
                             auth.isAdmin ? 'Administrador' : (auth.isVendedor ? 'Proprietária' : 'Operador'),
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 13,
                               color: Colors.grey[600],
                               fontWeight: FontWeight.w500,
                             ),
@@ -281,81 +282,89 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
               // Grid de cards
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  padding: const EdgeInsets.all(20),
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
-                  childAspectRatio: 1.0,
-                  children: [
-                    // Ordem priorizada: ações do dia a dia primeiro
-                    _MenuCard(
-                      icon: Icons.arrow_upward_rounded,
-                      title: 'Registrar Venda',
-                      color: const Color(0xFF10B981),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
-                      ),
-                    ),
-                    if (auth.canCadastrarProduto)
-                      _MenuCard(
-                        icon: Icons.arrow_downward_rounded,
-                        title: 'Registrar Compra',
-                        color: const Color(0xFF14B8A6),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'ENTRADA')),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Calcula o número de colunas baseado na largura
+                    final width = constraints.maxWidth;
+                    final crossAxisCount = width > 600 ? 3 : 2;
+                    
+                    return GridView.count(
+                      crossAxisCount: crossAxisCount,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 1.0,
+                      children: [
+                        // Ordem priorizada: ações do dia a dia primeiro
+                        _MenuCard(
+                          icon: Icons.arrow_upward_rounded,
+                          title: 'Registrar Venda',
+                          color: const Color(0xFF10B981),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
+                          ),
                         ),
-                      ),
-                    _MenuCard(
-                      icon: Icons.inventory_2_rounded,
-                      title: 'Produtos',
-                      color: const Color(0xFF3B82F6),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ProdutosScreen()),
-                      ),
-                    ),
-                    if (auth.canCadastrarProduto)
-                      _MenuCard(
-                        icon: Icons.add_box_rounded,
-                        title: 'Cadastrar Produto',
-                        color: const Color(0xFF6366F1),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const CadastroProdutoScreen()),
+                        if (auth.canCadastrarProduto)
+                          _MenuCard(
+                            icon: Icons.arrow_downward_rounded,
+                            title: 'Registrar Compra',
+                            color: const Color(0xFF14B8A6),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'ENTRADA')),
+                            ),
+                          ),
+                        _MenuCard(
+                          icon: Icons.inventory_2_rounded,
+                          title: 'Produtos',
+                          color: const Color(0xFF3B82F6),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProdutosScreen()),
+                          ),
                         ),
-                      ),
-                    _MenuCard(
-                      icon: Icons.assessment_rounded,
-                      title: 'Relatório de Lucro',
-                      color: const Color(0xFF8B5CF6),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RelatorioLucroScreen()),
-                      ),
-                    ),
-                    _MenuCard(
-                      icon: Icons.history_rounded,
-                      title: 'Histórico',
-                      color: const Color(0xFFF59E0B),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
-                      ),
-                    ),
-                    if (auth.isAdmin)
-                      _MenuCard(
-                        icon: Icons.people_rounded,
-                        title: 'Gerenciar Usuários',
-                        color: const Color(0xFF7C3AED),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const UsuariosScreen()),
+                        if (auth.canCadastrarProduto)
+                          _MenuCard(
+                            icon: Icons.add_box_rounded,
+                            title: 'Cadastrar Produto',
+                            color: const Color(0xFF6366F1),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const CadastroProdutoScreen()),
+                            ),
+                          ),
+                        _MenuCard(
+                          icon: Icons.assessment_rounded,
+                          title: 'Relatório de Lucro',
+                          color: const Color(0xFF8B5CF6),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const RelatorioLucroScreen()),
+                          ),
                         ),
-                      ),
-                  ],
+                        _MenuCard(
+                          icon: Icons.history_rounded,
+                          title: 'Histórico',
+                          color: const Color(0xFFF59E0B),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
+                          ),
+                        ),
+                        if (auth.isAdmin)
+                          _MenuCard(
+                            icon: Icons.people_rounded,
+                            title: 'Gerenciar Usuários',
+                            color: const Color(0xFF7C3AED),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const UsuariosScreen()),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -401,7 +410,7 @@ class _MenuCardState extends State<_MenuCard> {
         curve: Curves.easeInOut,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               colors: [
                 widget.color,
@@ -413,8 +422,8 @@ class _MenuCardState extends State<_MenuCard> {
             boxShadow: [
               BoxShadow(
                 color: widget.color.withOpacity(0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -422,32 +431,34 @@ class _MenuCardState extends State<_MenuCard> {
             color: Colors.transparent,
             child: InkWell(
               onTap: widget.onTap,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(20),
               splashColor: Colors.white.withOpacity(0.1),
               highlightColor: Colors.white.withOpacity(0.05),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: Icon(
                         widget.icon,
-                        size: 32,
+                        size: 28,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Text(
                       widget.title,
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Colors.white,
                         height: 1.2,
