@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Foto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            border: 2px solid #E91E63;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #E91E63;
+        }
+        input[type="file"] {
+            margin: 20px 0;
+        }
+        button {
+            background: #E91E63;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #C2185B;
+        }
+        #preview {
+            margin-top: 20px;
+            max-width: 200px;
+            border-radius: 50%;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .success {
+            background: #10B981;
+            color: white;
+        }
+        .error {
+            background: #EF4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍦 Sorveteria Camila</h1>
+        <h2>Upload de Foto de Perfil</h2>
+        
+        <input type="file" id="fileInput" accept="image/*">
+        <br>
+        <button onclick="uploadFoto()">Enviar Foto</button>
+        
+        <div id="message"></div>
+        <img id="preview" style="display:none;">
+    </div>
+
+    <script>
+        const API_URL = 'https://sorveteria-camila-api.onrender.com';
+        
+        // Pegar token do localStorage
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            document.getElementById('message').innerHTML = '<div class="error">Você precisa fazer login primeiro!</div>';
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function uploadFoto() {
+            const fileInput = document.getElementById('fileInput');
+            const messageDiv = document.getElementById('message');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                messageDiv.innerHTML = '<div class="error">Selecione uma foto primeiro!</div>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            console.log('Arquivo selecionado:', file.name, file.size, 'bytes');
+
+            messageDiv.innerHTML = '<div>Enviando...</div>';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                console.log('Fazendo upload para:', API_URL + '/usuarios/me/foto');
+                console.log('Token:', token ? 'Presente' : 'Ausente');
+
+                const response = await fetch(API_URL + '/usuarios/me/foto', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: formData
+                });
+
+                console.log('Status da resposta:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Resposta:', data);
+                    
+                    // Atualizar localStorage
+                    localStorage.setItem('foto_url', data.foto_url);
+                    
+                    messageDiv.innerHTML = '<div class="success">✅ Foto enviada com sucesso!</div>';
+                    
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                } else {
+                    const error = await response.text();
+                    console.error('Erro:', error);
+                    messageDiv.innerHTML = '<div class="error">Erro: ' + error + '</div>';
+                }
+            } catch (error) {
+                console.error('Erro ao fazer upload:', error);
+                messageDiv.innerHTML = '<div class="error">Erro: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>
