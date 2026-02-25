@@ -290,11 +290,97 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     final width = constraints.maxWidth;
                     final crossAxisCount = width > 600 ? 3 : 2;
                     
-                    // Debug: contar cards
-                    int totalCards = 5; // cards sempre visíveis
-                    if (auth.canCadastrarProduto) totalCards += 2;
-                    if (auth.isAdmin) totalCards += 1;
-                    print('🎯 Total de cards: $totalCards');
+                    // Criar lista de cards
+                    final cards = <Widget>[
+                      // Ordem priorizada: ações do dia a dia primeiro
+                      _MenuCard(
+                        emoji: '🛒',
+                        title: 'Venda Rápida',
+                        color: const Color(0xFF10B981),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
+                        ),
+                      ),
+                      _MenuCard(
+                        emoji: '🛍️',
+                        title: 'Carrinho (Vários Itens)',
+                        color: const Color(0xFF059669),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const CarrinhoVendaScreen()),
+                        ),
+                      ),
+                      if (auth.canCadastrarProduto)
+                        _MenuCard(
+                          emoji: '📦',
+                          title: 'Registrar Compra',
+                          color: const Color(0xFF14B8A6),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'ENTRADA')),
+                          ),
+                        ),
+                      _MenuCard(
+                        emoji: '📊',
+                        title: 'Produtos',
+                        color: const Color(0xFF3B82F6),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ProdutosScreen()),
+                        ),
+                      ),
+                      if (auth.canCadastrarProduto)
+                        _MenuCard(
+                          emoji: '➕',
+                          title: 'Cadastrar Produto',
+                          color: const Color(0xFF6366F1),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const CadastroProdutoScreen()),
+                          ),
+                        ),
+                      _MenuCard(
+                        emoji: '💰',
+                        title: 'Relatório de Lucro',
+                        color: const Color(0xFF8B5CF6),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const RelatorioLucroScreen()),
+                        ),
+                      ),
+                      _MenuCard(
+                        emoji: '📜',
+                        title: 'Histórico',
+                        color: const Color(0xFFF59E0B),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
+                        ),
+                      ),
+                      _MenuCard(
+                        emoji: '💼',
+                        title: 'Gestão Financeira',
+                        color: const Color(0xFF06B6D4),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const FinanceiroScreen()),
+                        ),
+                      ),
+                      if (auth.isAdmin)
+                        _MenuCard(
+                          emoji: '👥',
+                          title: 'Gerenciar Usuários',
+                          color: const Color(0xFF7C3AED),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const UsuariosScreen()),
+                          ),
+                        ),
+                    ];
+                    
+                    // Debug
+                    print('🎯 Total de cards criados: ${cards.length}');
                     print('   canCadastrarProduto: ${auth.canCadastrarProduto}');
                     print('   isAdmin: ${auth.isAdmin}');
                     
@@ -303,94 +389,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 1.1, // Aumentado para cards menores
-                      children: [
-                        // Ordem priorizada: ações do dia a dia primeiro
-                        _MenuCard(
-                          emoji: '🛒',
-                          title: 'Venda Rápida',
-                          color: const Color(0xFF10B981),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
-                          ),
-                        ),
-                        _MenuCard(
-                          emoji: '🛍️',
-                          title: 'Carrinho (Vários Itens)',
-                          color: const Color(0xFF059669),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const CarrinhoVendaScreen()),
-                          ),
-                        ),
-                        if (auth.canCadastrarProduto)
-                          _MenuCard(
-                            emoji: '📦',
-                            title: 'Registrar Compra',
-                            color: const Color(0xFF14B8A6),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'ENTRADA')),
-                            ),
-                          ),
-                        _MenuCard(
-                          emoji: '📊',
-                          title: 'Produtos',
-                          color: const Color(0xFF3B82F6),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ProdutosScreen()),
-                          ),
-                        ),
-                        if (auth.canCadastrarProduto)
-                          _MenuCard(
-                            emoji: '➕',
-                            title: 'Cadastrar Produto',
-                            color: const Color(0xFF6366F1),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const CadastroProdutoScreen()),
-                            ),
-                          ),
-                        _MenuCard(
-                          emoji: '💰',
-                          title: 'Relatório de Lucro',
-                          color: const Color(0xFF8B5CF6),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const RelatorioLucroScreen()),
-                          ),
-                        ),
-                        _MenuCard(
-                          emoji: '📜',
-                          title: 'Histórico',
-                          color: const Color(0xFFF59E0B),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
-                          ),
-                        ),
-                        _MenuCard(
-                          emoji: '💼',
-                          title: 'Gestão Financeira',
-                          color: const Color(0xFF06B6D4),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const FinanceiroScreen()),
-                          ),
-                        ),
-                        if (auth.isAdmin)
-                          _MenuCard(
-                            emoji: '👥',
-                            title: 'Gerenciar Usuários',
-                            color: const Color(0xFF7C3AED),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const UsuariosScreen()),
-                            ),
-                          ),
-                      ],
+                      childAspectRatio: 1.05,
+                      children: cards,
                     );
                   },
                 ),
