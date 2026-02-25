@@ -16,18 +16,20 @@ class _ClientesScreenState extends State<ClientesScreen> {
   List<Cliente> _clientes = [];
   bool _isLoading = true;
   String? _errorMessage;
+  ClienteService? _clienteService;
 
   @override
-  void initState() {
-    super.initState();
-    // Aguarda o frame ser construído antes de acessar o context
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_clienteService == null) {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      _clienteService = ClienteService(authService);
       _carregarClientes();
-    });
+    }
   }
 
   Future<void> _carregarClientes() async {
-    if (!mounted) return;
+    if (!mounted || _clienteService == null) return;
     
     setState(() {
       _isLoading = true;
@@ -35,9 +37,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
     });
 
     try {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      final clienteService = ClienteService(authService);
-      final clientes = await clienteService.listarClientes();
+      final clientes = await _clienteService!.listarClientes();
       
       if (!mounted) return;
       
@@ -56,6 +56,8 @@ class _ClientesScreenState extends State<ClientesScreen> {
   }
 
   Future<void> _deletarCliente(Cliente cliente) async {
+    if (_clienteService == null) return;
+    
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -77,9 +79,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
     if (confirmar == true && cliente.id != null) {
       try {
-        final authService = Provider.of<AuthService>(context, listen: false);
-        final clienteService = ClienteService(authService);
-        await clienteService.deletarCliente(cliente.id!);
+        await _clienteService!.deletarCliente(cliente.id!);
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
