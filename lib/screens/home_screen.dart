@@ -8,7 +8,6 @@ import 'relatorio_lucro_screen.dart';
 import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
 import 'carrinho_venda_screen.dart';
-import 'financeiro_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -356,15 +355,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
-                        ),
-                      ),
-                      _MenuCard(
-                        emoji: '💼',
-                        title: 'Gestão Financeira',
-                        color: const Color(0xFF06B6D4),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const FinanceiroScreen()),
                         ),
                       ),
                       if (auth.isAdmin)
