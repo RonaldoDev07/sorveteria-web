@@ -34,6 +34,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final auth = Provider.of<AuthService>(context, listen: false);
+      
+      // Mostrar mensagem se demorar mais de 5 segundos
+      bool showingSlowMessage = false;
+      Future.delayed(const Duration(seconds: 5), () {
+        if (_isLoading && mounted && !showingSlowMessage) {
+          showingSlowMessage = true;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('⏳ Servidor iniciando, aguarde mais alguns segundos...'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 10),
+            ),
+          );
+        }
+      });
+      
       final success = await auth.login(
         _loginController.text,
         _senhaController.text,
@@ -59,14 +75,14 @@ class _LoginScreenState extends State<LoginScreen> {
       
       // Mensagem específica para timeout
       final errorMessage = e.toString().contains('TimeoutException')
-          ? 'Servidor demorando para responder. Aguarde 30 segundos e tente novamente.'
+          ? 'Servidor demorou muito para responder. Aguarde 30 segundos e tente novamente (servidor estava dormindo).'
           : 'Erro ao conectar com o servidor. Verifique sua conexão.';
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),
           backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 6),
+          duration: const Duration(seconds: 8),
         ),
       );
     }

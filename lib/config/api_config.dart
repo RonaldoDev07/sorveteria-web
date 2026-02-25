@@ -12,6 +12,7 @@ class ApiConfig {
   // URL atual - TROCAR ENTRE devUrl E prodUrl CONFORME NECESSÁRIO
   static const String baseUrl = prodUrl;  // ← USANDO PRODUÇÃO
   
-  // Timeout das requisições (aumentado para iPhone)
-  static const Duration timeout = Duration(seconds: 90);
+  // Timeout das requisições (aumentado para cold start do Render)
+  // Render free tier pode demorar até 120s para acordar
+  static const Duration timeout = Duration(seconds: 150);
 }
