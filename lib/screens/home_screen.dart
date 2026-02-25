@@ -8,6 +8,7 @@ import 'relatorio_lucro_screen.dart';
 import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
 import 'carrinho_venda_screen.dart';
+import 'financeiro/clientes_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -367,6 +368,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             MaterialPageRoute(builder: (_) => const UsuariosScreen()),
                           ),
                         ),
+                      // Módulo Financeiro (isolado)
+                      _MenuCard(
+                        emoji: '💳',
+                        title: 'Financeiro',
+                        color: const Color(0xFFEC4899),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ClientesScreen()),
+                        ),
+                      ),
                     ];
                     
                     return GridView.count(
