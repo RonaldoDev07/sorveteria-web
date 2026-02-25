@@ -375,7 +375,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         color: const Color(0xFFEC4899),
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const ClientesScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const ClientesScreen(),
+                          ),
                         ),
                       ),
                     ];
