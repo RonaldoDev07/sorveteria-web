@@ -379,10 +379,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ];
                     
-                    // Debug
+                    // Debug - forçar rebuild
                     print('🎯 Total de cards criados: ${cards.length}');
                     print('   canCadastrarProduto: ${auth.canCadastrarProduto}');
                     print('   isAdmin: ${auth.isAdmin}');
+                    print('   Gestão Financeira deve estar visível!');
                     
                     return GridView.count(
                       crossAxisCount: crossAxisCount,
