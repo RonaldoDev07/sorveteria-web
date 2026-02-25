@@ -35,15 +35,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/home': (context) => const HomeScreen(),
-      },
       home: Consumer<AuthService>(
         builder: (context, auth, _) {
-          // Se já está autenticado, pula o splash
+          // Se já está autenticado, mostra home
           if (auth.isAuthenticated) {
             return const HomeScreen();
           }
