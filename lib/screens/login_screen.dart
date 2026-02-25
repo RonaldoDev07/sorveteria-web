@@ -32,19 +32,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final auth = Provider.of<AuthService>(context, listen: false);
-    final success = await auth.login(
-      _loginController.text,
-      _senhaController.text,
-    );
+    try {
+      final auth = Provider.of<AuthService>(context, listen: false);
+      final success = await auth.login(
+        _loginController.text,
+        _senhaController.text,
+      );
 
-    setState(() => _isLoading = false);
+      if (!mounted) return;
+      
+      setState(() => _isLoading = false);
 
-    if (!success && mounted) {
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Usuário ou senha inválidos. Verifique suas credenciais.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      
+      setState(() => _isLoading = false);
+      
+      // Mensagem específica para timeout
+      final errorMessage = e.toString().contains('TimeoutException')
+          ? 'Servidor demorando para responder. Aguarde 30 segundos e tente novamente.'
+          : 'Erro ao conectar com o servidor. Verifique sua conexão.';
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Usuário ou senha inválidos. Verifique suas credenciais.'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 6),
         ),
       );
     }

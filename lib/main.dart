@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
+import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
@@ -34,9 +35,20 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
       home: Consumer<AuthService>(
         builder: (context, auth, _) {
-          return auth.isAuthenticated ? const HomeScreen() : const LoginScreen();
+          // Se já está autenticado, pula o splash
+          if (auth.isAuthenticated) {
+            return const HomeScreen();
+          }
+          // Senão, mostra o splash que vai acordar o servidor
+          return const SplashScreen();
         },
       ),
     );

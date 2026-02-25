@@ -1,20 +1,33 @@
 import 'dart:convert';
 import 'dart:html' as html;
+import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 
 class ApiService {
   static const String baseUrl = ApiConfig.baseUrl;
 
-  // Headers padrão com UTF-8 explícito
+  // Headers padrão com UTF-8 explícito e Authorization Bearer
   static Map<String, String> _getHeaders(String? token) {
     final headers = {
       'Content-Type': 'application/json; charset=utf-8',
       'Accept': 'application/json; charset=utf-8',
     };
-    if (token != null) {
+    
+    // CRÍTICO: Adicionar token JWT no header Authorization
+    if (token != null && token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
+      // Debug: Log do token (apenas primeiros caracteres)
+      if (kDebugMode) {
+        print('🔑 Token enviado: ${token.substring(0, min(20, token.length))}...');
+      }
+    } else {
+      if (kDebugMode) {
+        print('⚠️ AVISO: Requisição sem token!');
+      }
     }
+    
     return headers;
   }
 
@@ -29,27 +42,57 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> login(String login, String senha) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/login/json'),
-      headers: _getHeaders(null),
-      body: _encodeBody({'login': login, 'senha': senha}),
-    );
+    try {
+      print('📡 Enviando requisição de login para: $baseUrl/login/json');
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/login/json'),
+        headers: _getHeaders(null),
+        body: _encodeBody({'login': login, 'senha': senha}),
+      ).timeout(ApiConfig.timeout);
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      throw Exception('Falha no login');
+      print('📥 Resposta recebida - Status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = _decodeResponse(response);
+        print('✅ Login bem-sucedido! Token recebido.');
+        return data;
+      } else if (response.statusCode == 401) {
+        print('❌ Credenciais inválidas (401)');
+        throw Exception('Credenciais inválidas');
+      } else {
+        print('❌ Erro no servidor: ${response.statusCode}');
+        throw Exception('Erro no servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Exceção no login: $e');
+      if (e.toString().contains('TimeoutException')) {
+        throw Exception('TimeoutException: Servidor demorando para responder');
+      }
+      rethrow;
     }
   }
 
   static Future<List<dynamic>> getProdutos(String token) async {
+    if (kDebugMode) {
+      print('📡 Buscando produtos...');
+      print('🔑 Token: ${token.substring(0, min(20, token.length))}...');
+    }
+    
     final response = await http.get(
       Uri.parse('$baseUrl/produtos'),
       headers: _getHeaders(token),
-    );
+    ).timeout(ApiConfig.timeout);
+
+    if (kDebugMode) {
+      print('📥 Resposta produtos - Status: ${response.statusCode}');
+    }
 
     if (response.statusCode == 200) {
       return _decodeResponse(response);
+    } else if (response.statusCode == 401) {
+      print('❌ Token inválido ou expirado (401)');
+      throw Exception('401');
     } else {
       throw Exception('Erro ao buscar produtos');
     }

@@ -44,7 +44,7 @@ Aguarde uns 2-3 minutos. Quando terminar, execute:
 
 ```bash
 git add build/web
-git commit -m "build: atualizar com Gestão Financeira"
+git commit -m "build: atualizar aplicação"
 git push origin main
 ```
 
@@ -52,7 +52,7 @@ git push origin main
 
 Aguarde 1-2 minutos e acesse: https://sorveteria-web-one.vercel.app
 
-A aba de Gestão Financeira vai aparecer! 🎉
+Pronto! 🎉
 
 ---
 

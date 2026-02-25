@@ -34,16 +34,20 @@ class AuthService extends ChangeNotifier {
 
   Future<bool> login(String login, String senha) async {
     try {
+      print('🔐 Iniciando login...');
+      print('   Login: $login');
+      
       final response = await ApiService.login(login, senha);
+      
       _token = response['access_token'];
       _username = response['nome'] ?? login;
       _perfil = response['perfil'];
       _fotoUrl = response['foto_url'];
       
-      // Debug: mostrar perfil no console
-      print('🔐 Login realizado:');
+      // Debug: Verificar token no iPhone
+      print('✅ Login bem-sucedido!');
+      print('   Token recebido: ${_token?.substring(0, 20)}...');
       print('   Nome: $_username');
-      print('   Login: $login');
       print('   Perfil: $_perfil');
       print('   É Admin? ${_perfil == 'ADMIN'}');
       
@@ -54,6 +58,10 @@ class AuthService extends ChangeNotifier {
       if (_fotoUrl != null) {
         await prefs.setString('foto_url', _fotoUrl!);
       }
+      
+      // Verificar se salvou corretamente
+      final tokenSalvo = prefs.getString('token');
+      print('📱 Token salvo no SharedPreferences: ${tokenSalvo != null ? "SIM" : "NÃO"}');
       
       _isAuthenticated = true;
       notifyListeners();
