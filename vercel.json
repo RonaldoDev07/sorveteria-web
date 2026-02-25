@@ -1,7 +1,7 @@
 {
-  "buildCommand": "echo 'Using pre-built files'",
+  "buildCommand": "if cd flutter 2>/dev/null; then cd ..; else git clone https://github.com/flutter/flutter.git -b stable --depth 1; fi && flutter/bin/flutter build web --release",
   "outputDirectory": "build/web",
-  "installCommand": "echo 'No install needed'",
+  "installCommand": "echo 'Flutter will be installed during build'",
   "rewrites": [
     {
       "source": "/(.*)",
