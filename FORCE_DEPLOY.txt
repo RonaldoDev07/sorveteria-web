@@ -1,0 +1,2 @@
+Deploy forçado em: 2026-02-25 16:45
+Motivo: Correção de CORS no backend
