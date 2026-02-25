@@ -358,15 +358,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
                         ),
                       ),
-                      _MenuCard(
-                        emoji: '💼',
-                        title: 'Gestão Financeira',
-                        color: const Color(0xFF06B6D4),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const FinanceiroScreen()),
-                        ),
-                      ),
                       if (auth.isAdmin)
                         _MenuCard(
                           emoji: '👥',
@@ -377,6 +368,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             MaterialPageRoute(builder: (_) => const UsuariosScreen()),
                           ),
                         ),
+                      _MenuCard(
+                        emoji: '💼',
+                        title: 'Gestão Financeira',
+                        color: const Color(0xFF06B6D4),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const FinanceiroScreen()),
+                        ),
+                      ),
                     ];
                     
                     // Debug
