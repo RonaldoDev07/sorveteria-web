@@ -13,7 +13,6 @@ class ClientesScreen extends StatefulWidget {
 }
 
 class _ClientesScreenState extends State<ClientesScreen> {
-  late ClienteService _clienteService;
   List<Cliente> _clientes = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -21,23 +20,34 @@ class _ClientesScreenState extends State<ClientesScreen> {
   @override
   void initState() {
     super.initState();
-    _clienteService = ClienteService(context.read<AuthService>());
-    _carregarClientes();
+    // Aguarda o frame ser construído antes de acessar o context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _carregarClientes();
+    });
   }
 
   Future<void> _carregarClientes() async {
+    if (!mounted) return;
+    
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final clientes = await _clienteService.listarClientes();
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final clienteService = ClienteService(authService);
+      final clientes = await clienteService.listarClientes();
+      
+      if (!mounted) return;
+      
       setState(() {
         _clientes = clientes;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
+      
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -67,7 +77,10 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
     if (confirmar == true && cliente.id != null) {
       try {
-        await _clienteService.deletarCliente(cliente.id!);
+        final authService = Provider.of<AuthService>(context, listen: false);
+        final clienteService = ClienteService(authService);
+        await clienteService.deletarCliente(cliente.id!);
+        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Cliente excluído com sucesso')),
