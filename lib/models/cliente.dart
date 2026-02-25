@@ -34,7 +34,7 @@ class Cliente {
 
   Map<String, dynamic> toJson() {
     return {
-      'nome': nome,
+      'nome_completo': nome,
       'cpf_cnpj': cpfCnpj,
       'telefone': telefone,
       'email': email,

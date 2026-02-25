@@ -43532,7 +43532,7 @@ $3(a,b,c){return b.e?B.SD:B.a5W},
 $S:588}
 A.jn.prototype={
 kj(){var s=this
-return A.aH(["nome",s.b,"cpf_cnpj",s.c,"telefone",s.d,"email",s.e,"endereco",s.f,"limite_credito",s.r],t.N,t.z)}}
+return A.aH(["nome_completo",s.b,"cpf_cnpj",s.c,"telefone",s.d,"email",s.e,"endereco",s.f,"limite_credito",s.r],t.N,t.z)}}
 A.nu.prototype={}
 A.kk.prototype={}
 A.nF.prototype={
