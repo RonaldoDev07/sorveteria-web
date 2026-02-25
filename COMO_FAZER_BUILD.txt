@@ -1,0 +1,72 @@
+========================================
+COMO FAZER O BUILD E DEPLOY
+========================================
+
+A API JÁ ESTÁ FUNCIONANDO! ✓
+Agora você precisa fazer o build do frontend.
+
+========================================
+OPÇÃO 1: Clique com botão direito
+========================================
+
+1. Clique com BOTÃO DIREITO no arquivo:
+   build_e_deploy.ps1
+
+2. Escolha:
+   "Executar com PowerShell"
+
+3. Aguarde terminar
+
+4. Pronto!
+
+========================================
+OPÇÃO 2: Abrir PowerShell manualmente
+========================================
+
+1. Abra esta pasta no Windows Explorer
+
+2. Na barra de endereço, digite:
+   powershell
+
+3. Pressione Enter
+
+4. Cole este comando:
+   .\build_e_deploy.ps1
+
+5. Pressione Enter
+
+========================================
+OPÇÃO 3: Comandos um por um
+========================================
+
+Abra PowerShell nesta pasta e execute:
+
+C:\flutter\bin\flutter.bat build web --release
+
+(aguarde terminar)
+
+git add -A
+
+git commit -m "Update API URL to v3"
+
+git push origin main
+
+========================================
+DEPOIS DO PUSH
+========================================
+
+1. Aguarde 1-2 minutos
+2. Acesse: https://sorveteria-web-one.vercel.app
+3. Teste no iPhone (limpe cache do Safari)
+
+========================================
+SE DER ERRO DE EXECUÇÃO
+========================================
+
+Execute este comando primeiro:
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+Depois execute:
+.\build_e_deploy.ps1
+
+========================================
