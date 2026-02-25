@@ -42,8 +42,8 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
       setState(() {
         _resumoReceber = resumoReceber;
         _resumoPagar = resumoPagar;
-        _alertasReceber = alertasReceber;
-        _alertasPagar = alertasPagar;
+        _alertasReceber = (alertasReceber is int) ? alertasReceber : int.tryParse(alertasReceber.toString()) ?? 0;
+        _alertasPagar = (alertasPagar is int) ? alertasPagar : int.tryParse(alertasPagar.toString()) ?? 0;
         _isLoading = false;
       });
     } catch (e) {
