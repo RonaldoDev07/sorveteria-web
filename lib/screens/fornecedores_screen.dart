@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/fornecedores_api_service.dart';
 import '../models/fornecedor.dart';
+import 'fornecedor_form_screen.dart';
 
 class FornecedoresScreen extends StatefulWidget {
   const FornecedoresScreen({super.key});
@@ -47,6 +48,19 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const FornecedorFormScreen()),
+          );
+          if (result == true) {
+            _carregarFornecedores();
+          }
+        },
+        backgroundColor: const Color(0xFFF59E0B),
+        child: const Icon(Icons.add),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
