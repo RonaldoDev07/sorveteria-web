@@ -335,14 +335,42 @@ _isLoading
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.inventory_rounded, size: 16, color: Colors.grey[600]),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.inventory_rounded, size: 14, color: Colors.orange[700]),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
+                                            style: TextStyle(
+                                              color: Colors.orange[900],
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        'R\$ ${_formatarNumero(produto['preco_venda'])}',
+                                        style: const TextStyle(
+                                          color: Color(0xFF10B981),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],

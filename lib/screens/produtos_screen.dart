@@ -634,55 +634,42 @@ _isLoading
                               children: [
                                 Row(
                                   children: [
-                                    Icon(
-                                      () {
-                                        final estoque = produto['estoque_atual'];
-                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
-                                        return estoqueNum == 0 ? Icons.warning_rounded : Icons.inventory_rounded;
-                                      }(), 
-                                      size: 16, 
-                                      color: () {
-                                        final estoque = produto['estoque_atual'];
-                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
-                                        return estoqueNum == 0 ? Colors.red[600] : Colors.grey[600];
-                                      }()
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      () {
-                                        final estoque = produto['estoque_atual'];
-                                        final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
-                                        return estoqueNum == 0
-                                          ? 'Estoque esgotado'
-                                          : 'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}';
-                                      }(),
-                                      style: TextStyle(
-                                        color: () {
-                                          final estoque = produto['estoque_atual'];
-                                          final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
-                                          return estoqueNum == 0 ? Colors.red[700] : Colors.grey[700];
-                                        }(),
-                                        fontSize: 14,
-                                        fontWeight: () {
-                                          final estoque = produto['estoque_atual'];
-                                          final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString().replaceAll('.', '').replaceAll(',', '.')) ?? 0);
-                                          return estoqueNum == 0 ? FontWeight.w600 : FontWeight.w500;
-                                        }(),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.inventory_rounded, size: 14, color: Colors.orange[700]),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
+                                            style: TextStyle(
+                                              color: Colors.orange[900],
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    Icon(Icons.payments_rounded, size: 16, color: Colors.green[600]),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      BrazilianFormatters.formatCurrency(produto['preco_venda']),
-                                      style: TextStyle(
-                                        color: Colors.green[700],
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15,
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        'R\$ ${_formatarNumero(produto['preco_venda'])}',
+                                        style: const TextStyle(
+                                          color: Color(0xFF10B981),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
