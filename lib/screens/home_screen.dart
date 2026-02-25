@@ -290,12 +290,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     final width = constraints.maxWidth;
                     final crossAxisCount = width > 600 ? 3 : 2;
                     
+                    // Debug: contar cards
+                    int totalCards = 5; // cards sempre visíveis
+                    if (auth.canCadastrarProduto) totalCards += 2;
+                    if (auth.isAdmin) totalCards += 1;
+                    print('🎯 Total de cards: $totalCards');
+                    print('   canCadastrarProduto: ${auth.canCadastrarProduto}');
+                    print('   isAdmin: ${auth.isAdmin}');
+                    
                     return GridView.count(
                       crossAxisCount: crossAxisCount,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 1.0,
+                      childAspectRatio: 1.1, // Aumentado para cards menores
                       children: [
                         // Ordem priorizada: ações do dia a dia primeiro
                         _MenuCard(
