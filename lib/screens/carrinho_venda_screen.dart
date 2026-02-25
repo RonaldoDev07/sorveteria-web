@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import 'barcode_scanner_screen.dart';
+import 'barcode_scanner_web.dart';
 
 class CarrinhoVendaScreen extends StatefulWidget {
   const CarrinhoVendaScreen({super.key});
@@ -829,6 +832,43 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
               ),
             )
           : null,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          try {
+            final codigo = await Navigator.push<String>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => kIsWeb 
+                    ? const BarcodeScannerWeb() 
+                    : const BarcodeScannerScreen(),
+              ),
+            );
+            
+            if (codigo != null && mounted) {
+              _codigoBarrasController.text = codigo;
+              _buscarPorCodigoBarras(codigo);
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Erro ao abrir scanner: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        },
+        backgroundColor: const Color(0xFF10B981),
+        icon: const Icon(Icons.qr_code_scanner, size: 28),
+        label: const Text(
+          'Escanear',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 }
