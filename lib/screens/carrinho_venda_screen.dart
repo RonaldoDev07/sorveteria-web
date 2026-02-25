@@ -16,6 +16,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
   List<Map<String, dynamic>> _carrinho = [];
   bool _isLoading = true;
   final _searchController = TextEditingController();
+  final _codigoBarrasController = TextEditingController();
 
   @override
   void initState() {
@@ -26,6 +27,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _codigoBarrasController.dispose();
     super.dispose();
   }
 
@@ -66,6 +68,39 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
             .toList();
       }
     });
+  }
+
+  void _buscarPorCodigoBarras(String codigo) {
+    if (codigo.isEmpty) return;
+    
+    final produto = _produtos.firstWhere(
+      (p) => p['codigo_barras']?.toString() == codigo,
+      orElse: () => null,
+    );
+    
+    if (produto != null) {
+      final estoque = double.parse(produto['estoque_atual'].toString());
+      if (estoque > 0) {
+        _adicionarAoCarrinho(produto);
+        _codigoBarrasController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${produto['nome']} sem estoque'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        _codigoBarrasController.clear();
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Produto não encontrado'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      _codigoBarrasController.clear();
+    }
   }
 
   Future<void> _carregarProdutos() async {
@@ -505,19 +540,53 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                 // Lista de produtos
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _filtrarProdutos,
-                    decoration: InputDecoration(
-                      hintText: 'Pesquisar produto...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                  child: Column(
+                    children: [
+                      // Campo de código de barras
+                      TextField(
+                        controller: _codigoBarrasController,
+                        decoration: InputDecoration(
+                          hintText: 'Código de barras',
+                          prefixIcon: const Icon(Icons.qr_code_scanner, color: Color(0xFF10B981)),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.search),
+                            onPressed: () => _buscarPorCodigoBarras(_codigoBarrasController.text),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(color: Color(0xFF10B981)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(color: const Color(0xFF10B981).withOpacity(0.3)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(color: Color(0xFF10B981), width: 2),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        onSubmitted: _buscarPorCodigoBarras,
+                        keyboardType: TextInputType.number,
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
+                      const SizedBox(height: 12),
+                      // Campo de pesquisa por nome
+                      TextField(
+                        controller: _searchController,
+                        onChanged: _filtrarProdutos,
+                        decoration: InputDecoration(
+                          hintText: 'Pesquisar produto por nome...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 
