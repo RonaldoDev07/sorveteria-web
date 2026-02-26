@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'clientes_screen.dart';
+import 'fornecedores_screen.dart';
+import 'dashboard_financeiro_screen.dart';
+import 'parcelas_screen.dart';
+import 'contas_receber_screen.dart';
+import 'contas_pagar_screen.dart';
+import 'vendas_prazo_screen.dart';
+import 'compras_prazo_screen.dart';
 
 /// Tela de menu do módulo financeiro
 class FinanceiroMenuScreen extends StatelessWidget {
@@ -40,9 +47,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               subtitle: 'Cadastro de fornecedores',
               color: Colors.orange,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de Fornecedores em desenvolvimento'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FornecedoresScreen(),
                   ),
                 );
               },
@@ -53,9 +61,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               subtitle: 'Vendas parceladas',
               color: Colors.green,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de Vendas a Prazo em desenvolvimento'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VendasPrazoScreen(),
                   ),
                 );
               },
@@ -66,9 +75,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               subtitle: 'Compras parceladas',
               color: Colors.purple,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de Compras a Prazo em desenvolvimento'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComprasPrazoScreen(),
                   ),
                 );
               },
@@ -79,9 +89,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               subtitle: 'Recebimentos pendentes',
               color: Colors.teal,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de Contas a Receber em desenvolvimento'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContasReceberScreen(),
                   ),
                 );
               },
@@ -92,9 +103,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               subtitle: 'Pagamentos pendentes',
               color: Colors.red,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de Contas a Pagar em desenvolvimento'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContasPagarScreen(),
                   ),
                 );
               },
@@ -105,9 +117,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               subtitle: 'Controle de parcelas',
               color: Colors.indigo,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Tela de Parcelas em desenvolvimento'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ParcelasScreen(),
                   ),
                 );
               },
@@ -118,9 +131,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               subtitle: 'Visão geral financeira',
               color: const Color(0xFFEC4899),
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Dashboard Financeiro em desenvolvimento'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardFinanceiroScreen(),
                   ),
                 );
               },
