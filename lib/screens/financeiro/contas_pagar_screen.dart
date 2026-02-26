@@ -25,7 +25,7 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
   
   String? _filtroStatus;
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');$');
   final _formatoData = DateFormat('dd/MM/yyyy');
 
   @override
