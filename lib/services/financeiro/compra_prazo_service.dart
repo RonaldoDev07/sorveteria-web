@@ -9,7 +9,7 @@ class CompraPrazoService {
 
   CompraPrazoService(this._authService);
 
-  String get _baseUrl => '${ApiConfig.baseUrl}/api/v1/financeiro/compras-prazo';
+  String get _baseUrl => '${ApiConfig.baseUrl}/financeiro/compras-prazo';
 
   Map<String, String> get _headers {
     final token = _authService.token;

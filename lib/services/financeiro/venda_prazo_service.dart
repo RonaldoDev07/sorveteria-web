@@ -9,7 +9,7 @@ class VendaPrazoService {
 
   VendaPrazoService(this._authService);
 
-  String get _baseUrl => '${ApiConfig.baseUrl}/api/v1/financeiro/vendas-prazo';
+  String get _baseUrl => '${ApiConfig.baseUrl}/financeiro/vendas-prazo';
 
   Map<String, String> get _headers {
     final token = _authService.token;

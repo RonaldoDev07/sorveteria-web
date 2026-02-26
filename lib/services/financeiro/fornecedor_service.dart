@@ -10,7 +10,7 @@ class FornecedorService {
 
   FornecedorService(this._authService);
 
-  String get _baseUrl => '${ApiConfig.baseUrl}/api/v1/financeiro/fornecedores';
+  String get _baseUrl => '${ApiConfig.baseUrl}/financeiro/fornecedores';
 
   Map<String, String> get _headers {
     final token = _authService.token;

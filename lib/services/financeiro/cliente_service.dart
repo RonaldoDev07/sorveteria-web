@@ -10,7 +10,7 @@ class ClienteService {
 
   ClienteService(this._authService);
 
-  String get _baseUrl => '${ApiConfig.baseUrl}/api/v1/financeiro/clientes';
+  String get _baseUrl => '${ApiConfig.baseUrl}/financeiro/clientes';
 
   Map<String, String> get _headers {
     final token = _authService.token;

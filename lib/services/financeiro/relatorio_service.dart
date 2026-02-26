@@ -10,7 +10,7 @@ class RelatorioService {
 
   RelatorioService(this._authService);
 
-  String get _baseUrl => '${ApiConfig.baseUrl}/api/v1/financeiro/relatorios';
+  String get _baseUrl => '${ApiConfig.baseUrl}/financeiro/relatorios';
 
   Map<String, String> get _headers {
     final token = _authService.token;
