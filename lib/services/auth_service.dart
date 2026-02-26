@@ -110,14 +110,22 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    print('🚪 Fazendo logout...');
+    
+    // Limpar variáveis primeiro
     _token = null;
     _perfil = null;
     _username = null;
     _fotoUrl = null;
     _isAuthenticated = false;
     
+    // Limpar SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpa TUDO do cache
+    await prefs.clear();
+    
+    // Verificar se realmente limpou
+    final tokenAposLimpar = prefs.getString('token');
+    print('✅ Logout completo! Token após limpar: ${tokenAposLimpar ?? "NULL"}');
     
     notifyListeners();
   }

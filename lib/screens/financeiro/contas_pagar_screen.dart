@@ -140,6 +140,7 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                 )
               : Column(
                   children: [
+                    // Resumo
                     Container(
                       padding: const EdgeInsets.all(16),
                       color: Colors.red.shade50,
@@ -179,6 +180,7 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                         ],
                       ),
                     ),
+                    // Lista
                     Expanded(
                       child: _compras.isEmpty
                           ? const Center(
@@ -223,6 +225,7 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                                           ? const Icon(Icons.arrow_forward_ios)
                                           : null,
                                       onTap: () {
+                                        // TODO: Abrir detalhes da compra
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
                                             content: Text('Detalhes da compra em desenvolvimento'),
