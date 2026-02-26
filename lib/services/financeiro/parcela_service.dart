@@ -9,7 +9,7 @@ class ParcelaService {
 
   ParcelaService(this._authService);
 
-  String get _baseUrl => '${ApiConfig.baseUrl}/financeiro/parcelas';
+  String get _baseUrl => '${ApiConfig.baseUrl}/api/v1/financeiro/parcelas';
 
   Map<String, String> get _headers {
     final token = _authService.token;

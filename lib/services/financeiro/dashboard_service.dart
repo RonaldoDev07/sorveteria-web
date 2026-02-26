@@ -10,7 +10,7 @@ class DashboardService {
 
   DashboardService(this._authService);
 
-  String get _baseUrl => '${ApiConfig.baseUrl}/financeiro/relatorios/dashboard';
+  String get _baseUrl => '${ApiConfig.baseUrl}/api/v1/financeiro/relatorios/dashboard';
 
   Map<String, String> get _headers {
     final token = _authService.token;
