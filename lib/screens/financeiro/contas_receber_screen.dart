@@ -140,7 +140,6 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                 )
               : Column(
                   children: [
-                    // Resumo
                     Container(
                       padding: const EdgeInsets.all(16),
                       color: Colors.teal.shade50,
@@ -180,7 +179,6 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                         ],
                       ),
                     ),
-                    // Lista
                     Expanded(
                       child: _vendas.isEmpty
                           ? const Center(
@@ -225,7 +223,6 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                                           ? const Icon(Icons.arrow_forward_ios)
                                           : null,
                                       onTap: () {
-                                        // TODO: Abrir detalhes da venda
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
                                             content: Text('Detalhes da venda em desenvolvimento'),
