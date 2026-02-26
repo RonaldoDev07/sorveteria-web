@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
-import 'screens/splash_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'widgets/auth_wrapper.dart';
 
 void main() {
   runApp(
@@ -35,16 +33,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: Consumer<AuthService>(
-        builder: (context, auth, _) {
-          // Se já está autenticado, mostra home
-          if (auth.isAuthenticated) {
-            return const HomeScreen();
-          }
-          // Senão, mostra o splash que vai acordar o servidor
-          return const SplashScreen();
-        },
-      ),
+      home: const AuthWrapper(),
     );
   }
 }
