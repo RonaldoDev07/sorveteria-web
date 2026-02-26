@@ -112,21 +112,35 @@ class AuthService extends ChangeNotifier {
   Future<void> logout() async {
     print('🚪 Fazendo logout...');
     
-    // Limpar variáveis primeiro
-    _token = null;
-    _perfil = null;
-    _username = null;
-    _fotoUrl = null;
-    _isAuthenticated = false;
-    
-    // Limpar SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    
-    // Verificar se realmente limpou
-    final tokenAposLimpar = prefs.getString('token');
-    print('✅ Logout completo! Token após limpar: ${tokenAposLimpar ?? "NULL"}');
-    
-    notifyListeners();
+    try {
+      // Limpar SharedPreferences PRIMEIRO
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      
+      // Verificar se realmente limpou
+      final tokenAposLimpar = prefs.getString('token');
+      print('📱 SharedPreferences limpo! Token: ${tokenAposLimpar ?? "NULL"}');
+      
+      // Limpar variáveis DEPOIS
+      _token = null;
+      _perfil = null;
+      _username = null;
+      _fotoUrl = null;
+      _isAuthenticated = false;
+      
+      print('✅ Logout completo!');
+      
+      // Notificar listeners para atualizar UI
+      notifyListeners();
+    } catch (e) {
+      print('❌ Erro no logout: $e');
+      // Mesmo com erro, limpar variáveis
+      _token = null;
+      _perfil = null;
+      _username = null;
+      _fotoUrl = null;
+      _isAuthenticated = false;
+      notifyListeners();
+    }
   }
 }

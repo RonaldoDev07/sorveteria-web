@@ -126,14 +126,26 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
 
     if (resultado == true) {
+      print('🚪 Usuário confirmou logout');
+      
+      // Fazer logout
       await auth.logout();
-      // Força navegação para tela de login
-      if (context.mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const AuthWrapper()),
-          (route) => false,
-        );
-      }
+      
+      print('🔄 Navegando para tela de login...');
+      
+      // Garantir que está montado antes de navegar
+      if (!context.mounted) return;
+      
+      // Navegar para AuthWrapper removendo todas as rotas anteriores
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const AuthWrapper(),
+          settings: const RouteSettings(name: '/'),
+        ),
+        (route) => false, // Remove todas as rotas
+      );
+      
+      print('✅ Navegação concluída');
     }
   }
 
