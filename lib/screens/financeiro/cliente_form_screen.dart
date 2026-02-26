@@ -181,14 +181,18 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
             TextFormField(
               controller: _cpfCnpjController,
               decoration: const InputDecoration(
-                labelText: 'CPF/CNPJ *',
+                labelText: 'CPF/CNPJ * (Ex: 040.697.722-43 ou 11.222.333/0001-81)',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.badge),
-                hintText: '000.000.000-00 ou 00.000.000/0000-00',
+                hintText: '040.697.722-43',
               ),
               validator: _validarCpfCnpj,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(14),
+                _CpfCnpjInputFormatter(),
+              ],
               enabled: !_isEdicao, // CPF/CNPJ não pode ser alterado
             ),
             const SizedBox(height: 16),
@@ -246,6 +250,53 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+
+// Formatador de CPF/CNPJ: 040.697.722-43 ou 11.222.333/0001-81
+class _CpfCnpjInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final text = newValue.text;
+    final buffer = StringBuffer();
+    
+    // Remove tudo que não é número
+    final numbers = text.replaceAll(RegExp(r'[^0-9]'), '');
+    
+    if (numbers.length <= 11) {
+      // Formata como CPF: 040.697.722-43
+      for (int i = 0; i < numbers.length && i < 11; i++) {
+        if (i == 3 || i == 6) {
+          buffer.write('.');
+        } else if (i == 9) {
+          buffer.write('-');
+        }
+        buffer.write(numbers[i]);
+      }
+    } else {
+      // Formata como CNPJ: 11.222.333/0001-81
+      for (int i = 0; i < numbers.length && i < 14; i++) {
+        if (i == 2 || i == 5) {
+          buffer.write('.');
+        } else if (i == 8) {
+          buffer.write('/');
+        } else if (i == 12) {
+          buffer.write('-');
+        }
+        buffer.write(numbers[i]);
+      }
+    }
+    
+    final formatted = buffer.toString();
+    
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

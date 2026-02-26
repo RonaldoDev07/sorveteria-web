@@ -181,14 +181,18 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
             TextFormField(
               controller: _cnpjController,
               decoration: const InputDecoration(
-                labelText: 'CNPJ *',
+                labelText: 'CNPJ * (Ex: 11.222.333/0001-81)',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.badge),
-                hintText: '00.000.000/0000-00',
+                hintText: '11.222.333/0001-81',
               ),
               validator: _validarCnpj,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(14),
+                _CnpjInputFormatter(),
+              ],
               enabled: !_isEdicao, // CNPJ não pode ser alterado
             ),
             const SizedBox(height: 16),
@@ -246,6 +250,41 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+
+// Formatador de CNPJ: 11.222.333/0001-81
+class _CnpjInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final text = newValue.text;
+    final buffer = StringBuffer();
+    
+    // Remove tudo que não é número
+    final numbers = text.replaceAll(RegExp(r'[^0-9]'), '');
+    
+    // Aplica a máscara: 11.222.333/0001-81
+    for (int i = 0; i < numbers.length && i < 14; i++) {
+      if (i == 2 || i == 5) {
+        buffer.write('.');
+      } else if (i == 8) {
+        buffer.write('/');
+      } else if (i == 12) {
+        buffer.write('-');
+      }
+      buffer.write(numbers[i]);
+    }
+    
+    final formatted = buffer.toString();
+    
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }
