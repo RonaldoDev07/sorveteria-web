@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -41,7 +42,9 @@ class _SplashScreenState extends State<SplashScreen> {
         await Future.delayed(const Duration(milliseconds: 500));
         
         if (mounted) {
-          Navigator.of(context).pushReplacementNamed('/login');
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
         }
       } else {
         _showError('Servidor retornou erro: ${response.statusCode}');
