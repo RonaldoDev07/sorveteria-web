@@ -59,7 +59,10 @@ class _LoginScreenState extends State<LoginScreen> {
       
       setState(() => _isLoading = false);
 
-      if (!success) {
+      if (success) {
+        // Login bem-sucedido - AuthWrapper vai navegar automaticamente
+        // Não precisa fazer navegação manual
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Usuário ou senha inválidos. Verifique suas credenciais.'),
