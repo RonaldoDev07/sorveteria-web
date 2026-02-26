@@ -1,0 +1,5 @@
+Force rebuild v3 - Corrigir arquivos corrompidos
+Timestamp: 2026-02-26 15:30
+Arquivos corrigidos:
+- contas_receber_screen.dart
+- contas_pagar_screen.dart
