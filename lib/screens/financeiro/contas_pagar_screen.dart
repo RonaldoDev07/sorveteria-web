@@ -25,7 +25,7 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
   
   String? _filtroStatus;
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final _formatoData = DateFormat('dd/MM/yyyy');
 
   @override
@@ -140,7 +140,6 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                 )
               : Column(
                   children: [
-                    // Resumo
                     Container(
                       padding: const EdgeInsets.all(16),
                       color: Colors.red.shade50,
@@ -180,7 +179,6 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                         ],
                       ),
                     ),
-                    // Lista
                     Expanded(
                       child: _compras.isEmpty
                           ? const Center(
@@ -225,7 +223,6 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                                           ? const Icon(Icons.arrow_forward_ios)
                                           : null,
                                       onTap: () {
-                                        // TODO: Abrir detalhes da compra
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
                                             content: Text('Detalhes da compra em desenvolvimento'),
