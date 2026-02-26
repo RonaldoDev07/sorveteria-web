@@ -8,7 +8,7 @@ import 'relatorio_lucro_screen.dart';
 import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
 import 'carrinho_venda_screen.dart';
-import 'financeiro/clientes_screen.dart';
+import 'financeiro/financeiro_menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -376,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ClientesScreen(),
+                            builder: (context) => const FinanceiroMenuScreen(),
                           ),
                         ),
                       ),
