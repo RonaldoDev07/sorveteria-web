@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../widgets/auth_wrapper.dart';
 import 'produtos_screen.dart';
 import 'cadastro_produto_screen.dart';
 import 'selecionar_produto_screen.dart';
@@ -125,7 +126,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
 
     if (resultado == true) {
-      auth.logout();
+      await auth.logout();
+      // Força navegação para tela de login
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AuthWrapper()),
+          (route) => false,
+        );
+      }
     }
   }
 
