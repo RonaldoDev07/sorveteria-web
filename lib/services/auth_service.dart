@@ -30,9 +30,18 @@ class AuthService extends ChangeNotifier {
       _username = prefs.getString('username');
       _fotoUrl = prefs.getString('foto_url');
       _isAuthenticated = _token != null && _token!.isNotEmpty;
+      
+      if (kDebugMode) {
+        print('📱 Token carregado: ${_token != null ? "SIM" : "NÃO"}');
+        print('   Perfil: $_perfil');
+        print('   Username: $_username');
+      }
+      
       notifyListeners();
     } catch (e) {
-      print('❌ Erro ao carregar token: $e');
+      if (kDebugMode) {
+        print('❌ Erro ao carregar token: $e');
+      }
       // Em caso de erro, inicializar com valores padrão
       _token = null;
       _perfil = null;
