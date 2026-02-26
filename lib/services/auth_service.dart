@@ -23,13 +23,24 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    _token = prefs.getString('token');
-    _perfil = prefs.getString('perfil');
-    _username = prefs.getString('username');
-    _fotoUrl = prefs.getString('foto_url');
-    _isAuthenticated = _token != null;
-    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _token = prefs.getString('token');
+      _perfil = prefs.getString('perfil');
+      _username = prefs.getString('username');
+      _fotoUrl = prefs.getString('foto_url');
+      _isAuthenticated = _token != null && _token!.isNotEmpty;
+      notifyListeners();
+    } catch (e) {
+      print('❌ Erro ao carregar token: $e');
+      // Em caso de erro, inicializar com valores padrão
+      _token = null;
+      _perfil = null;
+      _username = null;
+      _fotoUrl = null;
+      _isAuthenticated = false;
+      notifyListeners();
+    }
   }
 
   Future<bool> login(String login, String senha) async {
