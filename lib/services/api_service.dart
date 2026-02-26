@@ -8,6 +8,20 @@ import '../config/api_config.dart';
 class ApiService {
   static const String baseUrl = ApiConfig.baseUrl;
 
+  // 🔥 WAKE UP API - Acordar servidor antes de fazer login
+  static Future<void> wakeUpApi() async {
+    try {
+      print('⏰ Acordando API...');
+      await http.get(
+        Uri.parse('$baseUrl/health'),
+      ).timeout(const Duration(seconds: 30));
+      print('✅ API acordada!');
+    } catch (e) {
+      print('⚠️ Erro ao acordar API (ignorado): $e');
+      // Ignorar erro - API pode já estar acordada
+    }
+  }
+
   // Headers padrão com UTF-8 explícito e Authorization Bearer
   static Map<String, String> _getHeaders(String? token) {
     final headers = {
@@ -49,7 +63,7 @@ class ApiService {
         Uri.parse('$baseUrl/login/json'),
         headers: _getHeaders(null),
         body: _encodeBody({'login': login, 'senha': senha}),
-      ).timeout(ApiConfig.timeout);
+      ).timeout(const Duration(seconds: 30)); // 🔥 Timeout aumentado para 30s
 
       print('📥 Resposta recebida - Status: ${response.statusCode}');
 
@@ -67,7 +81,7 @@ class ApiService {
     } catch (e) {
       print('❌ Exceção no login: $e');
       if (e.toString().contains('TimeoutException')) {
-        throw Exception('TimeoutException: Servidor demorando para responder');
+        throw Exception('Servidor demorando para responder. Aguarde e tente novamente.');
       }
       rethrow;
     }

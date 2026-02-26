@@ -57,6 +57,9 @@ class AuthService extends ChangeNotifier {
       print('🔐 Iniciando login...');
       print('   Login: $login');
       
+      // 🔥 ACORDAR API PRIMEIRO (Cold Start do Render)
+      await ApiService.wakeUpApi();
+      
       final response = await ApiService.login(login, senha);
       
       _token = response['access_token'];
