@@ -47,11 +47,21 @@
 </head>
 <body>
   <script>
+    // Desabilitar service worker para forçar atualização
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister();
+          console.log('Service Worker desregistrado:', registration);
+        }
+      });
+    }
+    
     window.addEventListener('load', function(ev) {
-      // Download main.dart.js
+      // Download main.dart.js SEM service worker
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
+          serviceWorkerVersion: null,  // Desabilita service worker
         },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
