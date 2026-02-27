@@ -11,6 +11,8 @@ class CompraPrazo {
   final String status;
   final String? observacoes;
   final DateTime createdAt;
+  final DateTime? updatedAt;
+  final List<dynamic>? produtos;  // Lista de produtos (opcional)
 
   CompraPrazo({
     required this.id,
@@ -23,6 +25,8 @@ class CompraPrazo {
     required this.status,
     this.observacoes,
     required this.createdAt,
+    this.updatedAt,
+    this.produtos,
   });
 
   factory CompraPrazo.fromJson(Map<String, dynamic> json) {
@@ -38,6 +42,8 @@ class CompraPrazo {
         status: json['status'] ?? 'em_dia',
         observacoes: json['observacoes'],
         createdAt: DateTime.parse(json['created_at']),
+        updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+        produtos: json['produtos'] as List<dynamic>?,  // Aceita lista de produtos
       );
     } catch (e) {
       print('❌ Erro em CompraPrazo.fromJson: $e');
