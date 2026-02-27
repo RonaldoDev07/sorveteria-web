@@ -546,6 +546,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
   Produto? _produtoSelecionado;
   final _quantidadeController = TextEditingController(text: '1');
   final _valorController = TextEditingController();
+  String _filtroProduto = '';
 
   @override
   void initState() {
