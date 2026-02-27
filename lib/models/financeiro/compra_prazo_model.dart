@@ -26,18 +26,24 @@ class CompraPrazo {
   });
 
   factory CompraPrazo.fromJson(Map<String, dynamic> json) {
-    return CompraPrazo(
-      id: json['id'],
-      fornecedorId: json['fornecedor_id'],
-      fornecedor: json['fornecedor'] != null ? Fornecedor.fromJson(json['fornecedor']) : null,
-      usuarioId: json['usuario_id'].toString(),  // Converter int para String
-      dataCompra: DateTime.parse(json['data_compra']),
-      valorTotal: (json['valor_total'] ?? 0).toDouble(),
-      saldoDevedor: (json['saldo_devedor'] ?? 0).toDouble(),
-      status: json['status'],
-      observacoes: json['observacoes'],
-      createdAt: DateTime.parse(json['created_at']),
-    );
+    try {
+      return CompraPrazo(
+        id: json['id'],
+        fornecedorId: json['fornecedor_id'],
+        fornecedor: json['fornecedor'] != null ? Fornecedor.fromJson(json['fornecedor']) : null,
+        usuarioId: json['usuario_id']?.toString() ?? '0',  // Null-safe com fallback
+        dataCompra: DateTime.parse(json['data_compra']),
+        valorTotal: (json['valor_total'] ?? 0).toDouble(),
+        saldoDevedor: (json['saldo_devedor'] ?? 0).toDouble(),
+        status: json['status'] ?? 'em_dia',
+        observacoes: json['observacoes'],
+        createdAt: DateTime.parse(json['created_at']),
+      );
+    } catch (e) {
+      print('❌ Erro em CompraPrazo.fromJson: $e');
+      print('   JSON recebido: $json');
+      rethrow;
+    }
   }
 
   bool get estaQuitada => status == 'quitada';
