@@ -18,7 +18,7 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   CompraPrazoService? _compraService;
-  String? _filtroStatus;
+  String? _filtroStatus = 'ativas'; // Filtro padrão: não mostrar canceladas
 
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
   final _formatoData = DateFormat('dd/MM/yyyy');
@@ -42,12 +42,20 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
     });
 
     try {
-      final compras = await _compraService!.listarCompras(status: _filtroStatus);
+      // Filtrar compras: se filtro for 'ativas', excluir canceladas no frontend
+      final compras = await _compraService!.listarCompras(
+        status: _filtroStatus == 'ativas' ? null : _filtroStatus
+      );
+      
+      // Se filtro for 'ativas', remover canceladas
+      final comprasFiltradas = _filtroStatus == 'ativas'
+          ? compras.where((c) => c.status != 'cancelada').toList()
+          : compras;
       
       if (!mounted) return;
       
       setState(() {
-        _compras = compras;
+        _compras = comprasFiltradas;
         _isLoading = false;
       });
     } catch (e) {
@@ -158,12 +166,13 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
             icon: const Icon(Icons.filter_list),
             onSelected: (value) {
               setState(() {
-                _filtroStatus = value == 'todas' ? null : value;
+                _filtroStatus = value;
               });
               _carregarCompras();
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'todas', child: Text('Todas')),
+              const PopupMenuItem(value: 'ativas', child: Text('Ativas (padrão)')),
+              const PopupMenuItem(value: null, child: Text('Todas')),
               const PopupMenuItem(value: 'em_dia', child: Text('Em Dia')),
               const PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
               const PopupMenuItem(value: 'quitada', child: Text('Quitadas')),

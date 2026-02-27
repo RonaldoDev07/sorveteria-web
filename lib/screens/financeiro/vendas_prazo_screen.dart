@@ -18,7 +18,7 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   VendaPrazoService? _vendaService;
-  String? _filtroStatus;
+  String? _filtroStatus = 'ativas'; // Filtro padrão: não mostrar canceladas
 
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
   final _formatoData = DateFormat('dd/MM/yyyy');
@@ -42,12 +42,20 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
     });
 
     try {
-      final vendas = await _vendaService!.listarVendas(status: _filtroStatus);
+      // Filtrar vendas: se filtro for 'ativas', excluir canceladas no frontend
+      final vendas = await _vendaService!.listarVendas(
+        status: _filtroStatus == 'ativas' ? null : _filtroStatus
+      );
+      
+      // Se filtro for 'ativas', remover canceladas
+      final vendasFiltradas = _filtroStatus == 'ativas'
+          ? vendas.where((v) => v.status != 'cancelada').toList()
+          : vendas;
       
       if (!mounted) return;
       
       setState(() {
-        _vendas = vendas;
+        _vendas = vendasFiltradas;
         _isLoading = false;
       });
     } catch (e) {
@@ -158,12 +166,13 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
             icon: const Icon(Icons.filter_list),
             onSelected: (value) {
               setState(() {
-                _filtroStatus = value == 'todas' ? null : value;
+                _filtroStatus = value;
               });
               _carregarVendas();
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'todas', child: Text('Todas')),
+              const PopupMenuItem(value: 'ativas', child: Text('Ativas (padrão)')),
+              const PopupMenuItem(value: null, child: Text('Todas')),
               const PopupMenuItem(value: 'em_dia', child: Text('Em Dia')),
               const PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
               const PopupMenuItem(value: 'quitada', child: Text('Quitadas')),
