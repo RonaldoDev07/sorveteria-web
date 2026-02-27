@@ -1,7 +1,7 @@
 {
-  "buildCommand": "flutter build web --release --no-tree-shake-icons",
+  "buildCommand": "echo 'Using pre-built files'",
   "outputDirectory": "build/web",
-  "installCommand": "flutter pub get",
+  "installCommand": "echo 'No install needed'",
   "headers": [
     {
       "source": "/(.*)",
