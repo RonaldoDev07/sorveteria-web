@@ -68,11 +68,11 @@ class CompraDetalhesScreen extends StatelessWidget {
             ),
 
             // Card de Produtos
-            if (compra.produtos.isNotEmpty) ...[
+            if (compra.produtos != null && compra.produtos!.isNotEmpty) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Produtos (${compra.produtos.length})',
+                  'Produtos (${compra.produtos!.length})',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class CompraDetalhesScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              ...compra.produtos.map((produto) => Card(
+              ...compra.produtos!.map((produto) => Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: ListTile(
                   leading: const CircleAvatar(

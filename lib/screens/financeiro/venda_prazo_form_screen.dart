@@ -209,11 +209,12 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
       }
 
       try {
-        await _clienteService.criarCliente(
+        final novoCliente = Cliente(
           nome: nomeController.text,
           cpfCnpj: cpfCnpjController.text,
           telefone: telefoneController.text.isEmpty ? null : telefoneController.text,
         );
+        await _clienteService.criarCliente(novoCliente);
 
         // Recarregar lista de clientes
         await _carregarClientes();

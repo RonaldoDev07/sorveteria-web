@@ -173,11 +173,12 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
       }
 
       try {
-        await _fornecedorService.criarFornecedor(
+        final novoFornecedor = Fornecedor(
           nome: nomeController.text,
           cnpj: cnpjController.text,
           telefone: telefoneController.text.isEmpty ? null : telefoneController.text,
         );
+        await _fornecedorService.criarFornecedor(novoFornecedor);
 
         // Recarregar lista de fornecedores
         await _carregarFornecedores();

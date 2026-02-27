@@ -68,11 +68,11 @@ class VendaDetalhesScreen extends StatelessWidget {
             ),
 
             // Card de Produtos
-            if (venda.produtos.isNotEmpty) ...[
+            if (venda.produtos != null && venda.produtos!.isNotEmpty) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Produtos (${venda.produtos.length})',
+                  'Produtos (${venda.produtos!.length})',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class VendaDetalhesScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              ...venda.produtos.map((produto) => Card(
+              ...venda.produtos!.map((produto) => Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: ListTile(
                   leading: const CircleAvatar(
