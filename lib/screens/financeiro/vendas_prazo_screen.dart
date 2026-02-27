@@ -15,10 +15,12 @@ class VendasPrazoScreen extends StatefulWidget {
 
 class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
   List<VendaPrazo> _vendas = [];
+  List<VendaPrazo> _vendasFiltradas = [];
   bool _isLoading = true;
   String? _errorMessage;
   VendaPrazoService? _vendaService;
   String? _filtroStatus = 'ativas'; // Filtro padrão: não mostrar canceladas
+  final TextEditingController _searchController = TextEditingController();
 
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
   final _formatoData = DateFormat('dd/MM/yyyy');
@@ -31,6 +33,26 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
       _vendaService = VendaPrazoService(authService);
       _carregarVendas();
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filtrarVendas(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _vendasFiltradas = _vendas;
+      } else {
+        _vendasFiltradas = _vendas.where((venda) {
+          final nomeCliente = venda.cliente?.nome.toLowerCase() ?? '';
+          final searchLower = query.toLowerCase();
+          return nomeCliente.contains(searchLower);
+        }).toList();
+      }
+    });
   }
 
   Future<void> _carregarVendas() async {
@@ -56,6 +78,7 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
       
       setState(() {
         _vendas = vendasFiltradas;
+        _vendasFiltradas = vendasFiltradas;
         _isLoading = false;
       });
     } catch (e) {
@@ -222,10 +245,29 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
                     )
                   : RefreshIndicator(
                       onRefresh: _carregarVendas,
-                      child: ListView.builder(
-                        itemCount: _vendas.length,
-                        itemBuilder: (context, index) {
-                          final venda = _vendas[index];
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Pesquisar cliente...',
+                                prefixIcon: const Icon(Icons.search),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                              ),
+                              onChanged: _filtrarVendas,
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: _vendasFiltradas.length,
+                              itemBuilder: (context, index) {
+                                final venda = _vendasFiltradas[index];
                           return Card(
                             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: ListTile(
