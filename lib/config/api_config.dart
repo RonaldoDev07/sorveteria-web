@@ -13,6 +13,6 @@ class ApiConfig {
   static const String baseUrl = prodUrl;  // ← USANDO PRODUÇÃO
   
   // Timeout das requisições (aumentado para cold start do Render)
-  // Render free tier pode demorar até 120s para acordar
-  static const Duration timeout = Duration(seconds: 150);
+  // Render free tier pode demorar até 180s para acordar
+  static const Duration timeout = Duration(seconds: 180);
 }
