@@ -20,14 +20,33 @@ class ProdutoService {
     final response = await ApiService.getProdutos(token);
     print('📦 API retornou ${response.length} produtos');
     
-    final produtos = response.map((json) => Produto.fromJson(json)).toList();
-    print('✅ ${produtos.length} produtos convertidos com sucesso');
-    
-    if (produtos.isNotEmpty) {
-      print('   Exemplo: ${produtos.first.nome} (ID: ${produtos.first.id})');
+    try {
+      final produtos = <Produto>[];
+      for (var i = 0; i < response.length; i++) {
+        try {
+          final json = response[i];
+          print('   Convertendo produto $i: ${json['nome']}');
+          final produto = Produto.fromJson(json);
+          produtos.add(produto);
+        } catch (e, stackTrace) {
+          print('❌ Erro ao converter produto $i: $e');
+          print('   JSON: ${response[i]}');
+          print('   Stack: $stackTrace');
+        }
+      }
+      
+      print('✅ ${produtos.length} produtos convertidos com sucesso');
+      
+      if (produtos.isNotEmpty) {
+        print('   Exemplo: ${produtos.first.nome} (ID: ${produtos.first.id})');
+      }
+      
+      return produtos;
+    } catch (e, stackTrace) {
+      print('❌ Erro fatal ao processar produtos: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
     }
-    
-    return produtos;
   }
 
   Future<List<Produto>> listarProdutos() async {
