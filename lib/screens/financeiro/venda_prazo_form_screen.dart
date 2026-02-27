@@ -469,15 +469,55 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          widget.produtos.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    'Nenhum produto disponível. Cadastre produtos primeiro.',
-                    style: TextStyle(color: Colors.orange),
+          // MOSTRAR STATUS DOS PRODUTOS
+          if (widget.produtos.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade100,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.warning, color: Colors.orange, size: 32),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Nenhum produto disponível',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Total recebido: ${widget.produtos.length} produtos',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Cadastre produtos na aba Produtos primeiro',
+                    style: TextStyle(fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
-                )
+                ],
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.green.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '✅ ${widget.produtos.length} produtos disponíveis',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ),
+          
+          // DROPDOWN
+          widget.produtos.isEmpty
+              ? const SizedBox.shrink()
               : DropdownButtonFormField<Produto>(
                   value: _produtoSelecionado,
                   decoration: const InputDecoration(
