@@ -143,6 +143,51 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     }
   }
 
+  Future<void> _cancelarParcela(Parcela parcela) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar cancelamento'),
+        content: Text(
+          'Deseja realmente cancelar esta parcela?\n\n'
+          '${parcela.tipo == 'venda' ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}\n'
+          'Valor: ${_formatoMoeda.format(parcela.valorParcela)}\n'
+          'Status: ${_getStatusLabel(parcela.status)}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Não'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Sim, Cancelar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar == true) {
+      try {
+        await _parcelaService!.cancelarParcela(parcela.id);
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Parcela cancelada com sucesso')),
+          );
+          _carregarParcelas();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
+
   Color _getStatusColor(String status) {
     switch (status) {
       case 'paga':
@@ -270,13 +315,38 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                                   ),
                                 ],
                               ),
-                              trailing: !parcela.estaPaga
-                                  ? IconButton(
-                                      icon: const Icon(Icons.payment),
-                                      onPressed: () => _darBaixa(parcela),
-                                      tooltip: 'Dar Baixa',
-                                    )
-                                  : const Icon(Icons.check_circle, color: Colors.green),
+                              trailing: PopupMenuButton(
+                                itemBuilder: (context) => [
+                                  if (!parcela.estaPaga)
+                                    const PopupMenuItem(
+                                      value: 'baixa',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.payment, size: 20),
+                                          SizedBox(width: 8),
+                                          Text('Dar Baixa'),
+                                        ],
+                                      ),
+                                    ),
+                                  const PopupMenuItem(
+                                    value: 'cancelar',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.cancel, size: 20, color: Colors.red),
+                                        SizedBox(width: 8),
+                                        Text('Cancelar', style: TextStyle(color: Colors.red)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                                onSelected: (value) {
+                                  if (value == 'baixa') {
+                                    _darBaixa(parcela);
+                                  } else if (value == 'cancelar') {
+                                    _cancelarParcela(parcela);
+                                  }
+                                },
+                              ),
                             ),
                           );
                         },

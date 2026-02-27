@@ -90,4 +90,20 @@ class ParcelaService {
       throw Exception('Erro ao dar baixa: $e');
     }
   }
+
+  Future<void> cancelarParcela(String id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/$id'),
+        headers: _headers,
+      );
+
+      if (response.statusCode != 200) {
+        final error = json.decode(utf8.decode(response.bodyBytes));
+        throw Exception(error['detail'] ?? 'Erro ao cancelar parcela');
+      }
+    } catch (e) {
+      throw Exception('Erro ao cancelar parcela: $e');
+    }
+  }
 }
