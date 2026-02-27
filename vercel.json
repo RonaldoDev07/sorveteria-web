@@ -2,5 +2,20 @@
   "version": 2,
   "buildCommand": "echo 'Using pre-built files'",
   "outputDirectory": "build/web",
-  "installCommand": "echo 'No install needed'"
+  "installCommand": "echo 'No install needed'",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "X-Build-Version",
+          "value": "v16-2026-02-27"
+        }
+      ]
+    }
+  ]
 }

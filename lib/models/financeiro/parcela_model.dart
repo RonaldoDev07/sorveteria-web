@@ -1,3 +1,10 @@
+// Função helper para parsing defensivo de números
+double _toDouble(dynamic v) {
+  if (v == null) return 0.0;
+  if (v is num) return v.toDouble();
+  return double.tryParse(v.toString()) ?? 0.0;
+}
+
 /// Model para Parcela
 class Parcela {
   final String id;
@@ -30,8 +37,8 @@ class Parcela {
       tipo: json['tipo'],
       referenciaId: json['referencia_id'],
       numeroParcela: json['numero_parcela'],
-      valorParcela: (json['valor_parcela'] ?? 0).toDouble(),
-      valorPago: (json['valor_pago'] ?? 0).toDouble(),
+      valorParcela: _toDouble(json['valor_parcela']),
+      valorPago: _toDouble(json['valor_pago']),
       dataVencimento: DateTime.parse(json['data_vencimento']),
       status: json['status'],
       createdAt: DateTime.parse(json['created_at']),
