@@ -1,0 +1,3 @@
+# Force rebuild
+.dart_tool/
+build/
