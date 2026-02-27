@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_service.dart';
@@ -8,8 +9,14 @@ class AuthService extends ChangeNotifier {
   String? _username;
   String? _fotoUrl;
   bool _isAuthenticated = false;
+  Timer? _tokenCheckTimer;
 
-  String? get token => _token;
+  String? get token {
+    if (_token == null && kDebugMode) {
+      print('⚠️ Token solicitado mas está NULL!');
+    }
+    return _token;
+  }
   String? get perfil => _perfil;
   String? get username => _username;
   String? get fotoUrl => _fotoUrl;
@@ -17,6 +24,37 @@ class AuthService extends ChangeNotifier {
   bool get isAdmin => _perfil == 'ADMIN';
   bool get isVendedor => _perfil == 'VENDEDOR';
   bool get canCadastrarProduto => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+
+  AuthService() {
+    _loadToken();
+    _startTokenCheck();
+  }
+
+  void _startTokenCheck() {
+    // Verificar token a cada 30 segundos
+    _tokenCheckTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (kDebugMode) {
+        print('🔍 Verificando token...');
+        print('   Token: ${_token != null ? "PRESENTE" : "AUSENTE"}');
+        print('   Autenticado: $_isAuthenticated');
+        if (_token != null) {
+          print('   Token (primeiros 20 chars): ${_token!.substring(0, _token!.length > 20 ? 20 : _token!.length)}...');
+        }
+      }
+      
+      if (_token == null && _isAuthenticated) {
+        print('🚨 PROBLEMA DETECTADO: Token NULL mas isAuthenticated=true!');
+        print('   Forçando logout...');
+        logout();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tokenCheckTimer?.cancel();
+    super.dispose();
+  }
 
   AuthService() {
     _loadToken();
