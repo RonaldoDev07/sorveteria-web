@@ -447,6 +447,18 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
       print('   Exemplo: ${widget.produtos.first.nome}');
     } else {
       print('   ⚠️ AVISO: Lista de produtos vazia no dialog!');
+      // Mostrar alerta visual
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('⚠️ ERRO: ${widget.produtos.length} produtos carregados! Verifique se há produtos cadastrados.'),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      });
     }
   }
 
