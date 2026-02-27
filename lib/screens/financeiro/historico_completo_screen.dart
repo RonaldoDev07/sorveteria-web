@@ -80,26 +80,38 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
 
       // Adicionar movimentações de estoque (vendas à vista)
       for (var mov in movimentacoes) {
-        if (mov['tipo'] == 'SAIDA') {
-          itens.add(_ItemHistorico(
-            tipo: 'Venda à Vista',
-            descricao: mov['produto_nome'] ?? 'Produto',
-            valor: (mov['quantidade'] ?? 0) * (mov['preco_venda'] ?? 0),
-            data: DateTime.parse(mov['data_movimentacao']),
-            status: 'quitada',
-            cor: Colors.teal,
-            icone: Icons.shopping_cart,
-          ));
-        } else if (mov['tipo'] == 'ENTRADA') {
-          itens.add(_ItemHistorico(
-            tipo: 'Compra à Vista',
-            descricao: mov['produto_nome'] ?? 'Produto',
-            valor: (mov['quantidade'] ?? 0) * (mov['custo_unitario'] ?? 0),
-            data: DateTime.parse(mov['data_movimentacao']),
-            status: 'quitada',
-            cor: Colors.orange,
-            icone: Icons.inventory,
-          ));
+        try {
+          DateTime data;
+          if (mov['data_movimentacao'] is String) {
+            data = DateTime.parse(mov['data_movimentacao']);
+          } else {
+            data = DateTime.now();
+          }
+          
+          if (mov['tipo'] == 'SAIDA') {
+            itens.add(_ItemHistorico(
+              tipo: 'Venda à Vista',
+              descricao: mov['produto_nome'] ?? 'Produto',
+              valor: ((mov['quantidade'] ?? 0) * (mov['preco_venda'] ?? 0)).toDouble(),
+              data: data,
+              status: 'quitada',
+              cor: Colors.teal,
+              icone: Icons.shopping_cart,
+            ));
+          } else if (mov['tipo'] == 'ENTRADA') {
+            itens.add(_ItemHistorico(
+              tipo: 'Compra à Vista',
+              descricao: mov['produto_nome'] ?? 'Produto',
+              valor: ((mov['quantidade'] ?? 0) * (mov['custo_unitario'] ?? 0)).toDouble(),
+              data: data,
+              status: 'quitada',
+              cor: Colors.orange,
+              icone: Icons.inventory,
+            ));
+          }
+        } catch (e) {
+          print('Erro ao processar movimentação: $e');
+          // Ignora movimentações com erro
         }
       }
 
