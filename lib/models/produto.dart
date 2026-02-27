@@ -21,13 +21,21 @@ class Produto {
 
   factory Produto.fromJson(Map<String, dynamic> json) {
     try {
+      // Helper para converter String ou num para double
+      double parseDouble(dynamic value) {
+        if (value == null) return 0.0;
+        if (value is num) return value.toDouble();
+        if (value is String) return double.parse(value);
+        throw TypeError();
+      }
+
       return Produto(
         id: json['id'] as int,
         nome: json['nome'] as String,
         unidade: json['unidade'] as String,
-        preco: (json['preco_venda'] as num).toDouble(),
-        quantidade: (json['estoque_atual'] as num).toDouble(),
-        custoMedio: json['custo_medio'] != null ? (json['custo_medio'] as num).toDouble() : null,
+        preco: parseDouble(json['preco_venda']),
+        quantidade: parseDouble(json['estoque_atual']),
+        custoMedio: json['custo_medio'] != null ? parseDouble(json['custo_medio']) : null,
         dataValidade: json['data_validade'] as String?,
         codigoBarras: json['codigo_barras'] as String?,
       );
