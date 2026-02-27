@@ -32,6 +32,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
   bool _isLoadingFornecedores = true;
   bool _isLoadingProdutos = true;
   
+  String _filtroProduto = '';
   final _observacoesController = TextEditingController();
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
@@ -513,13 +514,28 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          TextField(
+            decoration: const InputDecoration(
+              labelText: 'Pesquisar produto...',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.search),
+            ),
+            onChanged: (value) {
+              setState(() => _filtroProduto = value.toLowerCase());
+            },
+          ),
+          const SizedBox(height: 8),
           DropdownButtonFormField<Produto>(
             value: _produtoSelecionado,
             decoration: const InputDecoration(
               labelText: 'Produto',
               border: OutlineInputBorder(),
             ),
-            items: widget.produtos.map((produto) {
+            items: widget.produtos
+                .where((produto) => 
+                    _filtroProduto.isEmpty || 
+                    produto.nome.toLowerCase().contains(_filtroProduto))
+                .map((produto) {
               return DropdownMenuItem(
                 value: produto,
                 child: Text(produto.nome),

@@ -32,6 +32,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
   bool _isLoadingClientes = true;
   bool _isLoadingProdutos = true;
   
+  String _filtroProduto = '';
   final _observacoesController = TextEditingController();
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
@@ -623,7 +624,20 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
               ),
             ),
           
-          // DROPDOWN
+          // CAMPO DE PESQUISA
+          TextField(
+            decoration: const InputDecoration(
+              labelText: 'Pesquisar produto...',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.search),
+            ),
+            onChanged: (value) {
+              setState(() => _filtroProduto = value.toLowerCase());
+            },
+          ),
+          const SizedBox(height: 8),
+          
+          // DROPDOWN COM PRODUTOS FILTRADOS
           widget.produtos.isEmpty
               ? const SizedBox.shrink()
               : DropdownButtonFormField<Produto>(
@@ -632,7 +646,11 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                     labelText: 'Produto',
                     border: OutlineInputBorder(),
                   ),
-                  items: widget.produtos.map((produto) {
+                  items: widget.produtos
+                      .where((produto) => 
+                          _filtroProduto.isEmpty || 
+                          produto.nome.toLowerCase().contains(_filtroProduto))
+                      .map((produto) {
                     return DropdownMenuItem(
                       value: produto,
                       child: Text('${produto.nome} (Estoque: ${produto.quantidade})'),
