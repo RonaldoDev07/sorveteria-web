@@ -1,5 +1,5 @@
 class Produto {
-  final int id;
+  final String id;  // UUID como String
   final String nome;
   final String unidade;
   final double preco;
@@ -30,7 +30,7 @@ class Produto {
       }
 
       return Produto(
-        id: json['id'] as int,
+        id: json['id'].toString(),  // Converter para String (aceita int ou UUID)
         nome: json['nome'] as String,
         unidade: json['unidade'] as String,
         preco: parseDouble(json['preco_venda']),
