@@ -14,6 +14,7 @@ class CompraPrazo {
   final String usuarioId;
   final DateTime dataCompra;
   final double valorTotal;
+  final double valorPago;
   final double saldoDevedor;
   final String status;
   final String? observacoes;
@@ -28,6 +29,7 @@ class CompraPrazo {
     required this.usuarioId,
     required this.dataCompra,
     required this.valorTotal,
+    required this.valorPago,
     required this.saldoDevedor,
     required this.status,
     this.observacoes,
@@ -45,6 +47,7 @@ class CompraPrazo {
         usuarioId: json['usuario_id']?.toString() ?? '0',
         dataCompra: DateTime.parse(json['data_compra']),
         valorTotal: _toDouble(json['valor_total']),
+        valorPago: _toDouble(json['valor_pago']),
         saldoDevedor: _toDouble(json['saldo_devedor']),
         status: json['status'] ?? 'em_dia',
         observacoes: json['observacoes'],
