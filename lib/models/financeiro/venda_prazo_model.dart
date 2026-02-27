@@ -30,7 +30,7 @@ class VendaPrazo {
       id: json['id'],
       clienteId: json['cliente_id'],
       cliente: json['cliente'] != null ? Cliente.fromJson(json['cliente']) : null,
-      usuarioId: json['usuario_id'],
+      usuarioId: json['usuario_id'].toString(),  // Converter int para String
       dataVenda: DateTime.parse(json['data_venda']),
       valorTotal: (json['valor_total'] ?? 0).toDouble(),
       saldoDevedor: (json['saldo_devedor'] ?? 0).toDouble(),
