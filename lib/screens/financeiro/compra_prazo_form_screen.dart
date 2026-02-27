@@ -184,11 +184,11 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
         await _carregarFornecedores();
 
         // Selecionar o fornecedor recém-criado
-        final novoFornecedor = _fornecedores.firstWhere(
+        final fornecedorCriado = _fornecedores.firstWhere(
           (f) => f.cnpj == cnpjController.text,
           orElse: () => _fornecedores.last,
         );
-        setState(() => _fornecedorSelecionado = novoFornecedor);
+        setState(() => _fornecedorSelecionado = fornecedorCriado);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -220,11 +220,11 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
         await _carregarClientes();
 
         // Selecionar o cliente recém-criado
-        final novoCliente = _clientes.firstWhere(
+        final clienteCriado = _clientes.firstWhere(
           (c) => c.cpfCnpj == cpfCnpjController.text,
           orElse: () => _clientes.last,
         );
-        setState(() => _clienteSelecionado = novoCliente);
+        setState(() => _clienteSelecionado = clienteCriado);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
