@@ -5,6 +5,13 @@ import '../../models/financeiro/compra_prazo_model.dart';
 import '../auth_service.dart';
 import '../../config/api_config.dart';
 
+// Função helper para parsing defensivo de números
+double _toDouble(dynamic v) {
+  if (v == null) return 0.0;
+  if (v is num) return v.toDouble();
+  return double.tryParse(v.toString()) ?? 0.0;
+}
+
 class RelatorioService {
   final AuthService _authService;
 
@@ -42,9 +49,9 @@ class RelatorioService {
         final data = json.decode(utf8.decode(response.bodyBytes));
         return {
           'vendas': (data['vendas'] as List).map((v) => VendaPrazo.fromJson(v)).toList(),
-          'total_a_receber': (data['total_a_receber'] ?? 0).toDouble(),
-          'total_recebido': (data['total_recebido'] ?? 0).toDouble(),
-          'total_em_aberto': (data['total_em_aberto'] ?? 0).toDouble(),
+          'total_a_receber': _toDouble(data['total_a_receber']),
+          'total_recebido': _toDouble(data['total_recebido']),
+          'total_em_aberto': _toDouble(data['total_em_aberto']),
           'contas_atrasadas': data['contas_atrasadas'] ?? 0,
         };
       } else {
@@ -77,9 +84,9 @@ class RelatorioService {
         final data = json.decode(utf8.decode(response.bodyBytes));
         return {
           'compras': (data['compras'] as List).map((c) => CompraPrazo.fromJson(c)).toList(),
-          'total_a_pagar': (data['total_a_pagar'] ?? 0).toDouble(),
-          'total_pago': (data['total_pago'] ?? 0).toDouble(),
-          'total_em_aberto': (data['total_em_aberto'] ?? 0).toDouble(),
+          'total_a_pagar': _toDouble(data['total_a_pagar']),
+          'total_pago': _toDouble(data['total_pago']),
+          'total_em_aberto': _toDouble(data['total_em_aberto']),
           'contas_atrasadas': data['contas_atrasadas'] ?? 0,
         };
       } else {
