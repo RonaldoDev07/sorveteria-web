@@ -56,10 +56,6 @@ class AuthService extends ChangeNotifier {
     super.dispose();
   }
 
-  AuthService() {
-    _loadToken();
-  }
-
   Future<void> _loadToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();

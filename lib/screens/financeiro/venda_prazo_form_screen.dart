@@ -82,7 +82,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
     try {
       print('🔍 Carregando produtos para venda...');
       final produtos = await _produtoService.listarProdutos();
-      print('✅ ${produtos.length} produtos carregados');
+      print('✅ ${produtos.length} produtos carregados da API');
       
       if (mounted) {
         setState(() {
@@ -91,15 +91,30 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
           _isLoadingProdutos = false;
         });
         print('📦 ${_produtos.length} produtos disponíveis no dropdown');
+        
+        // Listar os produtos para debug
+        if (_produtos.isNotEmpty) {
+          print('📋 Produtos carregados:');
+          for (var p in _produtos.take(5)) {
+            print('   - ${p.nome} (ID: ${p.id}, Estoque: ${p.quantidade})');
+          }
+          if (_produtos.length > 5) {
+            print('   ... e mais ${_produtos.length - 5} produtos');
+          }
+        } else {
+          print('⚠️ AVISO: Lista de produtos está vazia!');
+        }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('❌ Erro ao carregar produtos: $e');
+      print('Stack trace: $stackTrace');
       if (mounted) {
         setState(() => _isLoadingProdutos = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao carregar produtos: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
           ),
         );
       }
@@ -424,33 +439,54 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
   final _valorController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    print('🔍 Dialog Adicionar Produto iniciado');
+    print('   Produtos recebidos: ${widget.produtos.length}');
+    if (widget.produtos.isNotEmpty) {
+      print('   Exemplo: ${widget.produtos.first.nome}');
+    } else {
+      print('   ⚠️ AVISO: Lista de produtos vazia no dialog!');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Adicionar Produto'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          DropdownButtonFormField<Produto>(
-            value: _produtoSelecionado,
-            decoration: const InputDecoration(
-              labelText: 'Produto',
-              border: OutlineInputBorder(),
-            ),
-            items: widget.produtos.map((produto) {
-              return DropdownMenuItem(
-                value: produto,
-                child: Text('${produto.nome} (Estoque: ${produto.quantidade})'),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _produtoSelecionado = value;
-                if (value != null) {
-                  _valorController.text = value.preco.toStringAsFixed(2);
-                }
-              });
-            },
-          ),
+          widget.produtos.isEmpty
+              ? const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'Nenhum produto disponível. Cadastre produtos primeiro.',
+                    style: TextStyle(color: Colors.orange),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : DropdownButtonFormField<Produto>(
+                  value: _produtoSelecionado,
+                  decoration: const InputDecoration(
+                    labelText: 'Produto',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: widget.produtos.map((produto) {
+                    return DropdownMenuItem(
+                      value: produto,
+                      child: Text('${produto.nome} (Estoque: ${produto.quantidade})'),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _produtoSelecionado = value;
+                      if (value != null) {
+                        _valorController.text = value.preco.toStringAsFixed(2);
+                      }
+                    });
+                  },
+                ),
           const SizedBox(height: 16),
           TextField(
             controller: _quantidadeController,
