@@ -54,7 +54,10 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
 
   Future<void> _carregarClientes() async {
     try {
+      print('🔍 Carregando clientes...');
       final clientes = await _clienteService.listarClientes();
+      print('✅ ${clientes.length} clientes carregados');
+      
       if (mounted) {
         setState(() {
           _clientes = clientes;
@@ -62,24 +65,43 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
         });
       }
     } catch (e) {
+      print('❌ Erro ao carregar clientes: $e');
       if (mounted) {
         setState(() => _isLoadingClientes = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar clientes: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
 
   Future<void> _carregarProdutos() async {
     try {
+      print('🔍 Carregando produtos para venda...');
       final produtos = await _produtoService.listarProdutos();
+      print('✅ ${produtos.length} produtos carregados');
+      
       if (mounted) {
         setState(() {
-          _produtos = produtos.where((p) => p.quantidade > 0).toList();
+          // Remover filtro de quantidade para debug - mostrar todos os produtos
+          _produtos = produtos; // .where((p) => p.quantidade > 0).toList();
           _isLoadingProdutos = false;
         });
+        print('📦 ${_produtos.length} produtos disponíveis no dropdown');
       }
     } catch (e) {
+      print('❌ Erro ao carregar produtos: $e');
       if (mounted) {
         setState(() => _isLoadingProdutos = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar produtos: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
