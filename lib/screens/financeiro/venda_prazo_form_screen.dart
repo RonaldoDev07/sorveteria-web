@@ -145,6 +145,101 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
     });
   }
 
+  Future<void> _cadastrarClienteRapido() async {
+    final nomeController = TextEditingController();
+    final cpfCnpjController = TextEditingController();
+    final telefoneController = TextEditingController();
+
+    final resultado = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cadastrar Cliente'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nomeController,
+                decoration: const InputDecoration(
+                  labelText: 'Nome *',
+                  border: OutlineInputBorder(),
+                ),
+                textCapitalization: TextCapitalization.words,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: cpfCnpjController,
+                decoration: const InputDecoration(
+                  labelText: 'CPF/CNPJ *',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: telefoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Telefone',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Cadastrar'),
+          ),
+        ],
+      ),
+    );
+
+    if (resultado == true) {
+      if (nomeController.text.isEmpty || cpfCnpjController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Preencha nome e CPF/CNPJ')),
+        );
+        return;
+      }
+
+      try {
+        await _clienteService.criarCliente(
+          nome: nomeController.text,
+          cpfCnpj: cpfCnpjController.text,
+          telefone: telefoneController.text.isEmpty ? null : telefoneController.text,
+        );
+
+        // Recarregar lista de clientes
+        await _carregarClientes();
+
+        // Selecionar o cliente recém-criado
+        final novoCliente = _clientes.firstWhere(
+          (c) => c.cpfCnpj == cpfCnpjController.text,
+          orElse: () => _clientes.last,
+        );
+        setState(() => _clienteSelecionado = novoCliente);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Cliente cadastrado com sucesso')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
+
   double get _valorTotal {
     return _itensVenda.fold(0, (sum, item) => sum + item.subtotal);
   }
@@ -248,23 +343,35 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                 padding: const EdgeInsets.all(16),
                 children: [
                   // Cliente
-                  DropdownButtonFormField<Cliente>(
-                    value: _clienteSelecionado,
-                    decoration: const InputDecoration(
-                      labelText: 'Cliente *',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person),
-                    ),
-                    items: _clientes.map((cliente) {
-                      return DropdownMenuItem(
-                        value: cliente,
-                        child: Text(cliente.nome),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => _clienteSelecionado = value);
-                    },
-                    validator: (value) => value == null ? 'Selecione um cliente' : null,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<Cliente>(
+                          value: _clienteSelecionado,
+                          decoration: const InputDecoration(
+                            labelText: 'Cliente *',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.person),
+                          ),
+                          items: _clientes.map((cliente) {
+                            return DropdownMenuItem(
+                              value: cliente,
+                              child: Text(cliente.nome),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() => _clienteSelecionado = value);
+                          },
+                          validator: (value) => value == null ? 'Selecione um cliente' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: _cadastrarClienteRapido,
+                        icon: const Icon(Icons.add_circle, color: Colors.green, size: 32),
+                        tooltip: 'Cadastrar novo cliente',
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   

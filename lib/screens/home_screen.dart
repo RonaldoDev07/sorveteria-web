@@ -10,6 +10,8 @@ import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
 import 'carrinho_venda_screen.dart';
 import 'financeiro/financeiro_menu_screen.dart';
+import 'financeiro/venda_prazo_form_screen.dart';
+import 'financeiro/compra_prazo_form_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -329,6 +331,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const CarrinhoVendaScreen()),
+                        ),
+                      ),
+                      _MenuCard(
+                        emoji: '💳',
+                        title: 'Venda a Prazo',
+                        color: const Color(0xFF10B981),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const VendaPrazoFormScreen()),
                         ),
                       ),
                       if (auth.canCadastrarProduto)

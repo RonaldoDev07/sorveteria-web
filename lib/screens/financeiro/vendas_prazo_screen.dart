@@ -5,6 +5,7 @@ import '../../models/financeiro/venda_prazo_model.dart';
 import '../../services/financeiro/venda_prazo_service.dart';
 import '../../services/auth_service.dart';
 import 'venda_prazo_form_screen.dart';
+import 'venda_detalhes_screen.dart';
 
 class VendasPrazoScreen extends StatefulWidget {
   const VendasPrazoScreen({super.key});
@@ -22,7 +23,7 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
   String? _filtroStatus = 'ativas'; // Filtro padrão: não mostrar canceladas
   final TextEditingController _searchController = TextEditingController();
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final _formatoData = DateFormat('dd/MM/yyyy');
 
   @override
@@ -271,6 +272,14 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
                           return Card(
                             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => VendaDetalhesScreen(venda: venda),
+                                  ),
+                                );
+                              },
                               leading: CircleAvatar(
                                 backgroundColor: _getStatusColor(venda.status),
                                 child: const Icon(Icons.shopping_cart, color: Colors.white),
@@ -321,6 +330,9 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
                         },
                       ),
                     ),
+                  ],
+                ),
+              ),
       floatingActionButton: FloatingActionButton(
         onPressed: _abrirFormulario,
         backgroundColor: Colors.green,

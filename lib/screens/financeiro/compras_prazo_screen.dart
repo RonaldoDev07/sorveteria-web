@@ -5,6 +5,7 @@ import '../../models/financeiro/compra_prazo_model.dart';
 import '../../services/financeiro/compra_prazo_service.dart';
 import '../../services/auth_service.dart';
 import 'compra_prazo_form_screen.dart';
+import 'compra_detalhes_screen.dart';
 
 class ComprasPrazoScreen extends StatefulWidget {
   const ComprasPrazoScreen({super.key});
@@ -15,12 +16,14 @@ class ComprasPrazoScreen extends StatefulWidget {
 
 class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
   List<CompraPrazo> _compras = [];
+  List<CompraPrazo> _comprasFiltradas = [];
   bool _isLoading = true;
   String? _errorMessage;
   CompraPrazoService? _compraService;
   String? _filtroStatus = 'ativas'; // Filtro padrão: não mostrar canceladas
+  final TextEditingController _searchController = TextEditingController();
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final _formatoData = DateFormat('dd/MM/yyyy');
 
   @override
@@ -31,6 +34,26 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
       _compraService = CompraPrazoService(authService);
       _carregarCompras();
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filtrarCompras(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _comprasFiltradas = _compras;
+      } else {
+        _comprasFiltradas = _compras.where((compra) {
+          final nomeFornecedor = compra.fornecedor?.nome.toLowerCase() ?? '';
+          final searchLower = query.toLowerCase();
+          return nomeFornecedor.contains(searchLower);
+        }).toList();
+      }
+    });
   }
 
   Future<void> _carregarCompras() async {
@@ -56,6 +79,7 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
       
       setState(() {
         _compras = comprasFiltradas;
+        _comprasFiltradas = comprasFiltradas;
         _isLoading = false;
       });
     } catch (e) {
@@ -222,13 +246,40 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
                     )
                   : RefreshIndicator(
                       onRefresh: _carregarCompras,
-                      child: ListView.builder(
-                        itemCount: _compras.length,
-                        itemBuilder: (context, index) {
-                          final compra = _compras[index];
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Pesquisar fornecedor...',
+                                prefixIcon: const Icon(Icons.search),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                              ),
+                              onChanged: _filtrarCompras,
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: _comprasFiltradas.length,
+                              itemBuilder: (context, index) {
+                                final compra = _comprasFiltradas[index];
                           return Card(
                             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CompraDetalhesScreen(compra: compra),
+                                  ),
+                                );
+                              },
                               leading: CircleAvatar(
                                 backgroundColor: _getStatusColor(compra.status),
                                 child: const Icon(Icons.shopping_bag, color: Colors.white),
@@ -279,6 +330,9 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
                         },
                       ),
                     ),
+                  ],
+                ),
+              ),
       floatingActionButton: FloatingActionButton(
         onPressed: _abrirFormulario,
         backgroundColor: Colors.purple,

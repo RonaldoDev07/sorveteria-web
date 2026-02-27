@@ -7,6 +7,7 @@ import 'contas_receber_screen.dart';
 import 'contas_pagar_screen.dart';
 import 'vendas_prazo_screen.dart';
 import 'compras_prazo_screen.dart';
+import 'historico_completo_screen.dart';
 
 /// Tela de menu do módulo financeiro
 class FinanceiroMenuScreen extends StatelessWidget {
@@ -135,6 +136,20 @@ class FinanceiroMenuScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const DashboardFinanceiroScreen(),
+                  ),
+                );
+              },
+            ),
+            _MenuCard(
+              icon: Icons.history,
+              title: 'Histórico Completo',
+              subtitle: 'Todas as movimentações',
+              color: Colors.indigo,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HistoricoCompletoScreen(),
                   ),
                 );
               },

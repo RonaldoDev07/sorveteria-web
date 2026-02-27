@@ -108,6 +108,102 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
     });
   }
 
+  Future<void> _cadastrarFornecedorRapido() async {
+    final nomeController = TextEditingController();
+    final cnpjController = TextEditingController();
+    final telefoneController = TextEditingController();
+
+    final resultado = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cadastrar Fornecedor'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nomeController,
+                decoration: const InputDecoration(
+                  labelText: 'Nome *',
+                  border: OutlineInputBorder(),
+                ),
+                textCapitalization: TextCapitalization.words,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: cnpjController,
+                decoration: const InputDecoration(
+                  labelText: 'CNPJ *',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: telefoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Telefone',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+            child: const Text('Cadastrar'),
+          ),
+        ],
+      ),
+    );
+
+    if (resultado == true) {
+      if (nomeController.text.isEmpty || cnpjController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Preencha nome e CNPJ')),
+        );
+        return;
+      }
+
+      try {
+        await _fornecedorService.criarFornecedor(
+          nome: nomeController.text,
+          cnpj: cnpjController.text,
+          telefone: telefoneController.text.isEmpty ? null : telefoneController.text,
+        );
+
+        // Recarregar lista de fornecedores
+        await _carregarFornecedores();
+
+        // Selecionar o fornecedor recém-criado
+        final novoFornecedor = _fornecedores.firstWhere(
+          (f) => f.cnpj == cnpjController.text,
+          orElse: () => _fornecedores.last,
+        );
+        setState(() => _fornecedorSelecionado = novoFornecedor);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Fornecedor cadastrado com sucesso')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
+
   double get _valorTotal {
     return _itensCompra.fold(0, (sum, item) => sum + item.subtotal);
   }
@@ -210,23 +306,35 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  DropdownButtonFormField<Fornecedor>(
-                    value: _fornecedorSelecionado,
-                    decoration: const InputDecoration(
-                      labelText: 'Fornecedor *',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.business),
-                    ),
-                    items: _fornecedores.map((fornecedor) {
-                      return DropdownMenuItem(
-                        value: fornecedor,
-                        child: Text(fornecedor.nome),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => _fornecedorSelecionado = value);
-                    },
-                    validator: (value) => value == null ? 'Selecione um fornecedor' : null,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<Fornecedor>(
+                          value: _fornecedorSelecionado,
+                          decoration: const InputDecoration(
+                            labelText: 'Fornecedor *',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.business),
+                          ),
+                          items: _fornecedores.map((fornecedor) {
+                            return DropdownMenuItem(
+                              value: fornecedor,
+                              child: Text(fornecedor.nome),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() => _fornecedorSelecionado = value);
+                          },
+                          validator: (value) => value == null ? 'Selecione um fornecedor' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: _cadastrarFornecedorRapido,
+                        icon: const Icon(Icons.add_circle, color: Colors.purple, size: 32),
+                        tooltip: 'Cadastrar novo fornecedor',
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   
