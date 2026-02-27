@@ -20,15 +20,21 @@ class Produto {
   });
 
   factory Produto.fromJson(Map<String, dynamic> json) {
-    return Produto(
-      id: json['id'],
-      nome: json['nome'],
-      unidade: json['unidade'],
-      preco: (json['preco_venda'] ?? 0).toDouble(),
-      quantidade: (json['estoque_atual'] ?? 0).toDouble(),
-      custoMedio: json['custo_medio']?.toDouble(),
-      dataValidade: json['data_validade'],
-      codigoBarras: json['codigo_barras'],
-    );
+    try {
+      return Produto(
+        id: json['id'] as int,
+        nome: json['nome'] as String,
+        unidade: json['unidade'] as String,
+        preco: (json['preco_venda'] as num).toDouble(),
+        quantidade: (json['estoque_atual'] as num).toDouble(),
+        custoMedio: json['custo_medio'] != null ? (json['custo_medio'] as num).toDouble() : null,
+        dataValidade: json['data_validade'] as String?,
+        codigoBarras: json['codigo_barras'] as String?,
+      );
+    } catch (e) {
+      print('❌ Erro em Produto.fromJson: $e');
+      print('   JSON recebido: $json');
+      rethrow;
+    }
   }
 }
