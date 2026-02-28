@@ -80,13 +80,35 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
     );
 
     if (resultado == true && mounted) {
-      // Recarregar dados
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pagamento registrado com sucesso!')),
-      );
-      // Atualizar valores (simplificado - idealmente recarregar da API)
-      _carregarPagamentos();
-      Navigator.pop(context, true); // Voltar e sinalizar que houve mudança
+      // Atualizar valores localmente
+      setState(() {
+        _venda = VendaPrazo(
+          id: _venda.id,
+          clienteId: _venda.clienteId,
+          cliente: _venda.cliente,
+          usuarioId: _venda.usuarioId,
+          dataVenda: _venda.dataVenda,
+          valorTotal: _venda.valorTotal,
+          valorPago: _venda.valorPago, // Será atualizado ao recarregar
+          saldoDevedor: _venda.saldoDevedor, // Será atualizado ao recarregar
+          status: _venda.status,
+          observacoes: _venda.observacoes,
+          createdAt: _venda.createdAt,
+          updatedAt: _venda.updatedAt,
+          produtos: _venda.produtos,
+        );
+      });
+      
+      // Recarregar pagamentos
+      await _carregarPagamentos();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pagamento registrado com sucesso!')),
+        );
+        // Voltar e sinalizar que houve mudança para recarregar a lista
+        Navigator.pop(context, true);
+      }
     }
   }
 

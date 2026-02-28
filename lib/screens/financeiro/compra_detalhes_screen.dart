@@ -80,11 +80,16 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
     );
 
     if (resultado == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pagamento registrado com sucesso!')),
-      );
-      _carregarPagamentos();
-      Navigator.pop(context, true);
+      // Recarregar pagamentos
+      await _carregarPagamentos();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pagamento registrado com sucesso!')),
+        );
+        // Voltar e sinalizar que houve mudança para recarregar a lista
+        Navigator.pop(context, true);
+      }
     }
   }
 
