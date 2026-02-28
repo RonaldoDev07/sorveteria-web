@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../models/financeiro/venda_prazo_model.dart';
 import '../../services/financeiro/relatorio_service.dart';
 import '../../services/auth_service.dart';
+import 'venda_detalhes_screen.dart';
 
 class ContasReceberScreen extends StatefulWidget {
   const ContasReceberScreen({super.key});
@@ -223,11 +224,12 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                                           ? const Icon(Icons.arrow_forward_ios)
                                           : null,
                                       onTap: () {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Detalhes da venda em desenvolvimento'),
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => VendaDetalhesScreen(venda: venda),
                                           ),
-                                        );
+                                        ).then((_) => _carregarContas());
                                       },
                                     ),
                                   );
