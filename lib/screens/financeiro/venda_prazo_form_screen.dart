@@ -574,119 +574,167 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
 
   @override
   Widget build(BuildContext context) {
+    final produtosFiltrados = widget.produtos
+        .where((produto) => 
+            _filtroProduto.isEmpty || 
+            produto.nome.toLowerCase().contains(_filtroProduto))
+        .toList();
+    
     return AlertDialog(
       title: const Text('Adicionar Produto'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // MOSTRAR STATUS DOS PRODUTOS
-          if (widget.produtos.isEmpty)
-            Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade100,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange),
-              ),
-              child: Column(
-                children: [
-                  const Icon(Icons.warning, color: Colors.orange, size: 32),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Nenhum produto disponível',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Total recebido: ${widget.produtos.length} produtos',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Cadastre produtos na aba Produtos primeiro',
-                    style: TextStyle(fontSize: 12),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            )
-          else
-            Container(
-              padding: const EdgeInsets.all(8),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.green.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '✅ ${widget.produtos.length} produtos disponíveis',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-            ),
-          
-          // CAMPO DE PESQUISA
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Pesquisar produto...',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.search),
-            ),
-            onChanged: (value) {
-              setState(() => _filtroProduto = value.toLowerCase());
-            },
-          ),
-          const SizedBox(height: 8),
-          
-          // DROPDOWN COM PRODUTOS FILTRADOS
-          widget.produtos.isEmpty
-              ? const SizedBox.shrink()
-              : DropdownButtonFormField<Produto>(
-                  value: _produtoSelecionado,
-                  decoration: const InputDecoration(
-                    labelText: 'Produto',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: widget.produtos
-                      .where((produto) => 
-                          _filtroProduto.isEmpty || 
-                          produto.nome.toLowerCase().contains(_filtroProduto))
-                      .map((produto) {
-                    return DropdownMenuItem(
-                      value: produto,
-                      child: Text('${produto.nome} (Estoque: ${produto.quantidade})'),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _produtoSelecionado = value;
-                      if (value != null) {
-                        _valorController.text = value.preco.toStringAsFixed(2);
-                      }
-                    });
-                  },
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 500,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // CAMPO DE PESQUISA
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Pesquisar produto...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _quantidadeController,
-            decoration: const InputDecoration(
-              labelText: 'Quantidade',
-              border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+              onChanged: (value) {
+                setState(() => _filtroProduto = value.toLowerCase());
+              },
             ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _valorController,
-            decoration: const InputDecoration(
-              labelText: 'Valor Unitário',
-              prefixText: 'R\$ ',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+            
+            // LISTA DE PRODUTOS
+            Expanded(
+              child: produtosFiltrados.isEmpty
+                  ? const Center(child: Text('Nenhum produto encontrado'))
+                  : ListView.builder(
+                      itemCount: produtosFiltrados.length,
+                      itemBuilder: (context, index) {
+                        final produto = produtosFiltrados[index];
+                        final isSelected = _produtoSelecionado?.id == produto.id;
+                        
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          color: isSelected ? Colors.green.shade50 : null,
+                          child: ListTile(
+                            leading: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.inventory_2, color: Colors.white, size: 20),
+                            ),
+                            title: Text(
+                              produto.nome,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.shade100,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    '${produto.quantidade} UN',
+                                    style: TextStyle(
+                                      color: Colors.orange.shade900,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.shade100,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    'R\$ ${produto.preco.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color: Colors.green.shade900,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: isSelected 
+                                ? const Icon(Icons.check_circle, color: Colors.green)
+                                : const Icon(Icons.arrow_forward_ios, size: 16),
+                            onTap: () {
+                              setState(() {
+                                _produtoSelecionado = produto;
+                                _valorController.text = produto.preco.toStringAsFixed(2);
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ),
             ),
-            keyboardType: TextInputType.number,
-          ),
-        ],
+            
+            const SizedBox(height: 16),
+            
+            // PRODUTO SELECIONADO
+            if (_produtoSelecionado != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Selecionado: ${_produtoSelecionado!.nome}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _quantidadeController,
+                            decoration: const InputDecoration(
+                              labelText: 'Quantidade',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _valorController,
+                            decoration: const InputDecoration(
+                              labelText: 'Valor',
+                              prefixText: 'R\$ ',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
       actions: [
         TextButton(
