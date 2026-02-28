@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../models/financeiro/compra_prazo_model.dart';
 import '../../services/financeiro/relatorio_service.dart';
 import '../../services/auth_service.dart';
+import 'compra_detalhes_screen.dart';
 
 class ContasPagarScreen extends StatefulWidget {
   const ContasPagarScreen({super.key});
@@ -223,11 +224,12 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                                           ? const Icon(Icons.arrow_forward_ios)
                                           : null,
                                       onTap: () {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Detalhes da compra em desenvolvimento'),
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => CompraDetalhesScreen(compra: compra),
                                           ),
-                                        );
+                                        ).then((_) => _carregarContas());
                                       },
                                     ),
                                   );

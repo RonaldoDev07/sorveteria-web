@@ -246,31 +246,72 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
               ),
               const SizedBox(height: 8),
               ..._venda.produtos!.map((produto) {
-                // Acessar como Map para evitar erro de tipo
-                final produtoMap = produto as Map<String, dynamic>;
-                final produtoId = produtoMap['produto_id']?.toString() ?? 'N/A';
-                final quantidade = produtoMap['quantidade'] ?? 0;
-                final valorUnitario = _toDouble(produtoMap['valor_unitario']);
-                final subtotal = _toDouble(produtoMap['subtotal']);
-                
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: Colors.green,
-                      child: Icon(Icons.shopping_bag, color: Colors.white, size: 20),
-                    ),
-                    title: Text('Produto ID: $produtoId'),
-                    subtitle: Text('${quantidade}x ${formatoMoeda.format(valorUnitario)}'),
-                    trailing: Text(
-                      formatoMoeda.format(subtotal),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                try {
+                  // Acessar como Map para evitar erro de tipo
+                  final produtoMap = produto as Map<String, dynamic>;
+                  
+                  // Tentar pegar produto_id ou produtoId
+                  final produtoId = produtoMap['produto_id']?.toString() ?? 
+                                   produtoMap['produtoId']?.toString() ?? 
+                                   'N/A';
+                  
+                  final quantidade = produtoMap['quantidade'] ?? 0;
+                  
+                  // Tentar pegar valor_unitario ou valorUnitario
+                  final valorUnitario = _toDouble(
+                    produtoMap['valor_unitario'] ?? produtoMap['valorUnitario']
+                  );
+                  
+                  final subtotal = _toDouble(produtoMap['subtotal']);
+                  
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: ListTile(
+                      leading: const CircleAvatar(
+                        backgroundColor: Colors.green,
+                        child: Icon(Icons.shopping_bag, color: Colors.white, size: 20),
+                      ),
+                      title: Text('Produto #$produtoId'),
+                      subtitle: Text(
+                        'Quantidade: $quantidade un.\n'
+                        'Valor unitário: ${formatoMoeda.format(valorUnitario)}',
+                      ),
+                      isThreeLine: true,
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'Subtotal',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          Text(
+                            formatoMoeda.format(subtotal),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                );
+                  );
+                } catch (e) {
+                  print('Erro ao processar produto: $e');
+                  print('Produto data: $produto');
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: ListTile(
+                      leading: const CircleAvatar(
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.error, color: Colors.white, size: 20),
+                      ),
+                      title: const Text('Erro ao carregar produto'),
+                      subtitle: Text('Detalhes: $e'),
+                    ),
+                  );
+                }
               }),
             ],
 
