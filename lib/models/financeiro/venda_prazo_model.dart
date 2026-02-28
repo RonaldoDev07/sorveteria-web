@@ -40,6 +40,12 @@ class VendaPrazo {
 
   factory VendaPrazo.fromJson(Map<String, dynamic> json) {
     try {
+      // Debug: imprimir produtos
+      if (json['produtos'] != null) {
+        print('🔍 Produtos recebidos: ${json['produtos']}');
+        print('🔍 Tipo de produtos: ${json['produtos'].runtimeType}');
+      }
+      
       return VendaPrazo(
         id: json['id'],
         clienteId: json['cliente_id'],
@@ -55,9 +61,10 @@ class VendaPrazo {
         updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
         produtos: json['produtos'] as List<dynamic>?,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('❌ Erro em VendaPrazo.fromJson: $e');
       print('   JSON recebido: $json');
+      print('   Stack trace: $stackTrace');
       rethrow;
     }
   }
