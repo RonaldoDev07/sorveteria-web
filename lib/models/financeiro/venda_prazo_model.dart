@@ -65,5 +65,4 @@ class VendaPrazo {
   bool get estaQuitada => status == 'quitada';
   bool get estaAtrasada => status == 'atrasada';
   bool get estaCancelada => status == 'cancelada';
-  double get valorPago => valorTotal - saldoDevedor;
 }
