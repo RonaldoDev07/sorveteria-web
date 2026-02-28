@@ -1,0 +1,3 @@
+Force rebuild - Fix minified code error
+Data: 27/02/2026
+Motivo: NoSuchMethodError produtoId em vendas/compras
