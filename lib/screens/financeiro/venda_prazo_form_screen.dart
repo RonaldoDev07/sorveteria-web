@@ -574,30 +574,33 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
 
   @override
   Widget build(BuildContext context) {
-    final produtosFiltrados = widget.produtos
-        .where((produto) => 
-            _filtroProduto.isEmpty || 
-            produto.nome.toLowerCase().contains(_filtroProduto))
-        .toList();
-    
-    return AlertDialog(
-      title: const Text('Adicionar Produto'),
-      content: SizedBox(
-        width: double.maxFinite,
-        height: 500,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // CAMPO DE PESQUISA
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Pesquisar produto...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
+    try {
+      final produtosFiltrados = widget.produtos
+          .where((produto) => 
+              _filtroProduto.isEmpty || 
+              produto.nome.toLowerCase().contains(_filtroProduto))
+          .toList();
+      
+      print('📋 Produtos filtrados: ${produtosFiltrados.length}');
+      
+      return AlertDialog(
+        title: const Text('Adicionar Produto'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // CAMPO DE PESQUISA
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Pesquisar produto...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
               ),
               onChanged: (value) {
                 setState(() => _filtroProduto = value.toLowerCase());
@@ -774,6 +777,20 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
         ),
       ],
     );
+    } catch (e, stackTrace) {
+      print('❌ ERRO NO BUILD DO DIALOG: $e');
+      print('Stack: $stackTrace');
+      return AlertDialog(
+        title: const Text('Erro'),
+        content: Text('Erro ao carregar produtos: $e'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Fechar'),
+          ),
+        ],
+      );
+    }
   }
 }
 
