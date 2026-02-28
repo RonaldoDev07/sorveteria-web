@@ -5,6 +5,10 @@ import '../../services/auth_service.dart';
 import '../../services/financeiro/venda_prazo_service.dart';
 import '../../services/financeiro/compra_prazo_service.dart';
 import '../../services/api_service.dart';
+import '../../models/financeiro/venda_prazo_model.dart';
+import '../../models/financeiro/compra_prazo_model.dart';
+import 'venda_detalhes_screen.dart';
+import 'compra_detalhes_screen.dart';
 
 class HistoricoCompletoScreen extends StatefulWidget {
   const HistoricoCompletoScreen({super.key});
@@ -62,6 +66,7 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
           status: venda.status,
           cor: Colors.green,
           icone: Icons.credit_card,
+          vendaPrazo: venda,
         ));
       }
 
@@ -75,6 +80,7 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
           status: compra.status,
           cor: Colors.purple,
           icone: Icons.shopping_bag,
+          compraPrazo: compra,
         ));
       }
 
@@ -88,11 +94,18 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
             data = DateTime.now();
           }
           
+          // Calcular valor com segurança
+          double calcularValor(dynamic quantidade, dynamic preco) {
+            final qtd = quantidade is num ? quantidade.toDouble() : (double.tryParse(quantidade?.toString() ?? '0') ?? 0.0);
+            final prc = preco is num ? preco.toDouble() : (double.tryParse(preco?.toString() ?? '0') ?? 0.0);
+            return qtd * prc;
+          }
+          
           if (mov['tipo'] == 'SAIDA') {
             itens.add(_ItemHistorico(
               tipo: 'Venda à Vista',
               descricao: mov['produto_nome'] ?? 'Produto',
-              valor: ((mov['quantidade'] ?? 0) * (mov['preco_venda'] ?? 0)).toDouble(),
+              valor: calcularValor(mov['quantidade'], mov['preco_venda']),
               data: data,
               status: 'quitada',
               cor: Colors.teal,
@@ -102,7 +115,7 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
             itens.add(_ItemHistorico(
               tipo: 'Compra à Vista',
               descricao: mov['produto_nome'] ?? 'Produto',
-              valor: ((mov['quantidade'] ?? 0) * (mov['custo_unitario'] ?? 0)).toDouble(),
+              valor: calcularValor(mov['quantidade'], mov['custo_unitario']),
               data: data,
               status: 'quitada',
               cor: Colors.orange,
@@ -202,6 +215,23 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
                           return Card(
                             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                             child: ListTile(
+                              onTap: () {
+                                if (item.vendaPrazo != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VendaDetalhesScreen(venda: item.vendaPrazo!),
+                                    ),
+                                  );
+                                } else if (item.compraPrazo != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CompraDetalhesScreen(compra: item.compraPrazo!),
+                                    ),
+                                  );
+                                }
+                              },
                               leading: CircleAvatar(
                                 backgroundColor: item.cor,
                                 child: Icon(item.icone, color: Colors.white, size: 20),
@@ -289,6 +319,8 @@ class _ItemHistorico {
   final String status;
   final Color cor;
   final IconData icone;
+  final VendaPrazo? vendaPrazo;
+  final CompraPrazo? compraPrazo;
 
   _ItemHistorico({
     required this.tipo,
@@ -298,5 +330,7 @@ class _ItemHistorico {
     required this.status,
     required this.cor,
     required this.icone,
+    this.vendaPrazo,
+    this.compraPrazo,
   });
 }
