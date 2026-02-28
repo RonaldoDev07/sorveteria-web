@@ -6,6 +6,13 @@ import '../../models/financeiro/pagamento_model.dart';
 import '../../services/financeiro/pagamento_service.dart';
 import '../../services/auth_service.dart';
 
+// Função helper para parsing defensivo de números
+double _toDouble(dynamic v) {
+  if (v == null) return 0.0;
+  if (v is num) return v.toDouble();
+  return double.tryParse(v.toString()) ?? 0.0;
+}
+
 class CompraDetalhesScreen extends StatefulWidget {
   final CompraPrazo compra;
 
@@ -219,24 +226,33 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              ..._compra.produtos!.map((produto) => Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Colors.purple,
-                    child: Icon(Icons.inventory, color: Colors.white, size: 20),
-                  ),
-                  title: Text('Produto ID: ${produto.produtoId}'),
-                  subtitle: Text('${produto.quantidade}x ${formatoMoeda.format(produto.valorUnitario)}'),
-                  trailing: Text(
-                    formatoMoeda.format(produto.subtotal),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+              ..._compra.produtos!.map((produto) {
+                // Acessar como Map para evitar erro de tipo
+                final produtoMap = produto as Map<String, dynamic>;
+                final produtoId = produtoMap['produto_id']?.toString() ?? 'N/A';
+                final quantidade = produtoMap['quantidade'] ?? 0;
+                final valorUnitario = _toDouble(produtoMap['valor_unitario']);
+                final subtotal = _toDouble(produtoMap['subtotal']);
+                
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Colors.purple,
+                      child: Icon(Icons.inventory, color: Colors.white, size: 20),
+                    ),
+                    title: Text('Produto ID: $produtoId'),
+                    subtitle: Text('${quantidade}x ${formatoMoeda.format(valorUnitario)}'),
+                    trailing: Text(
+                      formatoMoeda.format(subtotal),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                ),
-              )),
+                );
+              }),
             ],
 
             const SizedBox(height: 16),
