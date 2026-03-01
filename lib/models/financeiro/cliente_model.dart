@@ -24,15 +24,15 @@ class Cliente {
     return Cliente(
       id: json['id'],
       nome: json['nome'],
-      cpfCnpj: json['cpf_cnpj'],
+      cpfCnpj: json['cpfCnpj'] ?? json['cpf_cnpj'],
       telefone: json['telefone'],
       endereco: json['endereco'],
       email: json['email'],
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+      createdAt: (json['createdAt'] ?? json['created_at']) != null 
+          ? DateTime.parse(json['createdAt'] ?? json['created_at']) 
           : null,
-      updatedAt: json['updated_at'] != null 
-          ? DateTime.parse(json['updated_at']) 
+      updatedAt: (json['updatedAt'] ?? json['updated_at']) != null 
+          ? DateTime.parse(json['updatedAt'] ?? json['updated_at']) 
           : null,
     );
   }

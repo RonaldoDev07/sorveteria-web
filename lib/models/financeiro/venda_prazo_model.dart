@@ -48,17 +48,19 @@ class VendaPrazo {
       
       return VendaPrazo(
         id: json['id'],
-        clienteId: json['cliente_id'],
+        clienteId: json['clienteId'] ?? json['cliente_id'],
         cliente: json['cliente'] != null ? Cliente.fromJson(json['cliente']) : null,
-        usuarioId: json['usuario_id']?.toString() ?? '0',
-        dataVenda: DateTime.parse(json['data_venda']),
-        valorTotal: _toDouble(json['valor_total']),
-        valorPago: _toDouble(json['valor_pago']),
-        saldoDevedor: _toDouble(json['saldo_devedor']),
+        usuarioId: (json['usuarioId'] ?? json['usuario_id'])?.toString() ?? '0',
+        dataVenda: DateTime.parse(json['dataVenda'] ?? json['data_venda']),
+        valorTotal: _toDouble(json['valorTotal'] ?? json['valor_total']),
+        valorPago: _toDouble(json['valorPago'] ?? json['valor_pago']),
+        saldoDevedor: _toDouble(json['saldoDevedor'] ?? json['saldo_devedor']),
         status: json['status'] ?? 'em_dia',
         observacoes: json['observacoes'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+        createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
+        updatedAt: (json['updatedAt'] ?? json['updated_at']) != null 
+            ? DateTime.parse(json['updatedAt'] ?? json['updated_at']) 
+            : null,
         produtos: json['produtos'] as List<dynamic>?,
       );
     } catch (e, stackTrace) {
