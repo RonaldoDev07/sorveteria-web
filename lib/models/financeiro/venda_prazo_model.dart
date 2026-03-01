@@ -46,22 +46,56 @@ class VendaPrazo {
         print('🔍 Tipo de produtos: ${json['produtos'].runtimeType}');
       }
       
+      // Parse com tratamento de erro individual para cada campo
+      final id = json['id'];
+      print('✅ id: $id');
+      
+      final clienteId = json['clienteId'] ?? json['cliente_id'];
+      print('✅ clienteId: $clienteId');
+      
+      final cliente = json['cliente'] != null ? Cliente.fromJson(json['cliente']) : null;
+      print('✅ cliente: ${cliente?.nome}');
+      
+      final usuarioId = (json['usuarioId'] ?? json['usuario_id'])?.toString() ?? '0';
+      print('✅ usuarioId: $usuarioId');
+      
+      final dataVendaStr = json['dataVenda'] ?? json['data_venda'];
+      print('🔍 dataVenda string: $dataVendaStr');
+      final dataVenda = DateTime.parse(dataVendaStr);
+      print('✅ dataVenda parsed: $dataVenda');
+      
+      final valorTotal = _toDouble(json['valorTotal'] ?? json['valor_total']);
+      final valorPago = _toDouble(json['valorPago'] ?? json['valor_pago']);
+      final saldoDevedor = _toDouble(json['saldoDevedor'] ?? json['saldo_devedor']);
+      final status = json['status'] ?? 'em_dia';
+      final observacoes = json['observacoes'];
+      
+      final createdAtStr = json['createdAt'] ?? json['created_at'];
+      print('🔍 createdAt string: $createdAtStr');
+      final createdAt = DateTime.parse(createdAtStr);
+      print('✅ createdAt parsed: $createdAt');
+      
+      final updatedAtStr = json['updatedAt'] ?? json['updated_at'];
+      print('🔍 updatedAt string: $updatedAtStr');
+      final updatedAt = updatedAtStr != null ? DateTime.parse(updatedAtStr) : null;
+      print('✅ updatedAt parsed: $updatedAt');
+      
+      final produtos = json['produtos'] as List<dynamic>?;
+      
       return VendaPrazo(
-        id: json['id'],
-        clienteId: json['clienteId'] ?? json['cliente_id'],
-        cliente: json['cliente'] != null ? Cliente.fromJson(json['cliente']) : null,
-        usuarioId: (json['usuarioId'] ?? json['usuario_id'])?.toString() ?? '0',
-        dataVenda: DateTime.parse(json['dataVenda'] ?? json['data_venda']),
-        valorTotal: _toDouble(json['valorTotal'] ?? json['valor_total']),
-        valorPago: _toDouble(json['valorPago'] ?? json['valor_pago']),
-        saldoDevedor: _toDouble(json['saldoDevedor'] ?? json['saldo_devedor']),
-        status: json['status'] ?? 'em_dia',
-        observacoes: json['observacoes'],
-        createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
-        updatedAt: (json['updatedAt'] ?? json['updated_at']) != null 
-            ? DateTime.parse(json['updatedAt'] ?? json['updated_at']) 
-            : null,
-        produtos: json['produtos'] as List<dynamic>?,
+        id: id,
+        clienteId: clienteId,
+        cliente: cliente,
+        usuarioId: usuarioId,
+        dataVenda: dataVenda,
+        valorTotal: valorTotal,
+        valorPago: valorPago,
+        saldoDevedor: saldoDevedor,
+        status: status,
+        observacoes: observacoes,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        produtos: produtos,
       );
     } catch (e, stackTrace) {
       print('❌ Erro em VendaPrazo.fromJson: $e');
