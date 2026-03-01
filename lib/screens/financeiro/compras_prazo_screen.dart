@@ -65,7 +65,7 @@ class _ComprasPrazoScreenState extends State<ComprasPrazoScreen> {
     final busca = _searchController.text.toLowerCase();
     if (busca.isNotEmpty) {
       resultado = resultado.where((c) {
-        final fornecedor = c.fornecedor?.nome?.toLowerCase() ?? '';
+        final fornecedor = (c.fornecedor?.nome ?? '').toLowerCase();
         return fornecedor.contains(busca);
       }).toList();
     }

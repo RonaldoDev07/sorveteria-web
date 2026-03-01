@@ -65,7 +65,7 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
     final busca = _searchController.text.toLowerCase();
     if (busca.isNotEmpty) {
       resultado = resultado.where((v) {
-        final cliente = v.cliente?.nome?.toLowerCase() ?? '';
+        final cliente = (v.cliente?.nome ?? '').toLowerCase();
         return cliente.contains(busca);
       }).toList();
     }
