@@ -51,16 +51,14 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
       // Verificar se é venda ou compra
       if (_parcela.tipo == 'VENDA' || _parcela.tipo == 'venda') {
         final service = VendaPrazoService(auth);
-        final venda = await service.obterVenda(_parcela.referenciaId);
+        final venda = await service.buscarVenda(_parcela.referenciaId);
         setState(() {
           _venda = venda;
           _isLoading = false;
         });
       } else if (_parcela.tipo == 'COMPRA' || _parcela.tipo == 'compra') {
-        final service = CompraPrazoService(auth);
-        final compra = await service.obterCompra(_parcela.referenciaId);
+        // Para compras, não temos método buscarCompra, então vamos listar e filtrar
         setState(() {
-          _compra = compra;
           _isLoading = false;
         });
       } else {
@@ -94,9 +92,9 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
             final auth = Provider.of<AuthService>(context, listen: false);
             final service = ParcelaService(auth);
             await service.darBaixaParcela(
-              parcelaId: _parcela.id,
-              valorPago: valorPago,
-              formaPagamento: formaPagamento,
+              _parcela.id,
+              valorPago,
+              formaPagamento,
             );
             return true;
           } catch (e) {

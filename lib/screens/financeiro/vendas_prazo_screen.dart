@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../models/financeiro/venda_prazo_model.dart';
 import '../../services/financeiro/venda_prazo_service.dart';
 import '../../services/auth_service.dart';
-import 'venda_prazo_form_screen.dart';
 import 'venda_detalhes_screen.dart';
 
 class VendasPrazoScreen extends StatefulWidget {
@@ -17,23 +16,14 @@ class VendasPrazoScreen extends StatefulWidget {
 class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
   List<VendaPrazo> _vendas = [];
   List<VendaPrazo> _vendasFiltradas = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-  VendaPrazoService? _vendaService;
-  String? _filtroStatus = 'ativas'; // Filtro padrão: não mostrar canceladas
+  bool _isLoading = false;
+  String _filtroStatus = 'todas';
   final TextEditingController _searchController = TextEditingController();
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
-  final _formatoData = DateFormat('dd/MM/yyyy');
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_vendaService == null) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      _vendaService = VendaPrazoService(authService);
-      _carregarVendas();
-    }
+  void initState() {
+    super.initState();
+    _carregarVendas();
   }
 
   @override
@@ -42,114 +32,270 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
     super.dispose();
   }
 
-  void _filtrarVendas(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _vendasFiltradas = _vendas;
-      } else {
-        _vendasFiltradas = _vendas.where((venda) {
-          final nomeCliente = venda.cliente?.nome.toLowerCase() ?? '';
-          final searchLower = query.toLowerCase();
-          return nomeCliente.contains(searchLower);
-        }).toList();
-      }
-    });
-  }
-
   Future<void> _carregarVendas() async {
-    if (!mounted || _vendaService == null) return;
-    
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
+    setState(() => _isLoading = true);
     try {
-      // Filtrar vendas: se filtro for 'ativas', excluir canceladas no frontend
-      final vendas = await _vendaService!.listarVendas(
-        status: _filtroStatus == 'ativas' ? null : _filtroStatus
-      );
-      
-      // Se filtro for 'ativas', remover canceladas
-      final vendasFiltradas = _filtroStatus == 'ativas'
-          ? vendas.where((v) => v.status != 'cancelada').toList()
-          : vendas;
-      
-      if (!mounted) return;
-      
+      final auth = Provider.of<AuthService>(context, listen: false);
+      final service = VendaPrazoService(auth);
+      final vendas = await service.listarVendas();
       setState(() {
-        _vendas = vendasFiltradas;
-        _vendasFiltradas = vendasFiltradas;
+        _vendas = vendas;
+        _aplicarFiltros();
         _isLoading = false;
       });
     } catch (e) {
-      if (!mounted) return;
-      
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _cancelarVenda(VendaPrazo venda) async {
-    if (_vendaService == null) return;
-    
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar cancelamento'),
-        content: Text(
-          'Deseja realmente cancelar esta venda?\n\n'
-          'Cliente: ${venda.cliente?.nome}\n'
-          'Valor: ${_formatoMoeda.format(venda.valorTotal)}\n\n'
-          'O estoque será revertido.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Não'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sim, Cancelar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmar == true) {
-      try {
-        await _vendaService!.cancelarVenda(venda.id);
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Venda cancelada com sucesso')),
-          );
-          _carregarVendas();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-          );
-        }
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar vendas: $e')),
+        );
       }
     }
   }
 
-  void _abrirFormulario() async {
-    final resultado = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const VendaPrazoFormScreen(),
+  void _aplicarFiltros() {
+    List<VendaPrazo> resultado = _vendas;
+
+    // Filtro por status
+    if (_filtroStatus != 'todas') {
+      resultado = resultado.where((v) => v.status == _filtroStatus).toList();
+    }
+
+    // Filtro por busca
+    final busca = _searchController.text.toLowerCase();
+    if (busca.isNotEmpty) {
+      resultado = resultado.where((v) {
+        final cliente = v.cliente?.nome?.toLowerCase() ?? '';
+        return cliente.contains(busca);
+      }).toList();
+    }
+
+    setState(() => _vendasFiltradas = resultado);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
+    final formatoData = DateFormat('dd/MM/yyyy');
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Vendas a Prazo'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          // Barra de busca e filtros
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Buscar por cliente...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              _aplicarFiltros();
+                            },
+                          )
+                        : null,
+                  ),
+                  onChanged: (value) => _aplicarFiltros(),
+                ),
+                const SizedBox(height: 12),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildFiltroChip('Todas', 'todas'),
+                      _buildFiltroChip('Em Dia', 'em_dia'),
+                      _buildFiltroChip('Atrasadas', 'atrasada'),
+                      _buildFiltroChip('Quitadas', 'quitada'),
+                      _buildFiltroChip('Canceladas', 'cancelada'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Lista de vendas
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _vendasFiltradas.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.shopping_cart_outlined,
+                                size: 64, color: Colors.grey[400]),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Nenhuma venda encontrada',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _carregarVendas,
+                        child: ListView.builder(
+                          itemCount: _vendasFiltradas.length,
+                          itemBuilder: (context, index) {
+                            final venda = _vendasFiltradas[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
+                              ),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: _getStatusColor(venda.status),
+                                  child: const Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                title: Text(
+                                  venda.cliente?.nome ?? 'Cliente',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(formatoData.format(venda.dataVenda)),
+                                    Text(
+                                      'Saldo: ${formatoMoeda.format(venda.saldoDevedor)}',
+                                      style: TextStyle(
+                                        color: venda.saldoDevedor > 0
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                trailing: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      formatoMoeda.format(venda.valorTotal),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: _getStatusColor(venda.status),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        _getStatusLabel(venda.status),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () async {
+                                  final resultado = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          VendaDetalhesScreen(venda: venda),
+                                    ),
+                                  );
+                                  if (resultado == true) {
+                                    _carregarVendas();
+                                  }
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+          ),
+
+          // Resumo
+          if (_vendasFiltradas.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                border: Border(
+                  top: BorderSide(color: Colors.grey[300]!),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total: ${_vendasFiltradas.length} vendas',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    formatoMoeda.format(
+                      _vendasFiltradas.fold<double>(
+                        0,
+                        (sum, v) => sum + v.valorTotal,
+                      ),
+                    ),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
+  }
 
-    if (resultado == true) {
-      _carregarVendas();
-    }
+  Widget _buildFiltroChip(String label, String valor) {
+    final isSelected = _filtroStatus == valor;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        label: Text(label),
+        selected: isSelected,
+        onSelected: (selected) {
+          setState(() {
+            _filtroStatus = valor;
+            _aplicarFiltros();
+          });
+        },
+        selectedColor: Colors.blue,
+        labelStyle: TextStyle(
+          color: isSelected ? Colors.white : Colors.black,
+        ),
+      ),
+    );
   }
 
   Color _getStatusColor(String status) {
@@ -176,1122 +322,5 @@ class _VendasPrazoScreenState extends State<VendasPrazoScreen> {
       default:
         return 'Em Dia';
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vendas a Prazo'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (value) {
-              setState(() {
-                _filtroStatus = value;
-              });
-              _carregarVendas();
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'ativas', child: Text('Ativas (padrão)')),
-              const PopupMenuItem(value: null, child: Text('Todas')),
-              const PopupMenuItem(value: 'em_dia', child: Text('Em Dia')),
-              const PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
-              const PopupMenuItem(value: 'quitada', child: Text('Quitadas')),
-              const PopupMenuItem(value: 'cancelada', child: Text('Canceladas')),
-            ],
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _carregarVendas,
-                        child: const Text('Tentar novamente'),
-                      ),
-                    ],
-                  ),
-                )
-              : _vendas.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.shopping_cart_outlined, size: 48, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          const Text('Nenhuma venda a prazo cadastrada'),
-                          const SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: _abrirFormulario,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Nova Venda a Prazo'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _carregarVendas,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                hintText: 'Pesquisar cliente...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                              onChanged: _filtrarVendas,
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: _vendasFiltradas.length,
-                              itemBuilder: (context, index) {
-                                final venda = _vendasFiltradas[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => VendaDetalhesScreen(venda: venda),
-                                  ),
-                                );
-                              },
-                              leading: CircleAvatar(
-                                backgroundColor: _getStatusColor(venda.status),
-                                child: const Icon(Icons.shopping_cart, color: Colors.white),
-                              ),
-                              title: Text(
-                                venda.cliente?.nome ?? 'Cliente',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Data: ${_formatoData.format(venda.dataVenda)}'),
-                                  Text('Total: ${_formatoMoeda.format(venda.valorTotal)}'),
-                                  Text('Saldo: ${_formatoMoeda.format(venda.saldoDevedor)}'),
-                                  Text(
-                                    _getStatusLabel(venda.status),
-                                    style: TextStyle(
-                                      color: _getStatusColor(venda.status),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              trailing: !venda.estaCancelada
-                                  ? PopupMenuButton(
-                                      itemBuilder: (context) => [
-                                        if (!venda.estaQuitada && !venda.estaCancelada)
-                                          const PopupMenuItem(
-                                            value: 'cancelar',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.cancel, size: 20, color: Colors.red),
-                                                SizedBox(width: 8),
-                                                Text('Cancelar', style: TextStyle(color: Colors.red)),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                      onSelected: (value) {
-                                        if (value == 'cancelar') {
-                                          _cancelarVenda(venda);
-                                        }
-                                      },
-                                    )
-                                  : null,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _abrirFormulario,
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
-  }
-}
-);$');
-  final _formatoData = DateFormat('dd/MM/yyyy');
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_vendaService == null) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      _vendaService = VendaPrazoService(authService);
-      _carregarVendas();
-    }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _filtrarVendas(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _vendasFiltradas = _vendas;
-      } else {
-        _vendasFiltradas = _vendas.where((venda) {
-          final nomeCliente = venda.cliente?.nome.toLowerCase() ?? '';
-          final searchLower = query.toLowerCase();
-          return nomeCliente.contains(searchLower);
-        }).toList();
-      }
-    });
-  }
-
-  Future<void> _carregarVendas() async {
-    if (!mounted || _vendaService == null) return;
-    
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      // Filtrar vendas: se filtro for 'ativas', excluir canceladas no frontend
-      final vendas = await _vendaService!.listarVendas(
-        status: _filtroStatus == 'ativas' ? null : _filtroStatus
-      );
-      
-      // Se filtro for 'ativas', remover canceladas
-      final vendasFiltradas = _filtroStatus == 'ativas'
-          ? vendas.where((v) => v.status != 'cancelada').toList()
-          : vendas;
-      
-      if (!mounted) return;
-      
-      setState(() {
-        _vendas = vendasFiltradas;
-        _vendasFiltradas = vendasFiltradas;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _cancelarVenda(VendaPrazo venda) async {
-    if (_vendaService == null) return;
-    
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar cancelamento'),
-        content: Text(
-          'Deseja realmente cancelar esta venda?\n\n'
-          'Cliente: ${venda.cliente?.nome}\n'
-          'Valor: ${_formatoMoeda.format(venda.valorTotal)}\n\n'
-          'O estoque será revertido.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Não'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sim, Cancelar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmar == true) {
-      try {
-        await _vendaService!.cancelarVenda(venda.id);
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Venda cancelada com sucesso')),
-          );
-          _carregarVendas();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-          );
-        }
-      }
-    }
-  }
-
-  void _abrirFormulario() async {
-    final resultado = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const VendaPrazoFormScreen(),
-      ),
-    );
-
-    if (resultado == true) {
-      _carregarVendas();
-    }
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'quitada':
-        return Colors.green;
-      case 'atrasada':
-        return Colors.red;
-      case 'cancelada':
-        return Colors.grey;
-      default:
-        return Colors.blue;
-    }
-  }
-
-  String _getStatusLabel(String status) {
-    switch (status) {
-      case 'quitada':
-        return 'Quitada';
-      case 'atrasada':
-        return 'Atrasada';
-      case 'cancelada':
-        return 'Cancelada';
-      default:
-        return 'Em Dia';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vendas a Prazo'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (value) {
-              setState(() {
-                _filtroStatus = value;
-              });
-              _carregarVendas();
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'ativas', child: Text('Ativas (padrão)')),
-              const PopupMenuItem(value: null, child: Text('Todas')),
-              const PopupMenuItem(value: 'em_dia', child: Text('Em Dia')),
-              const PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
-              const PopupMenuItem(value: 'quitada', child: Text('Quitadas')),
-              const PopupMenuItem(value: 'cancelada', child: Text('Canceladas')),
-            ],
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _carregarVendas,
-                        child: const Text('Tentar novamente'),
-                      ),
-                    ],
-                  ),
-                )
-              : _vendas.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.shopping_cart_outlined, size: 48, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          const Text('Nenhuma venda a prazo cadastrada'),
-                          const SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: _abrirFormulario,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Nova Venda a Prazo'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _carregarVendas,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                hintText: 'Pesquisar cliente...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                              onChanged: _filtrarVendas,
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: _vendasFiltradas.length,
-                              itemBuilder: (context, index) {
-                                final venda = _vendasFiltradas[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => VendaDetalhesScreen(venda: venda),
-                                  ),
-                                );
-                              },
-                              leading: CircleAvatar(
-                                backgroundColor: _getStatusColor(venda.status),
-                                child: const Icon(Icons.shopping_cart, color: Colors.white),
-                              ),
-                              title: Text(
-                                venda.cliente?.nome ?? 'Cliente',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Data: ${_formatoData.format(venda.dataVenda)}'),
-                                  Text('Total: ${_formatoMoeda.format(venda.valorTotal)}'),
-                                  Text('Saldo: ${_formatoMoeda.format(venda.saldoDevedor)}'),
-                                  Text(
-                                    _getStatusLabel(venda.status),
-                                    style: TextStyle(
-                                      color: _getStatusColor(venda.status),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              trailing: !venda.estaCancelada
-                                  ? PopupMenuButton(
-                                      itemBuilder: (context) => [
-                                        if (!venda.estaQuitada && !venda.estaCancelada)
-                                          const PopupMenuItem(
-                                            value: 'cancelar',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.cancel, size: 20, color: Colors.red),
-                                                SizedBox(width: 8),
-                                                Text('Cancelar', style: TextStyle(color: Colors.red)),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                      onSelected: (value) {
-                                        if (value == 'cancelar') {
-                                          _cancelarVenda(venda);
-                                        }
-                                      },
-                                    )
-                                  : null,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _abrirFormulario,
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
-  }
-}
-);$');
-  final _formatoData = DateFormat('dd/MM/yyyy');
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_vendaService == null) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      _vendaService = VendaPrazoService(authService);
-      _carregarVendas();
-    }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _filtrarVendas(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _vendasFiltradas = _vendas;
-      } else {
-        _vendasFiltradas = _vendas.where((venda) {
-          final nomeCliente = venda.cliente?.nome.toLowerCase() ?? '';
-          final searchLower = query.toLowerCase();
-          return nomeCliente.contains(searchLower);
-        }).toList();
-      }
-    });
-  }
-
-  Future<void> _carregarVendas() async {
-    if (!mounted || _vendaService == null) return;
-    
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      // Filtrar vendas: se filtro for 'ativas', excluir canceladas no frontend
-      final vendas = await _vendaService!.listarVendas(
-        status: _filtroStatus == 'ativas' ? null : _filtroStatus
-      );
-      
-      // Se filtro for 'ativas', remover canceladas
-      final vendasFiltradas = _filtroStatus == 'ativas'
-          ? vendas.where((v) => v.status != 'cancelada').toList()
-          : vendas;
-      
-      if (!mounted) return;
-      
-      setState(() {
-        _vendas = vendasFiltradas;
-        _vendasFiltradas = vendasFiltradas;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _cancelarVenda(VendaPrazo venda) async {
-    if (_vendaService == null) return;
-    
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar cancelamento'),
-        content: Text(
-          'Deseja realmente cancelar esta venda?\n\n'
-          'Cliente: ${venda.cliente?.nome}\n'
-          'Valor: ${_formatoMoeda.format(venda.valorTotal)}\n\n'
-          'O estoque será revertido.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Não'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sim, Cancelar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmar == true) {
-      try {
-        await _vendaService!.cancelarVenda(venda.id);
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Venda cancelada com sucesso')),
-          );
-          _carregarVendas();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-          );
-        }
-      }
-    }
-  }
-
-  void _abrirFormulario() async {
-    final resultado = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const VendaPrazoFormScreen(),
-      ),
-    );
-
-    if (resultado == true) {
-      _carregarVendas();
-    }
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'quitada':
-        return Colors.green;
-      case 'atrasada':
-        return Colors.red;
-      case 'cancelada':
-        return Colors.grey;
-      default:
-        return Colors.blue;
-    }
-  }
-
-  String _getStatusLabel(String status) {
-    switch (status) {
-      case 'quitada':
-        return 'Quitada';
-      case 'atrasada':
-        return 'Atrasada';
-      case 'cancelada':
-        return 'Cancelada';
-      default:
-        return 'Em Dia';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vendas a Prazo'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (value) {
-              setState(() {
-                _filtroStatus = value;
-              });
-              _carregarVendas();
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'ativas', child: Text('Ativas (padrão)')),
-              const PopupMenuItem(value: null, child: Text('Todas')),
-              const PopupMenuItem(value: 'em_dia', child: Text('Em Dia')),
-              const PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
-              const PopupMenuItem(value: 'quitada', child: Text('Quitadas')),
-              const PopupMenuItem(value: 'cancelada', child: Text('Canceladas')),
-            ],
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _carregarVendas,
-                        child: const Text('Tentar novamente'),
-                      ),
-                    ],
-                  ),
-                )
-              : _vendas.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.shopping_cart_outlined, size: 48, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          const Text('Nenhuma venda a prazo cadastrada'),
-                          const SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: _abrirFormulario,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Nova Venda a Prazo'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _carregarVendas,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                hintText: 'Pesquisar cliente...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                              onChanged: _filtrarVendas,
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: _vendasFiltradas.length,
-                              itemBuilder: (context, index) {
-                                final venda = _vendasFiltradas[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => VendaDetalhesScreen(venda: venda),
-                                  ),
-                                );
-                              },
-                              leading: CircleAvatar(
-                                backgroundColor: _getStatusColor(venda.status),
-                                child: const Icon(Icons.shopping_cart, color: Colors.white),
-                              ),
-                              title: Text(
-                                venda.cliente?.nome ?? 'Cliente',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Data: ${_formatoData.format(venda.dataVenda)}'),
-                                  Text('Total: ${_formatoMoeda.format(venda.valorTotal)}'),
-                                  Text('Saldo: ${_formatoMoeda.format(venda.saldoDevedor)}'),
-                                  Text(
-                                    _getStatusLabel(venda.status),
-                                    style: TextStyle(
-                                      color: _getStatusColor(venda.status),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              trailing: !venda.estaCancelada
-                                  ? PopupMenuButton(
-                                      itemBuilder: (context) => [
-                                        if (!venda.estaQuitada && !venda.estaCancelada)
-                                          const PopupMenuItem(
-                                            value: 'cancelar',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.cancel, size: 20, color: Colors.red),
-                                                SizedBox(width: 8),
-                                                Text('Cancelar', style: TextStyle(color: Colors.red)),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                      onSelected: (value) {
-                                        if (value == 'cancelar') {
-                                          _cancelarVenda(venda);
-                                        }
-                                      },
-                                    )
-                                  : null,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _abrirFormulario,
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
-  }
-}
-);$');
-  final _formatoData = DateFormat('dd/MM/yyyy');
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_vendaService == null) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      _vendaService = VendaPrazoService(authService);
-      _carregarVendas();
-    }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _filtrarVendas(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _vendasFiltradas = _vendas;
-      } else {
-        _vendasFiltradas = _vendas.where((venda) {
-          final nomeCliente = venda.cliente?.nome.toLowerCase() ?? '';
-          final searchLower = query.toLowerCase();
-          return nomeCliente.contains(searchLower);
-        }).toList();
-      }
-    });
-  }
-
-  Future<void> _carregarVendas() async {
-    if (!mounted || _vendaService == null) return;
-    
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      // Filtrar vendas: se filtro for 'ativas', excluir canceladas no frontend
-      final vendas = await _vendaService!.listarVendas(
-        status: _filtroStatus == 'ativas' ? null : _filtroStatus
-      );
-      
-      // Se filtro for 'ativas', remover canceladas
-      final vendasFiltradas = _filtroStatus == 'ativas'
-          ? vendas.where((v) => v.status != 'cancelada').toList()
-          : vendas;
-      
-      if (!mounted) return;
-      
-      setState(() {
-        _vendas = vendasFiltradas;
-        _vendasFiltradas = vendasFiltradas;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _cancelarVenda(VendaPrazo venda) async {
-    if (_vendaService == null) return;
-    
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar cancelamento'),
-        content: Text(
-          'Deseja realmente cancelar esta venda?\n\n'
-          'Cliente: ${venda.cliente?.nome}\n'
-          'Valor: ${_formatoMoeda.format(venda.valorTotal)}\n\n'
-          'O estoque será revertido.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Não'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sim, Cancelar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmar == true) {
-      try {
-        await _vendaService!.cancelarVenda(venda.id);
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Venda cancelada com sucesso')),
-          );
-          _carregarVendas();
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-          );
-        }
-      }
-    }
-  }
-
-  void _abrirFormulario() async {
-    final resultado = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const VendaPrazoFormScreen(),
-      ),
-    );
-
-    if (resultado == true) {
-      _carregarVendas();
-    }
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'quitada':
-        return Colors.green;
-      case 'atrasada':
-        return Colors.red;
-      case 'cancelada':
-        return Colors.grey;
-      default:
-        return Colors.blue;
-    }
-  }
-
-  String _getStatusLabel(String status) {
-    switch (status) {
-      case 'quitada':
-        return 'Quitada';
-      case 'atrasada':
-        return 'Atrasada';
-      case 'cancelada':
-        return 'Cancelada';
-      default:
-        return 'Em Dia';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vendas a Prazo'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (value) {
-              setState(() {
-                _filtroStatus = value;
-              });
-              _carregarVendas();
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'ativas', child: Text('Ativas (padrão)')),
-              const PopupMenuItem(value: null, child: Text('Todas')),
-              const PopupMenuItem(value: 'em_dia', child: Text('Em Dia')),
-              const PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
-              const PopupMenuItem(value: 'quitada', child: Text('Quitadas')),
-              const PopupMenuItem(value: 'cancelada', child: Text('Canceladas')),
-            ],
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _carregarVendas,
-                        child: const Text('Tentar novamente'),
-                      ),
-                    ],
-                  ),
-                )
-              : _vendas.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.shopping_cart_outlined, size: 48, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          const Text('Nenhuma venda a prazo cadastrada'),
-                          const SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: _abrirFormulario,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Nova Venda a Prazo'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _carregarVendas,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: TextField(
-                              controller: _searchController,
-                              decoration: InputDecoration(
-                                hintText: 'Pesquisar cliente...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                              onChanged: _filtrarVendas,
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: _vendasFiltradas.length,
-                              itemBuilder: (context, index) {
-                                final venda = _vendasFiltradas[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => VendaDetalhesScreen(venda: venda),
-                                  ),
-                                );
-                              },
-                              leading: CircleAvatar(
-                                backgroundColor: _getStatusColor(venda.status),
-                                child: const Icon(Icons.shopping_cart, color: Colors.white),
-                              ),
-                              title: Text(
-                                venda.cliente?.nome ?? 'Cliente',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Data: ${_formatoData.format(venda.dataVenda)}'),
-                                  Text('Total: ${_formatoMoeda.format(venda.valorTotal)}'),
-                                  Text('Saldo: ${_formatoMoeda.format(venda.saldoDevedor)}'),
-                                  Text(
-                                    _getStatusLabel(venda.status),
-                                    style: TextStyle(
-                                      color: _getStatusColor(venda.status),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              trailing: !venda.estaCancelada
-                                  ? PopupMenuButton(
-                                      itemBuilder: (context) => [
-                                        if (!venda.estaQuitada && !venda.estaCancelada)
-                                          const PopupMenuItem(
-                                            value: 'cancelar',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.cancel, size: 20, color: Colors.red),
-                                                SizedBox(width: 8),
-                                                Text('Cancelar', style: TextStyle(color: Colors.red)),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                      onSelected: (value) {
-                                        if (value == 'cancelar') {
-                                          _cancelarVenda(venda);
-                                        }
-                                      },
-                                    )
-                                  : null,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _abrirFormulario,
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
   }
 }
