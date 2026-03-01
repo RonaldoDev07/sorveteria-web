@@ -35,14 +35,14 @@ class Parcela {
     return Parcela(
       id: json['id'],
       tipo: json['tipo'],
-      referenciaId: json['referencia_id'],
-      numeroParcela: json['numero_parcela'],
-      valorParcela: _toDouble(json['valor_parcela']),
-      valorPago: _toDouble(json['valor_pago']),
-      dataVencimento: DateTime.parse(json['data_vencimento']),
+      referenciaId: json['referenciaId'] ?? json['referencia_id'],
+      numeroParcela: json['numeroParcela'] ?? json['numero_parcela'],
+      valorParcela: _toDouble(json['valorParcela'] ?? json['valor_parcela']),
+      valorPago: _toDouble(json['valorPago'] ?? json['valor_pago']),
+      dataVencimento: DateTime.parse(json['dataVencimento'] ?? json['data_vencimento']),
       status: json['status'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? json['updated_at']),
     );
   }
 

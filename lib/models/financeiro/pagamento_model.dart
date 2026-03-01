@@ -30,12 +30,12 @@ class Pagamento {
     return Pagamento(
       id: json['id'],
       tipo: json['tipo'],
-      referenciaId: json['referencia_id'],
-      valorPago: _toDouble(json['valor_pago']),
-      formaPagamento: json['forma_pagamento'],
-      dataPagamento: DateTime.parse(json['data_pagamento']),
-      usuarioId: json['usuario_id'],
-      createdAt: DateTime.parse(json['created_at']),
+      referenciaId: json['referenciaId'] ?? json['referencia_id'],
+      valorPago: _toDouble(json['valorPago'] ?? json['valor_pago']),
+      formaPagamento: json['formaPagamento'] ?? json['forma_pagamento'],
+      dataPagamento: DateTime.parse(json['dataPagamento'] ?? json['data_pagamento']),
+      usuarioId: json['usuarioId'] ?? json['usuario_id'],
+      createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
     );
   }
 

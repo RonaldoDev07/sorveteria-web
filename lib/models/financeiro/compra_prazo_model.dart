@@ -42,17 +42,19 @@ class CompraPrazo {
     try {
       return CompraPrazo(
         id: json['id'],
-        fornecedorId: json['fornecedor_id'],
+        fornecedorId: json['fornecedorId'] ?? json['fornecedor_id'],
         fornecedor: json['fornecedor'] != null ? Fornecedor.fromJson(json['fornecedor']) : null,
-        usuarioId: json['usuario_id']?.toString() ?? '0',
-        dataCompra: DateTime.parse(json['data_compra']),
-        valorTotal: _toDouble(json['valor_total']),
-        valorPago: _toDouble(json['valor_pago']),
-        saldoDevedor: _toDouble(json['saldo_devedor']),
+        usuarioId: (json['usuarioId'] ?? json['usuario_id'])?.toString() ?? '0',
+        dataCompra: DateTime.parse(json['dataCompra'] ?? json['data_compra']),
+        valorTotal: _toDouble(json['valorTotal'] ?? json['valor_total']),
+        valorPago: _toDouble(json['valorPago'] ?? json['valor_pago']),
+        saldoDevedor: _toDouble(json['saldoDevedor'] ?? json['saldo_devedor']),
         status: json['status'] ?? 'em_dia',
         observacoes: json['observacoes'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+        createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
+        updatedAt: (json['updatedAt'] ?? json['updated_at']) != null 
+            ? DateTime.parse(json['updatedAt'] ?? json['updated_at']) 
+            : null,
         produtos: json['produtos'] as List<dynamic>?,
       );
     } catch (e) {
