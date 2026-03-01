@@ -1,0 +1,1 @@
+Force rebuild para aplicar mudanças de debug nos modelos
