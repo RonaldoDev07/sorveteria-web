@@ -191,7 +191,10 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Cadastrar'),
           ),
         ],
@@ -729,7 +732,10 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Cadastrar'),
           ),
         ],
@@ -764,17 +770,24 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(dialogContext).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Produto cadastrado com sucesso!'),
-              backgroundColor: Colors.purple,
-            ),
-          );
-          
           // Recarregar a lista de produtos
           if (widget.onProdutoCadastrado != null) {
             await widget.onProdutoCadastrado!();
           }
+          
+          ScaffoldMessenger.of(dialogContext).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Produto cadastrado! Atualizando lista...'),
+              backgroundColor: Colors.purple,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          
+          // Fechar e reabrir o dialog para mostrar o produto novo
+          Navigator.pop(dialogContext);
+          
+          // Aguardar um pouco para garantir que a lista foi atualizada
+          await Future.delayed(const Duration(milliseconds: 300));
         }
       } catch (e) {
         if (mounted) {
