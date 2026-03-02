@@ -512,6 +512,12 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       final cor = isEntrada ? Colors.teal : Colors.green;
                       final icone = isEntrada ? Icons.arrow_downward : Icons.arrow_upward;
                       final titulo = isEntrada ? 'COMPRA' : 'VENDA';
+                      
+                      // Detectar se é à vista ou a prazo
+                      final formaPagamento = mov['forma_pagamento']?.toString().toUpperCase();
+                      final isAPrazo = formaPagamento == 'PRAZO';
+                      final badgeText = isAPrazo ? 'A PRAZO' : 'À VISTA';
+                      final badgeColor = isAPrazo ? Colors.blue : Colors.orange;
 
                       return Card(
                         elevation: 4,
@@ -551,13 +557,33 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          titulo,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: cor.shade700,
-                                          ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              titulo,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: cor.shade700,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: badgeColor,
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                badgeText,
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         const SizedBox(height: 4),
                                         Text(

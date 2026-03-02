@@ -545,6 +545,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
   Produto? _produtoSelecionado;
   final _quantidadeController = TextEditingController(text: '1');
   final _valorController = TextEditingController();
+  final _codigoBarrasController = TextEditingController();
   String _filtroProduto = '';
 
   @override
@@ -591,20 +592,95 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // CAMPO DE PESQUISA
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Pesquisar produto...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                      ),
+                      onChanged: (value) {
+                        setState(() => _filtroProduto = value.toLowerCase());
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Tooltip(
+                    message: 'Cadastrar novo produto',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('💡 Dica: Vá em "Cadastrar Produto" na tela principal para adicionar novos produtos'),
+                              duration: Duration(seconds: 4),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.add_circle, color: Colors.white, size: 28),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              
+              // CAMPO DE CÓDIGO DE BARRAS
               TextField(
+                controller: _codigoBarrasController,
                 decoration: InputDecoration(
-                  hintText: 'Pesquisar produto...',
-                  prefixIcon: const Icon(Icons.search),
+                  hintText: 'Código de barras...',
+                  prefixIcon: const Icon(Icons.qr_code_scanner),
+                  suffixIcon: _codigoBarrasController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _codigoBarrasController.clear();
+                            setState(() {});
+                          },
+                        )
+                      : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
                   fillColor: Colors.grey[100],
+                ),
+                onChanged: (value) {
+                  if (value.isNotEmpty) {
+                    // Buscar produto por código de barras
+                    final produtoEncontrado = widget.produtos.firstWhere(
+                      (p) => p.codigoBarras == value,
+                      orElse: () => widget.produtos.first, // Fallback
+                    );
+                    
+                    if (produtoEncontrado.codigoBarras == value) {
+                      setState(() {
+                        _produtoSelecionado = produtoEncontrado;
+                        _valorController.text = produtoEncontrado.preco.toStringAsFixed(2);
+                        _filtroProduto = ''; // Limpar filtro de nome
+                      });
+                    }
+                  }
+                },
+                onSubmitted: (value) {
+                  if (_produtoSelecionado != null && _produtoSelecionado!.codigoBarras == value) {
+                    // Focar no campo de quantidade
+                    FocusScope.of(context).nextFocus();
+                  }
+                },
               ),
-              onChanged: (value) {
-                setState(() => _filtroProduto = value.toLowerCase());
-              },
-            ),
             const SizedBox(height: 16),
             
             // LISTA DE PRODUTOS
@@ -741,13 +817,16 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: const Text('Concluir'),
         ),
         ElevatedButton(
           onPressed: () {
             if (_produtoSelecionado == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Selecione um produto')),
+                const SnackBar(
+                  content: Text('Selecione um produto'),
+                  duration: Duration(seconds: 2),
+                ),
               );
               return;
             }
@@ -757,22 +836,49 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
             
             if (quantidade <= 0 || valor <= 0) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Quantidade e valor devem ser maiores que zero')),
+                const SnackBar(
+                  content: Text('Quantidade e valor devem ser maiores que zero'),
+                  duration: Duration(seconds: 2),
+                ),
               );
               return;
             }
             
             if (quantidade > _produtoSelecionado!.quantidade) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Quantidade maior que o estoque disponível')),
+                const SnackBar(
+                  content: Text('Quantidade maior que o estoque disponível'),
+                  duration: Duration(seconds: 2),
+                ),
               );
               return;
             }
             
+            // Adicionar produto
             widget.onAdicionar(_produtoSelecionado!, quantidade, valor);
-            Navigator.pop(context);
+            
+            // Mostrar feedback
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('✅ ${_produtoSelecionado!.nome} adicionado!'),
+                duration: const Duration(seconds: 1),
+                backgroundColor: Colors.green,
+              ),
+            );
+            
+            // Limpar campos para adicionar próximo produto
+            setState(() {
+              _produtoSelecionado = null;
+              _quantidadeController.text = '1';
+              _valorController.clear();
+              _codigoBarrasController.clear();
+              _filtroProduto = '';
+            });
+            
+            // NÃO fechar o dialog - continua aberto para adicionar mais produtos
           },
-          child: const Text('Adicionar'),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+          child: const Text('Adicionar Outro'),
         ),
       ],
     );
