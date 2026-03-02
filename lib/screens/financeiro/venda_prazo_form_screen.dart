@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../models/financeiro/cliente_model.dart';
 import '../../models/produto.dart';
 import '../../services/financeiro/cliente_service.dart';
@@ -335,6 +336,83 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
     }
   }
 
+  Future<void> _abrirScanner() async {
+    await showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: SizedBox(
+          width: 400,
+          height: 500,
+          child: Column(
+            children: [
+              AppBar(
+                title: const Text('Escanear Código de Barras'),
+                automaticallyImplyLeading: false,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: MobileScanner(
+                  onDetect: (capture) {
+                    final List<Barcode> barcodes = capture.barcodes;
+                    if (barcodes.isNotEmpty) {
+                      final String? code = barcodes.first.rawValue;
+                      if (code != null) {
+                        Navigator.pop(context);
+                        _buscarProdutoPorCodigo(code);
+                      }
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _buscarProdutoPorCodigo(String codigo) {
+    final produto = _produtos.firstWhere(
+      (p) => p.codigoBarras == codigo,
+      orElse: () => _produtos.first,
+    );
+
+    if (produto.codigoBarras == codigo) {
+      // Produto encontrado, abrir dialog de adicionar com produto pré-selecionado
+      showDialog(
+        context: context,
+        builder: (context) => _DialogAdicionarProduto(
+          produtos: _produtos,
+          produtoInicial: produto,
+          onAdicionar: (produto, quantidade, valorUnitario) {
+            setState(() {
+              _itensVenda.add(_ItemVenda(
+                produto: produto,
+                quantidade: quantidade,
+                valorUnitario: valorUnitario,
+              ));
+            });
+          },
+          onProdutoCadastrado: () async {
+            await _carregarProdutos();
+          },
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Produto com código $codigo não encontrado'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -503,6 +581,12 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                 ],
               ),
             ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _abrirScanner,
+        backgroundColor: FinanceiroStyles.corVenda,
+        icon: const Icon(Icons.qr_code_scanner),
+        label: const Text('Escanear'),
+      ),
     );
   }
 }
@@ -537,11 +621,13 @@ class _DialogAdicionarProduto extends StatefulWidget {
   final List<Produto> produtos;
   final Function(Produto, int, double) onAdicionar;
   final Future<void> Function()? onProdutoCadastrado;
+  final Produto? produtoInicial;
 
   const _DialogAdicionarProduto({
     required this.produtos,
     required this.onAdicionar,
     this.onProdutoCadastrado,
+    this.produtoInicial,
   });
 
   @override
@@ -560,6 +646,14 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
     super.initState();
     print('🔍 Dialog Adicionar Produto iniciado');
     print('   Produtos recebidos: ${widget.produtos.length}');
+    
+    // Se foi passado um produto inicial, selecionar automaticamente
+    if (widget.produtoInicial != null) {
+      _produtoSelecionado = widget.produtoInicial;
+      _valorController.text = widget.produtoInicial!.preco.toStringAsFixed(2);
+      print('   ✅ Produto pré-selecionado: ${widget.produtoInicial!.nome}');
+    }
+    
     if (widget.produtos.isNotEmpty) {
       print('   Exemplo: ${widget.produtos.first.nome}');
     } else {
@@ -1017,7 +1111,10 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
             
             // NÃO fechar o dialog - continua aberto para adicionar mais produtos
           },
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
           child: const Text('Adicionar Outro'),
         ),
       ],
