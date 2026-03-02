@@ -127,6 +127,10 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
             ));
           });
         },
+        onProdutoCadastrado: () async {
+          // Recarregar lista de produtos após cadastro
+          await _carregarProdutos();
+        },
       ),
     );
   }
@@ -518,10 +522,12 @@ class _Parcela {
 class _DialogAdicionarProduto extends StatefulWidget {
   final List<Produto> produtos;
   final Function(Produto, int, double) onAdicionar;
+  final Future<void> Function()? onProdutoCadastrado;
 
   const _DialogAdicionarProduto({
     required this.produtos,
     required this.onAdicionar,
+    this.onProdutoCadastrado,
   });
 
   @override
@@ -669,6 +675,11 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
               backgroundColor: Colors.purple,
             ),
           );
+          
+          // Recarregar a lista de produtos
+          if (widget.onProdutoCadastrado != null) {
+            await widget.onProdutoCadastrado!();
+          }
         }
       } catch (e) {
         if (mounted) {
