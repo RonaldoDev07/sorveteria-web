@@ -8,6 +8,7 @@ import '../../services/financeiro/fornecedor_service.dart';
 import '../../services/financeiro/compra_prazo_service.dart';
 import '../../services/produto_service.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/financeiro_styles.dart';
 
 class CompraPrazoFormScreen extends StatefulWidget {
   const CompraPrazoFormScreen({super.key});
@@ -322,11 +323,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nova Compra a Prazo'),
-        backgroundColor: Colors.purple,
-        foregroundColor: Colors.white,
-      ),
+      appBar: FinanceiroStyles.appBar('Nova Compra a Prazo', FinanceiroStyles.corCompra),
       body: _isLoadingFornecedores || _isLoadingProdutos
           ? const Center(child: CircularProgressIndicator())
           : Form(
@@ -378,12 +375,9 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                               const Text('Produtos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                               ElevatedButton.icon(
                                 onPressed: _adicionarProduto,
-                                icon: const Icon(Icons.add, size: 18),
+                                icon: const Icon(FinanceiroStyles.iconeAdicionar, size: 20),
                                 label: const Text('Adicionar'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purple,
-                                  foregroundColor: Colors.white,
-                                ),
+                                style: FinanceiroStyles.botaoComIcone(FinanceiroStyles.corCompra),
                               ),
                             ],
                           ),
@@ -468,10 +462,8 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                   
                   ElevatedButton(
                     onPressed: _isLoading ? null : _salvar,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    style: FinanceiroStyles.botaoPrimario(FinanceiroStyles.corCompra).copyWith(
+                      padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 16)),
                     ),
                     child: _isLoading
                         ? const SizedBox(
@@ -479,7 +471,14 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
                           )
-                        : const Text('Criar Compra a Prazo'),
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(FinanceiroStyles.iconeSalvar, size: 22),
+                              SizedBox(width: 8),
+                              Text('Criar Compra a Prazo', style: TextStyle(fontSize: 17)),
+                            ],
+                          ),
                   ),
                 ],
               ),
