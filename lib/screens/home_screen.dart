@@ -318,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _MenuCard(
                         emoji: '🛒',
                         title: 'Venda Rápida',
-                        color: const Color(0xFF10B981),
+                        color: const Color(0xFF10B981), // Verde vibrante
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
@@ -327,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _MenuCard(
                         emoji: '🛍️',
                         title: 'Carrinho (Vários Itens)',
-                        color: const Color(0xFF059669),
+                        color: const Color(0xFF059669), // Verde escuro
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const CarrinhoVendaScreen()),
@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _MenuCard(
                         emoji: '💳',
                         title: 'Venda a Prazo',
-                        color: const Color(0xFF10B981),
+                        color: const Color(0xFF3B82F6), // Azul
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const VendaPrazoFormScreen()),
@@ -345,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _MenuCard(
                         emoji: '🏪',
                         title: 'Compra a Prazo',
-                        color: const Color(0xFF8B5CF6),
+                        color: const Color(0xFF8B5CF6), // Roxo
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const CompraPrazoFormScreen()),
@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         _MenuCard(
                           emoji: '📦',
                           title: 'Registrar Compra',
-                          color: const Color(0xFF14B8A6),
+                          color: const Color(0xFFF97316), // Laranja
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'ENTRADA')),
@@ -364,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _MenuCard(
                         emoji: '📊',
                         title: 'Produtos',
-                        color: const Color(0xFF3B82F6),
+                        color: const Color(0xFF2563EB), // Azul royal
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const ProdutosScreen()),
@@ -374,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         _MenuCard(
                           emoji: '➕',
                           title: 'Cadastrar Produto',
-                          color: const Color(0xFF6366F1),
+                          color: const Color(0xFF6366F1), // Índigo
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const CadastroProdutoScreen()),
@@ -383,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _MenuCard(
                         emoji: '💰',
                         title: 'Relatório de Lucro',
-                        color: const Color(0xFF8B5CF6),
+                        color: const Color(0xFFEC4899), // Rosa/Pink
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const RelatorioLucroScreen()),
@@ -391,8 +391,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                       _MenuCard(
                         emoji: '📜',
-                        title: 'Histórico de Vendas',
-                        color: const Color(0xFFF59E0B),
+                        title: 'Histórico Completo',
+                        color: const Color(0xFFF59E0B), // Âmbar/Dourado
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
@@ -402,7 +402,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         _MenuCard(
                           emoji: '👥',
                           title: 'Gerenciar Usuários',
-                          color: const Color(0xFF7C3AED),
+                          color: const Color(0xFF7C3AED), // Violeta
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const UsuariosScreen()),
@@ -410,9 +410,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       // Módulo Financeiro (isolado)
                       _MenuCard(
-                        emoji: '💳',
+                        emoji: '💼',
                         title: 'Financeiro',
-                        color: const Color(0xFFEC4899),
+                        color: const Color(0xFFDB2777), // Magenta
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(

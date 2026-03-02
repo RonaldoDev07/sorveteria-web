@@ -7,7 +7,6 @@ import 'contas_receber_screen.dart';
 import 'contas_pagar_screen.dart';
 import 'vendas_prazo_screen.dart';
 import 'compras_prazo_screen.dart';
-import 'historico_completo_screen.dart';
 
 /// Tela de menu do módulo financeiro
 class FinanceiroMenuScreen extends StatelessWidget {
@@ -29,10 +28,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
           mainAxisSpacing: 16,
           children: [
             _MenuCard(
-              icon: Icons.people,
+              emoji: '👤',
               title: 'Clientes',
               subtitle: 'Cadastro de clientes',
-              color: Colors.blue,
+              color: const Color(0xFF3B82F6), // Azul
               onTap: () {
                 Navigator.push(
                   context,
@@ -43,10 +42,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
             _MenuCard(
-              icon: Icons.business,
+              emoji: '🏢',
               title: 'Fornecedores',
               subtitle: 'Cadastro de fornecedores',
-              color: Colors.orange,
+              color: const Color(0xFFF97316), // Laranja
               onTap: () {
                 Navigator.push(
                   context,
@@ -57,10 +56,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
             _MenuCard(
-              icon: Icons.shopping_cart,
+              emoji: '🛒',
               title: 'Vendas a Prazo',
               subtitle: 'Vendas parceladas',
-              color: Colors.green,
+              color: const Color(0xFF10B981), // Verde
               onTap: () {
                 Navigator.push(
                   context,
@@ -71,10 +70,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
             _MenuCard(
-              icon: Icons.shopping_bag,
+              emoji: '🏪',
               title: 'Compras a Prazo',
               subtitle: 'Compras parceladas',
-              color: Colors.purple,
+              color: const Color(0xFF8B5CF6), // Roxo
               onTap: () {
                 Navigator.push(
                   context,
@@ -85,10 +84,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
             _MenuCard(
-              icon: Icons.attach_money,
+              emoji: '💰',
               title: 'Contas a Receber',
               subtitle: 'Recebimentos pendentes',
-              color: Colors.teal,
+              color: const Color(0xFF14B8A6), // Teal
               onTap: () {
                 Navigator.push(
                   context,
@@ -99,10 +98,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
             _MenuCard(
-              icon: Icons.money_off,
+              emoji: '💸',
               title: 'Contas a Pagar',
               subtitle: 'Pagamentos pendentes',
-              color: Colors.red,
+              color: const Color(0xFFEF4444), // Vermelho
               onTap: () {
                 Navigator.push(
                   context,
@@ -113,10 +112,10 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
             _MenuCard(
-              icon: Icons.calendar_today,
+              emoji: '📅',
               title: 'Parcelas',
               subtitle: 'Controle de parcelas',
-              color: Colors.indigo,
+              color: const Color(0xFF6366F1), // Índigo
               onTap: () {
                 Navigator.push(
                   context,
@@ -127,29 +126,15 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
             _MenuCard(
-              icon: Icons.dashboard,
+              emoji: '📊',
               title: 'Dashboard',
               subtitle: 'Visão geral financeira',
-              color: const Color(0xFFEC4899),
+              color: const Color(0xFFEC4899), // Pink
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const DashboardFinanceiroScreen(),
-                  ),
-                );
-              },
-            ),
-            _MenuCard(
-              icon: Icons.history,
-              title: 'Histórico Completo',
-              subtitle: 'Todas as movimentações',
-              color: Colors.indigo,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HistoricoCompletoScreen(),
                   ),
                 );
               },
@@ -162,14 +147,14 @@ class FinanceiroMenuScreen extends StatelessWidget {
 }
 
 class _MenuCard extends StatelessWidget {
-  final IconData icon;
+  final String emoji;
   final String title;
   final String subtitle;
   final Color color;
   final VoidCallback onTap;
 
   const _MenuCard({
-    required this.icon,
+    required this.emoji,
     required this.title,
     required this.subtitle,
     required this.color,
@@ -203,10 +188,18 @@ class _MenuCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  icon,
-                  size: 48,
-                  color: Colors.white,
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Text(
+                    emoji,
+                    style: const TextStyle(
+                      fontSize: 40,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Text(

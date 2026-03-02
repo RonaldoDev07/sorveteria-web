@@ -209,7 +209,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Histórico de Movimentações'),
+        title: const Text('Histórico Completo'),
         elevation: 0,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
