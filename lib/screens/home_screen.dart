@@ -342,6 +342,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           MaterialPageRoute(builder: (_) => const VendaPrazoFormScreen()),
                         ),
                       ),
+                      _MenuCard(
+                        emoji: '🏪',
+                        title: 'Compra a Prazo',
+                        color: const Color(0xFF8B5CF6),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const CompraPrazoFormScreen()),
+                        ),
+                      ),
                       if (auth.canCadastrarProduto)
                         _MenuCard(
                           emoji: '📦',
@@ -382,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                       _MenuCard(
                         emoji: '📜',
-                        title: 'Histórico',
+                        title: 'Histórico de Vendas',
                         color: const Color(0xFFF59E0B),
                         onTap: () => Navigator.push(
                           context,

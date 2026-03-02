@@ -143,6 +143,67 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
     }
   }
 
+  Future<void> _confirmarCancelamento(_ItemHistorico item) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar Cancelamento'),
+        content: Text(
+          'Deseja realmente cancelar esta ${item.tipo}?\n\n'
+          'Cliente/Fornecedor: ${item.descricao}\n'
+          'Valor: ${_formatoMoeda.format(item.valor)}\n\n'
+          'O estoque será revertido automaticamente.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Não'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Sim, Cancelar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar == true) {
+      try {
+        final auth = Provider.of<AuthService>(context, listen: false);
+        
+        if (item.vendaPrazo != null) {
+          final vendaService = VendaPrazoService(auth);
+          await vendaService.cancelarVenda(item.vendaPrazo!.id!);
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Venda cancelada com sucesso')),
+            );
+          }
+        } else if (item.compraPrazo != null) {
+          final compraService = CompraPrazoService(auth);
+          await compraService.cancelarCompra(item.compraPrazo!.id!);
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Compra cancelada com sucesso')),
+            );
+          }
+        }
+        
+        // Recarregar histórico
+        _carregarHistorico();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao cancelar: $e')),
+          );
+        }
+      }
+    }
+  }
+
   List<_ItemHistorico> get _historicoFiltrado {
     if (_filtroTipo == 'todos') return _historico;
     if (_filtroTipo == 'vendas') {
@@ -250,25 +311,38 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
                                   ),
                                 ],
                               ),
-                              trailing: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
-                                    _formatoMoeda.format(item.valor),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: item.tipo.contains('Venda') ? Colors.green : Colors.red,
-                                    ),
-                                  ),
-                                  if (item.status != 'quitada')
-                                    Text(
-                                      _getStatusLabel(item.status),
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: _getStatusColor(item.status),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        _formatoMoeda.format(item.valor),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: item.tipo.contains('Venda') ? Colors.green : Colors.red,
+                                        ),
                                       ),
+                                      if (item.status != 'quitada')
+                                        Text(
+                                          _getStatusLabel(item.status),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: _getStatusColor(item.status),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  // Botão de cancelar para vendas/compras a prazo
+                                  if ((item.vendaPrazo != null || item.compraPrazo != null) && 
+                                      item.status != 'cancelada' && item.status != 'quitada')
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                      onPressed: () => _confirmarCancelamento(item),
+                                      tooltip: 'Cancelar',
                                     ),
                                 ],
                               ),
