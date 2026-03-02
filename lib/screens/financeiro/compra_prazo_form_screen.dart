@@ -546,6 +546,123 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
     }
   }
 
+  Future<Produto?> _cadastrarProdutoRapido(BuildContext context) async {
+    final nomeController = TextEditingController();
+    final precoController = TextEditingController();
+    final codigoBarrasController = TextEditingController();
+    final quantidadeController = TextEditingController(text: '0');
+
+    final resultado = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cadastrar Produto Rápido'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nomeController,
+                decoration: const InputDecoration(
+                  labelText: 'Nome do Produto *',
+                  border: OutlineInputBorder(),
+                ),
+                textCapitalization: TextCapitalization.words,
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: precoController,
+                decoration: const InputDecoration(
+                  labelText: 'Preço *',
+                  prefixText: 'R\$ ',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: codigoBarrasController,
+                decoration: const InputDecoration(
+                  labelText: 'Código de Barras',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: quantidadeController,
+                decoration: const InputDecoration(
+                  labelText: 'Quantidade Inicial',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+            child: const Text('Cadastrar'),
+          ),
+        ],
+      ),
+    );
+
+    if (resultado == true) {
+      if (nomeController.text.isEmpty || precoController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Preencha nome e preço')),
+        );
+        return null;
+      }
+
+      try {
+        final preco = double.parse(precoController.text.replaceAll(',', '.'));
+        final quantidade = int.tryParse(quantidadeController.text) ?? 0;
+
+        // Criar produto via service
+        final authService = Provider.of<AuthService>(context, listen: false);
+        final produtoService = ProdutoService(authService);
+        
+        final novoProduto = Produto(
+          nome: nomeController.text,
+          preco: preco,
+          quantidade: quantidade,
+          codigoBarras: codigoBarrasController.text.isEmpty ? null : codigoBarrasController.text,
+        );
+
+        final produtoCriado = await produtoService.criarProduto(novoProduto);
+
+        // Adicionar à lista local
+        widget.produtos.add(produtoCriado);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ ${produtoCriado.nome} cadastrado!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        return produtoCriado;
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao cadastrar: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return null;
+      }
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final produtosFiltrados = widget.produtos
@@ -590,14 +707,14 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('💡 Dica: Vá em "Cadastrar Produto" na tela principal para adicionar novos produtos'),
-                            duration: Duration(seconds: 4),
-                          ),
-                        );
+                      onPressed: () async {
+                        final novoProduto = await _cadastrarProdutoRapido(context);
+                        if (novoProduto != null) {
+                          setState(() {
+                            _produtoSelecionado = novoProduto;
+                            _valorController.text = novoProduto.preco.toStringAsFixed(2);
+                          });
+                        }
                       },
                       icon: const Icon(Icons.add_circle, color: Colors.white, size: 28),
                     ),
