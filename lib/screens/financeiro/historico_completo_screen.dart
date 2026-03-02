@@ -33,6 +33,23 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
     _carregarHistorico();
   }
 
+  @override
+  void didUpdateWidget(HistoricoCompletoScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Recarregar quando o widget for atualizado
+    _carregarHistorico();
+  }
+
+  // Recarregar sempre que a tela voltar ao foco
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Recarregar dados quando voltar para esta tela
+    if (mounted) {
+      _carregarHistorico();
+    }
+  }
+
   Future<void> _carregarHistorico() async {
     setState(() {
       _isLoading = true;
@@ -283,14 +300,14 @@ class _HistoricoCompletoScreenState extends State<HistoricoCompletoScreen> {
                                     MaterialPageRoute(
                                       builder: (context) => VendaDetalhesScreen(venda: item.vendaPrazo!),
                                     ),
-                                  );
+                                  ).then((_) => _carregarHistorico());
                                 } else if (item.compraPrazo != null) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => CompraDetalhesScreen(compra: item.compraPrazo!),
                                     ),
-                                  );
+                                  ).then((_) => _carregarHistorico());
                                 }
                               },
                               leading: CircleAvatar(
