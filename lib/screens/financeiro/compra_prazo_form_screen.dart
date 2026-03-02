@@ -8,6 +8,7 @@ import '../../services/financeiro/fornecedor_service.dart';
 import '../../services/financeiro/compra_prazo_service.dart';
 import '../../services/produto_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
 
 class CompraPrazoFormScreen extends StatefulWidget {
@@ -546,16 +547,18 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
     }
   }
 
-  Future<Produto?> _cadastrarProdutoRapido(BuildContext context) async {
+  Future<void> _cadastrarProdutoRapido(BuildContext dialogContext) async {
     final nomeController = TextEditingController();
+    final unidadeController = TextEditingController(text: 'UN');
+    final custoController = TextEditingController();
     final precoController = TextEditingController();
+    final estoqueController = TextEditingController(text: '0');
     final codigoBarrasController = TextEditingController();
-    final quantidadeController = TextEditingController(text: '0');
 
     final resultado = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Cadastrar Produto Rápido'),
+      context: dialogContext,
+      builder: (context) => AlertDialog(
+        title: const Text('Cadastro Rápido de Produto'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -567,17 +570,45 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                   border: OutlineInputBorder(),
                 ),
                 textCapitalization: TextCapitalization.words,
-                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: unidadeController,
+                decoration: const InputDecoration(
+                  labelText: 'Unidade *',
+                  border: OutlineInputBorder(),
+                  hintText: 'UN, KG, L, etc',
+                ),
+                textCapitalization: TextCapitalization.characters,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: custoController,
+                decoration: const InputDecoration(
+                  labelText: 'Custo *',
+                  border: OutlineInputBorder(),
+                  prefixText: 'R\$ ',
+                ),
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: precoController,
                 decoration: const InputDecoration(
-                  labelText: 'Preço *',
+                  labelText: 'Preço de Venda *',
+                  border: OutlineInputBorder(),
                   prefixText: 'R\$ ',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: estoqueController,
+                decoration: const InputDecoration(
+                  labelText: 'Estoque Inicial',
                   border: OutlineInputBorder(),
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 12),
               TextField(
@@ -587,25 +618,16 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: quantidadeController,
-                decoration: const InputDecoration(
-                  labelText: 'Quantidade Inicial',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
             ],
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
+            onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
+            onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
             child: const Text('Cadastrar'),
           ),
@@ -614,53 +636,51 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
     );
 
     if (resultado == true) {
-      if (nomeController.text.isEmpty || precoController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preencha nome e preço')),
+      if (nomeController.text.isEmpty || 
+          unidadeController.text.isEmpty ||
+          custoController.text.isEmpty ||
+          precoController.text.isEmpty) {
+        ScaffoldMessenger.of(dialogContext).showSnackBar(
+          const SnackBar(content: Text('Preencha todos os campos obrigatórios')),
         );
-        return null;
+        return;
       }
 
       try {
-        final preco = double.parse(precoController.text.replaceAll(',', '.'));
-        final quantidade = int.tryParse(quantidadeController.text) ?? 0;
+        final authService = Provider.of<AuthService>(dialogContext, listen: false);
+        final custo = double.tryParse(custoController.text.replaceAll(',', '.')) ?? 0;
+        final preco = double.tryParse(precoController.text.replaceAll(',', '.')) ?? 0;
+        final estoque = double.tryParse(estoqueController.text) ?? 0;
 
-        // Criar produto via service
-        final authService = Provider.of<AuthService>(context, listen: false);
-        final produtoService = ProdutoService(authService);
-        
-        final novoProduto = Produto(
-          nome: nomeController.text,
-          preco: preco,
-          quantidade: quantidade,
+        await ApiService.criarProduto(
+          authService.token!,
+          nomeController.text,
+          unidadeController.text,
+          custo,
+          preco,
+          estoque,
           codigoBarras: codigoBarrasController.text.isEmpty ? null : codigoBarrasController.text,
         );
 
-        final produtoCriado = await produtoService.criarProduto(novoProduto);
-
-        // Adicionar à lista local
-        widget.produtos.add(produtoCriado);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✅ ${produtoCriado.nome} cadastrado!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        return produtoCriado;
+        if (mounted) {
+          ScaffoldMessenger.of(dialogContext).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Produto cadastrado com sucesso!'),
+              backgroundColor: Colors.purple,
+            ),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao cadastrar: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return null;
+        if (mounted) {
+          ScaffoldMessenger.of(dialogContext).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao cadastrar produto: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
-
-    return null;
   }
 
   @override
@@ -707,15 +727,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: IconButton(
-                      onPressed: () async {
-                        final novoProduto = await _cadastrarProdutoRapido(context);
-                        if (novoProduto != null) {
-                          setState(() {
-                            _produtoSelecionado = novoProduto;
-                            _valorController.text = novoProduto.preco.toStringAsFixed(2);
-                          });
-                        }
-                      },
+                      onPressed: () => _cadastrarProdutoRapido(context),
                       icon: const Icon(Icons.add_circle, color: Colors.white, size: 28),
                     ),
                   ),

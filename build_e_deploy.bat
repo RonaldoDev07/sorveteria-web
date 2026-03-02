@@ -1,28 +1,37 @@
 @echo off
 echo ========================================
-echo BUILD E DEPLOY - Melhorias UX
+echo BUILD E DEPLOY - Sorveteria Camila
 echo ========================================
 echo.
 
-echo [1/3] Adicionando arquivos ao Git...
-git add lib/screens/home_screen.dart
-git add lib/screens/financeiro/historico_completo_screen.dart
-git add DEPLOY_UX_MELHORIAS.bat
+cd /d "%~dp0"
 
-echo.
-echo [2/3] Fazendo commit...
-git commit -m "UX: Adicionar botão Compra a Prazo, renomear Histórico e adicionar cancelamento no Histórico Completo"
+set FLUTTER_PATH=C:\flutter\bin\flutter.bat
 
+echo [1/4] Limpando build anterior...
+if exist build\web rmdir /s /q build\web
 echo.
-echo [3/3] Fazendo push...
-git push origin main
 
+echo [2/4] Fazendo build do Flutter...
+%FLUTTER_PATH% build web --release
+if errorlevel 1 (
+    echo ERRO no build!
+    pause
+    exit /b 1
+)
 echo.
+
+echo [3/4] Adicionando ao Git...
+git add .
+git commit -m "build: atualizar build web com cadastro rapido de produto"
+echo.
+
+echo [4/4] Enviando para GitHub...
+git push
+echo.
+
 echo ========================================
 echo DEPLOY CONCLUIDO!
+echo Aguarde 1-2 minutos para o Vercel atualizar
 echo ========================================
-echo.
-echo Aguarde 2-3 minutos e acesse:
-echo https://sorveteria-camila.vercel.app
-echo.
 pause
