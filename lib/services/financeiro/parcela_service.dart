@@ -35,9 +35,9 @@ class ParcelaService {
       
       if (tipo != null) queryParams['tipo'] = tipo;
       if (status != null) queryParams['status'] = status;
-      if (referenciaId != null) queryParams['referencia_id'] = referenciaId;
+      if (referenciaId != null) queryParams['referenciaId'] = referenciaId;
       if (vencimentoAte != null) {
-        queryParams['vencimento_ate'] = vencimentoAte.toIso8601String().split('T')[0];
+        queryParams['vencimentoAte'] = vencimentoAte.toIso8601String().split('T')[0];
       }
 
       final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParams);
@@ -77,8 +77,8 @@ class ParcelaService {
         Uri.parse('$_baseUrl/$id/baixa'),
         headers: _headers,
         body: json.encode({
-          'valor_pago': valorPago,
-          'forma_pagamento': formaPagamento,
+          'valorPago': valorPago,
+          'formaPagamento': formaPagamento,
         }),
       );
 

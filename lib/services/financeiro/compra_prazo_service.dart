@@ -33,13 +33,13 @@ class CompraPrazoService {
         'limit': limit.toString(),
       };
       
-      if (fornecedorId != null) queryParams['fornecedor_id'] = fornecedorId;
+      if (fornecedorId != null) queryParams['fornecedorId'] = fornecedorId;
       if (status != null) queryParams['status'] = status;
       if (dataInicio != null) {
-        queryParams['data_inicio'] = dataInicio.toIso8601String().split('T')[0];
+        queryParams['dataInicio'] = dataInicio.toIso8601String().split('T')[0];
       }
       if (dataFim != null) {
-        queryParams['data_fim'] = dataFim.toIso8601String().split('T')[0];
+        queryParams['dataFim'] = dataFim.toIso8601String().split('T')[0];
       }
 
       final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParams);
@@ -67,7 +67,7 @@ class CompraPrazoService {
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode({
-          'fornecedor_id': fornecedorId,
+          'fornecedorId': fornecedorId,
           'produtos': produtos,
           'parcelas': parcelas,
           'observacoes': observacoes,

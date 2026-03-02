@@ -36,10 +36,10 @@ class RelatorioService {
       final queryParams = <String, String>{};
       if (status != null) queryParams['status'] = status;
       if (dataInicio != null) {
-        queryParams['data_inicio'] = dataInicio.toIso8601String().split('T')[0];
+        queryParams['dataInicio'] = dataInicio.toIso8601String().split('T')[0];
       }
       if (dataFim != null) {
-        queryParams['data_fim'] = dataFim.toIso8601String().split('T')[0];
+        queryParams['dataFim'] = dataFim.toIso8601String().split('T')[0];
       }
 
       final uri = Uri.parse('$_baseUrl/contas-receber').replace(queryParameters: queryParams);
@@ -71,10 +71,10 @@ class RelatorioService {
       final queryParams = <String, String>{};
       if (status != null) queryParams['status'] = status;
       if (dataInicio != null) {
-        queryParams['data_inicio'] = dataInicio.toIso8601String().split('T')[0];
+        queryParams['dataInicio'] = dataInicio.toIso8601String().split('T')[0];
       }
       if (dataFim != null) {
-        queryParams['data_fim'] = dataFim.toIso8601String().split('T')[0];
+        queryParams['dataFim'] = dataFim.toIso8601String().split('T')[0];
       }
 
       final uri = Uri.parse('$_baseUrl/contas-pagar').replace(queryParameters: queryParams);

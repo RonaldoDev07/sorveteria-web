@@ -48696,10 +48696,10 @@ A.aIQ.prototype={
 $0(){return this.a.as=!0},
 $S:0}
 A.aIR.prototype={
-$1(a){return A.aj(["produto_id",a.a.a,"quantidade",a.b,"valor_unitario",a.c],t.N,t.K)},
+$1(a){return A.aj(["produtoId",a.a.a,"quantidade",a.b,"valorUnitario",a.c],t.N,t.K)},
 $S:407}
 A.aIS.prototype={
-$1(a){return A.aj(["numero_parcela",a.a,"valor_parcela",a.b,"data_vencimento",a.c.iy().split("T")[0]],t.N,t.K)},
+$1(a){return A.aj(["numeroParcela",a.a,"valorParcela",a.b,"dataVencimento",a.c.iy().split("T")[0]],t.N,t.K)},
 $S:408}
 A.aIT.prototype={
 $0(){return this.a.as=!1},
@@ -50926,10 +50926,10 @@ a=null
 p=4
 h=t.N
 m=A.aj(["skip",J.aP(b),"limit",J.aP(c)],h,h)
-if(d!=null)J.cj(m,"fornecedor_id",d)
+if(d!=null)J.cj(m,"fornecedorId",d)
 if(a!=null)J.cj(m,"status",a)
-if(e!=null)J.cj(m,"data_inicio",e.iy().iH(0,"T").h(0,0))
-if(f!=null)J.cj(m,"data_fim",f.iy().iH(0,"T").h(0,0))
+if(e!=null)J.cj(m,"dataInicio",e.iy().iH(0,"T").h(0,0))
+if(f!=null)J.cj(m,"dataFim",f.iy().iH(0,"T").h(0,0))
 l=A.bX("https://sorveteria-camila-api.onrender.com/api/v1/financeiro/compras-prazo").tC(0,m)
 s=7
 return A.r(A.fj(l,A.aj(["Content-Type","application/json; charset=UTF-8","Authorization","Bearer "+A.i(n.a.gdN())],h,h)),$async$xt)
@@ -51132,7 +51132,7 @@ j=A.bX(u.A+c+"/pagamentos")
 i=n.gAy()
 h=f
 s=7
-return A.r(A.nK(j,B.D.hx(A.aj(["valor_pago",b,"forma_pagamento",a,"data_pagamento",(h==null?new A.bY(Date.now(),0,!1):h).iy()],t.N,t.K)),i),$async$Eg)
+return A.r(A.nK(j,B.D.hx(A.aj(["valorPago",b,"formaPagamento",a,"dataPagamento",(h==null?new A.bY(Date.now(),0,!1):h).iy()],t.N,t.K)),i),$async$Eg)
 case 7:m=a0
 if(m.b===200||m.b===201){j=A.amq(B.D.aU(0,B.A.aU(0,m.w)))
 q=j
@@ -51193,7 +51193,7 @@ j=A.bX(u.a+a+"/pagamentos")
 i=n.gAy()
 h=f
 s=7
-return A.r(A.nK(j,B.D.hx(A.aj(["valor_pago",c,"forma_pagamento",b,"data_pagamento",(h==null?new A.bY(Date.now(),0,!1):h).iy()],t.N,t.K)),i),$async$Ef)
+return A.r(A.nK(j,B.D.hx(A.aj(["valorPago",c,"formaPagamento",b,"dataPagamento",(h==null?new A.bY(Date.now(),0,!1):h).iy()],t.N,t.K)),i),$async$Ef)
 case 7:m=a0
 if(m.b===200||m.b===201){j=A.amq(B.D.aU(0,B.A.aU(0,m.w)))
 q=j
@@ -51266,8 +51266,8 @@ h=t.N
 m=A.aj(["skip",J.aP(d),"limit",J.aP(f)],h,h)
 if(a0!=null)J.cj(m,"tipo",a0)
 if(a!=null)J.cj(m,"status",a)
-if(e!=null)J.cj(m,"referencia_id",e)
-if(c!=null)J.cj(m,"vencimento_ate",c.iy().iH(0,"T").h(0,0))
+if(e!=null)J.cj(m,"referenciaId",e)
+if(c!=null)J.cj(m,"vencimentoAte",c.iy().iH(0,"T").h(0,0))
 l=A.bX("https://sorveteria-camila-api.onrender.com/api/v1/financeiro/parcelas").tC(0,m)
 s=7
 return A.r(A.fj(l,n.gHK()),$async$Do)
@@ -51300,7 +51300,7 @@ s=q}while(true)switch(s){case 0:q=3
 k=A.bX(u.G+a+"/baixa")
 j=o.gHK()
 s=6
-return A.r(A.a84(k,B.D.hx(A.aj(["valor_pago",b,"forma_pagamento",c],t.N,t.K)),j),$async$wx)
+return A.r(A.a84(k,B.D.hx(A.aj(["valorPago",b,"formaPagamento",c],t.N,t.K)),j),$async$wx)
 case 6:n=e
 if(n.b!==200){m=B.D.aU(0,B.A.aU(0,n.w))
 k=J.N(m,"detail")
@@ -51376,8 +51376,8 @@ p=4
 h=t.N
 m=A.J(h,h)
 if(a2!=null)J.cj(m,"status",a2)
-if(a0!=null)J.cj(m,"data_inicio",a0.iy().iH(0,"T").h(0,0))
-if(a!=null)J.cj(m,"data_fim",a.iy().iH(0,"T").h(0,0))
+if(a0!=null)J.cj(m,"dataInicio",a0.iy().iH(0,"T").h(0,0))
+if(a!=null)J.cj(m,"dataFim",a.iy().iH(0,"T").h(0,0))
 l=A.bX("https://sorveteria-camila-api.onrender.com/api/v1/financeiro/relatorios/contas-receber").tC(0,m)
 s=7
 return A.r(A.fj(l,n.gTW()),$async$C6)
@@ -51418,8 +51418,8 @@ p=4
 h=t.N
 m=A.J(h,h)
 if(a2!=null)J.cj(m,"status",a2)
-if(a0!=null)J.cj(m,"data_inicio",a0.iy().iH(0,"T").h(0,0))
-if(a!=null)J.cj(m,"data_fim",a.iy().iH(0,"T").h(0,0))
+if(a0!=null)J.cj(m,"dataInicio",a0.iy().iH(0,"T").h(0,0))
+if(a!=null)J.cj(m,"dataFim",a.iy().iH(0,"T").h(0,0))
 l=A.bX("https://sorveteria-camila-api.onrender.com/api/v1/financeiro/relatorios/contas-pagar").tC(0,m)
 s=7
 return A.r(A.fj(l,n.gTW()),$async$C5)
@@ -51472,10 +51472,10 @@ a=null
 p=4
 h=t.N
 m=A.aj(["skip",J.aP(b),"limit",J.aP(c)],h,h)
-if(f!=null)J.cj(m,"cliente_id",f)
+if(f!=null)J.cj(m,"clienteId",f)
 if(a!=null)J.cj(m,"status",a)
-if(d!=null)J.cj(m,"data_inicio",d.iy().iH(0,"T").h(0,0))
-if(e!=null)J.cj(m,"data_fim",e.iy().iH(0,"T").h(0,0))
+if(d!=null)J.cj(m,"dataInicio",d.iy().iH(0,"T").h(0,0))
+if(e!=null)J.cj(m,"dataFim",e.iy().iH(0,"T").h(0,0))
 l=A.bX(u.m).tC(0,m)
 s=7
 return A.r(A.fj(l,n.gHd()),$async$xu)
@@ -51534,7 +51534,7 @@ s=p}while(true)switch(s){case 0:p=4
 j=A.bX(u.m)
 i=n.gHd()
 s=7
-return A.r(A.nK(j,B.D.hx(A.aj(["cliente_id",a,"produtos",d,"parcelas",c,"observacoes",b],t.N,t.X)),i),$async$Cf)
+return A.r(A.nK(j,B.D.hx(A.aj(["clienteId",a,"produtos",d,"parcelas",c,"observacoes",b],t.N,t.X)),i),$async$Cf)
 case 7:m=f
 if(m.b===200||m.b===201){j=A.asW(B.D.aU(0,B.A.aU(0,m.w)))
 q=j

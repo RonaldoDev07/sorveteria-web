@@ -288,14 +288,14 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
       await _compraService.criarCompra(
         fornecedorId: _fornecedorSelecionado!.id!,
         produtos: _itensCompra.map((item) => {
-          'produto_id': item.produto.id,
+          'produtoId': item.produto.id,
           'quantidade': item.quantidade,
-          'valor_unitario': item.valorUnitario,
+          'valorUnitario': item.valorUnitario,
         }).toList(),
         parcelas: _parcelas.map((p) => {
-          'numero_parcela': p.numero,
-          'valor_parcela': p.valor,
-          'data_vencimento': p.dataVencimento.toIso8601String().split('T')[0],
+          'numeroParcela': p.numero,
+          'valorParcela': p.valor,
+          'dataVencimento': p.dataVencimento.toIso8601String().split('T')[0],
         }).toList(),
         observacoes: _observacoesController.text.isEmpty ? null : _observacoesController.text,
       );

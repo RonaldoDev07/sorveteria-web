@@ -298,14 +298,14 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
       await _vendaService.criarVenda(
         clienteId: _clienteSelecionado!.id!,
         produtos: _itensVenda.map((item) => {
-          'produto_id': item.produto.id,
+          'produtoId': item.produto.id,
           'quantidade': item.quantidade,
-          'valor_unitario': item.valorUnitario,
+          'valorUnitario': item.valorUnitario,
         }).toList(),
         parcelas: _parcelas.map((p) => {
-          'numero_parcela': p.numero,
-          'valor_parcela': p.valor,
-          'data_vencimento': p.dataVencimento.toIso8601String().split('T')[0],
+          'numeroParcela': p.numero,
+          'valorParcela': p.valor,
+          'dataVencimento': p.dataVencimento.toIso8601String().split('T')[0],
         }).toList(),
         observacoes: _observacoesController.text.isEmpty ? null : _observacoesController.text,
       );

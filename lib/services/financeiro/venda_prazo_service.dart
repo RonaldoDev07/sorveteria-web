@@ -33,13 +33,13 @@ class VendaPrazoService {
         'limit': limit.toString(),
       };
       
-      if (clienteId != null) queryParams['cliente_id'] = clienteId;
+      if (clienteId != null) queryParams['clienteId'] = clienteId;
       if (status != null) queryParams['status'] = status;
       if (dataInicio != null) {
-        queryParams['data_inicio'] = dataInicio.toIso8601String().split('T')[0];
+        queryParams['dataInicio'] = dataInicio.toIso8601String().split('T')[0];
       }
       if (dataFim != null) {
-        queryParams['data_fim'] = dataFim.toIso8601String().split('T')[0];
+        queryParams['dataFim'] = dataFim.toIso8601String().split('T')[0];
       }
 
       final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParams);
@@ -84,7 +84,7 @@ class VendaPrazoService {
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode({
-          'cliente_id': clienteId,
+          'clienteId': clienteId,
           'produtos': produtos,
           'parcelas': parcelas,
           'observacoes': observacoes,

@@ -31,9 +31,9 @@ class PagamentoService {
         Uri.parse('$_baseUrl/vendas/$vendaId/pagamentos'),
         headers: _headers,
         body: json.encode({
-          'valor_pago': valorPago,
-          'forma_pagamento': formaPagamento,
-          'data_pagamento': (dataPagamento ?? DateTime.now()).toIso8601String(),
+          'valorPago': valorPago,
+          'formaPagamento': formaPagamento,
+          'dataPagamento': (dataPagamento ?? DateTime.now()).toIso8601String(),
         }),
       );
 
@@ -79,9 +79,9 @@ class PagamentoService {
         Uri.parse('$_baseUrl/compras/$compraId/pagamentos'),
         headers: _headers,
         body: json.encode({
-          'valor_pago': valorPago,
-          'forma_pagamento': formaPagamento,
-          'data_pagamento': (dataPagamento ?? DateTime.now()).toIso8601String(),
+          'valorPago': valorPago,
+          'formaPagamento': formaPagamento,
+          'dataPagamento': (dataPagamento ?? DateTime.now()).toIso8601String(),
         }),
       );
 
