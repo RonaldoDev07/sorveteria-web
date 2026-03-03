@@ -286,7 +286,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
         await ApiService.criarMovimentacao(
           auth.token!,
           produto['id'],
-          -quantidade, // Negativo para saída
+          quantidade.toDouble(), // Quantidade positiva
           precoUnitario,
           'SAIDA',
           'Venda via carrinho - $formaPagamento',
