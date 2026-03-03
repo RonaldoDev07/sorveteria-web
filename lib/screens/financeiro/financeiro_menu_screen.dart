@@ -9,7 +9,7 @@ import '../relatorio_lucro_screen.dart';
 import 'vendas_prazo_list_screen.dart';
 import 'compras_prazo_list_screen.dart';
 
-/// Tela de menu do módulo financeiro
+/// Tela de menu do módulo financeiro - v2
 class FinanceiroMenuScreen extends StatelessWidget {
   const FinanceiroMenuScreen({super.key});
 
