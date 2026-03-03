@@ -5,6 +5,7 @@ import 'dashboard_financeiro_screen.dart';
 import 'parcelas_screen.dart';
 import 'contas_receber_screen.dart';
 import 'contas_pagar_screen.dart';
+import '../relatorio_lucro_screen.dart';
 
 /// Tela de menu do módulo financeiro
 class FinanceiroMenuScreen extends StatelessWidget {
@@ -116,6 +117,20 @@ class FinanceiroMenuScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const ParcelasScreen(),
+                  ),
+                );
+              },
+            ),
+            _MenuCard(
+              emoji: '📈',
+              title: 'Relatório de Lucro',
+              subtitle: 'Análise de vendas e lucros',
+              color: const Color(0xFF8B5CF6), // Roxo
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RelatorioLucroScreen(),
                   ),
                 );
               },
