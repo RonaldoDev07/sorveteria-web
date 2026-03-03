@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import 'barcode_scanner_camera_web.dart';
+import 'barcode_scanner_universal.dart';
 
 class CadastroProdutoScreen extends StatefulWidget {
   const CadastroProdutoScreen({super.key});
@@ -36,7 +36,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
     try {
       final codigo = await showDialog<String>(
         context: context,
-        builder: (_) => const BarcodeScannerCameraWeb(),
+        builder: (_) => const BarcodeScannerUniversal(),
       );
       
       if (codigo != null && mounted) {

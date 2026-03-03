@@ -10,7 +10,7 @@ import '../../services/produto_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
-import '../barcode_scanner_camera_web.dart';
+import '../barcode_scanner_universal.dart';
 
 class CompraPrazoFormScreen extends StatefulWidget {
   const CompraPrazoFormScreen({super.key});
@@ -331,11 +331,9 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
 
   Future<void> _abrirScanner() async {
     try {
-      final codigo = await Navigator.push<String>(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const BarcodeScannerCameraWeb(),
-        ),
+      final codigo = await showDialog<String>(
+        context: context,
+        builder: (_) => const BarcodeScannerUniversal(),
       );
       
       if (codigo != null && mounted) {
@@ -902,11 +900,9 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                         
                         // Abrir scanner da tela principal
                         final parentContext = context;
-                        final codigo = await Navigator.push<String>(
-                          parentContext,
-                          MaterialPageRoute(
-                            builder: (_) => const BarcodeScannerCameraWeb(),
-                          ),
+                        final codigo = await showDialog<String>(
+                          context: parentContext,
+                          builder: (_) => const BarcodeScannerUniversal(),
                         );
                         
                         if (codigo != null) {

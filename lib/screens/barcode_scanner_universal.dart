@@ -1,69 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// Scanner que REALMENTE usa câmera no navegador web
-/// Abre em DIALOG (não tela cheia)
-class BarcodeScannerCameraWeb extends StatefulWidget {
-  const BarcodeScannerCameraWeb({super.key});
+/// Scanner universal que funciona em qualquer plataforma
+/// - No navegador: mostra campo para digitar + botão para tentar câmera
+/// - No app: abre câmera diretamente
+class BarcodeScannerUniversal extends StatefulWidget {
+  const BarcodeScannerUniversal({super.key});
 
   @override
-  State<BarcodeScannerCameraWeb> createState() => _BarcodeScannerCameraWebState();
+  State<BarcodeScannerUniversal> createState() => _BarcodeScannerUniversalState();
 }
 
-class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
-  MobileScannerController cameraController = MobileScannerController(
-    detectionSpeed: DetectionSpeed.normal,
-    facing: CameraFacing.back,
-    torchEnabled: false,
-    returnImage: false,
-    formats: [
-      BarcodeFormat.ean13,
-      BarcodeFormat.ean8,
-      BarcodeFormat.code128,
-      BarcodeFormat.code39,
-      BarcodeFormat.code93,
-      BarcodeFormat.upcA,
-      BarcodeFormat.upcE,
-    ],
-  );
-  bool _isScanning = true;
-  final _manualController = TextEditingController();
-  bool _showManualInput = false;
-  bool _cameraError = false;
-  String _errorMessage = '';
+class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
+  final _codigoController = TextEditingController();
+  bool _mostrarCamera = false;
+  bool _cameraDisponivel = true;
+  
+  MobileScannerController? _cameraController;
 
   @override
   void initState() {
     super.initState();
-    // Verificar se há câmera disponível
-    _checkCamera();
-  }
-
-  Future<void> _checkCamera() async {
-    try {
-      await cameraController.start();
-    } catch (e) {
-      print('❌ Erro ao iniciar câmera: $e');
-      if (mounted) {
-        setState(() {
-          _cameraError = true;
-          _showManualInput = true;
-          _errorMessage = 'Câmera não disponível. Use o campo abaixo para digitar o código.';
-        });
-      }
+    // No web, começar com campo de digitação
+    // No app, tentar abrir câmera automaticamente
+    if (!kIsWeb) {
+      _tentarAbrirCamera();
     }
   }
 
   @override
   void dispose() {
-    cameraController.dispose();
-    _manualController.dispose();
+    _codigoController.dispose();
+    _cameraController?.dispose();
     super.dispose();
   }
 
-  void _onDetect(BarcodeCapture capture) {
-    if (!_isScanning) return;
+  Future<void> _tentarAbrirCamera() async {
+    try {
+      _cameraController = MobileScannerController(
+        detectionSpeed: DetectionSpeed.normal,
+        facing: CameraFacing.back,
+        torchEnabled: false,
+        returnImage: false,
+        formats: [
+          BarcodeFormat.ean13,
+          BarcodeFormat.ean8,
+          BarcodeFormat.code128,
+          BarcodeFormat.code39,
+          BarcodeFormat.code93,
+          BarcodeFormat.upcA,
+          BarcodeFormat.upcE,
+        ],
+      );
+      
+      await _cameraController!.start();
+      
+      if (mounted) {
+        setState(() {
+          _mostrarCamera = true;
+          _cameraDisponivel = true;
+        });
+      }
+    } catch (e) {
+      print('❌ Câmera não disponível: $e');
+      if (mounted) {
+        setState(() {
+          _mostrarCamera = false;
+          _cameraDisponivel = false;
+        });
+      }
+    }
+  }
 
+  void _onBarcodeDetect(BarcodeCapture capture) {
     final List<Barcode> barcodes = capture.barcodes;
     
     if (barcodes.isNotEmpty) {
@@ -71,18 +81,15 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
       final String? code = barcode.rawValue;
       
       if (code != null && code.isNotEmpty && code.length >= 8) {
-        setState(() => _isScanning = false);
-        
-        // Retornar código imediatamente
         Navigator.pop(context, code);
       }
     }
   }
 
-  void _submitManualCode() {
-    final code = _manualController.text.trim();
-    if (code.isNotEmpty) {
-      Navigator.pop(context, code);
+  void _confirmarCodigo() {
+    final codigo = _codigoController.text.trim();
+    if (codigo.isNotEmpty) {
+      Navigator.pop(context, codigo);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -99,12 +106,13 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
       backgroundColor: Colors.transparent,
       child: Container(
         width: 500,
-        height: 600,
+        constraints: const BoxConstraints(maxHeight: 650),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
@@ -122,7 +130,7 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      'Escanear Código de Barras',
+                      'Código de Barras',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -130,13 +138,20 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.keyboard, color: Colors.white),
-                    onPressed: () {
-                      setState(() => _showManualInput = !_showManualInput);
-                    },
-                    tooltip: 'Digitar manualmente',
-                  ),
+                  if (_cameraDisponivel && !_mostrarCamera)
+                    IconButton(
+                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                      onPressed: _tentarAbrirCamera,
+                      tooltip: 'Abrir câmera',
+                    ),
+                  if (_mostrarCamera)
+                    IconButton(
+                      icon: const Icon(Icons.keyboard, color: Colors.white),
+                      onPressed: () {
+                        setState(() => _mostrarCamera = false);
+                      },
+                      tooltip: 'Digitar manualmente',
+                    ),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.white),
                     onPressed: () => Navigator.pop(context),
@@ -147,58 +162,9 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
             
             // Content
             Expanded(
-              child: _showManualInput
-                  ? _buildManualInput()
-                  : _cameraError
-                      ? _buildCameraError()
-                      : Stack(
-                          children: [
-                            // Scanner
-                            ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(20),
-                                bottomRight: Radius.circular(20),
-                              ),
-                              child: MobileScanner(
-                                controller: cameraController,
-                                onDetect: _onDetect,
-                                errorBuilder: (context, error, child) {
-                                  return _buildCameraError();
-                                },
-                              ),
-                            ),
-                        
-                        // Overlay com guia
-                        CustomPaint(
-                          painter: ScannerOverlay(),
-                          child: Container(),
-                        ),
-                        
-                        // Instruções
-                        Positioned(
-                          bottom: 20,
-                          left: 20,
-                          right: 20,
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Text(
-                              'Posicione o código de barras\ndentro da área marcada',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+              child: _mostrarCamera && _cameraController != null
+                  ? _buildCamera()
+                  : _buildManualInput(),
             ),
           ],
         ),
@@ -206,64 +172,108 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
     );
   }
 
-  Widget _buildCameraError() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.videocam_off,
-            color: Colors.orange,
-            size: 64,
+  Widget _buildCamera() {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'Câmera não disponível',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _errorMessage.isEmpty 
-                ? 'Não foi possível acessar a câmera.\nClique no botão de teclado acima para digitar o código manualmente.'
-                : _errorMessage,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              setState(() => _showManualInput = true);
+          child: MobileScanner(
+            controller: _cameraController!,
+            onDetect: _onBarcodeDetect,
+            errorBuilder: (context, error, child) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Erro ao acessar câmera',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() => _mostrarCamera = false);
+                      },
+                      child: const Text('Digitar manualmente'),
+                    ),
+                  ],
+                ),
+              );
             },
-            icon: const Icon(Icons.keyboard),
-            label: const Text('Digitar Código'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF9C27B0),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        
+        // Overlay com guia
+        CustomPaint(
+          painter: ScannerOverlay(),
+          child: Container(),
+        ),
+        
+        // Instruções
+        Positioned(
+          bottom: 20,
+          left: 20,
+          right: 20,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text(
+              'Posicione o código de barras\ndentro da área marcada',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildManualInput() {
-    return Container(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          if (!_cameraDisponivel) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.orange),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Câmera não disponível neste dispositivo',
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+          
           const Icon(
             Icons.keyboard,
             color: Color(0xFF9C27B0),
@@ -273,28 +283,26 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
           const Text(
             'Digite o Código de Barras',
             style: TextStyle(
-              color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 24),
           TextField(
-            controller: _manualController,
+            controller: _codigoController,
             autofocus: true,
             keyboardType: TextInputType.number,
             style: const TextStyle(
-              color: Colors.white,
               fontSize: 18,
               letterSpacing: 2,
             ),
             decoration: InputDecoration(
               hintText: 'Ex: 7891234567890',
               hintStyle: TextStyle(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.grey[400],
               ),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.1),
+              fillColor: Colors.grey[100],
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -304,13 +312,13 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
                 vertical: 18,
               ),
             ),
-            onSubmitted: (_) => _submitManualCode(),
+            onSubmitted: (_) => _confirmarCodigo(),
           ),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: _submitManualCode,
+              onPressed: _confirmarCodigo,
               icon: const Icon(Icons.check_circle, size: 24),
               label: const Text(
                 'Confirmar',
@@ -331,7 +339,7 @@ class _BarcodeScannerCameraWebState extends State<BarcodeScannerCameraWeb> {
           Text(
             'Dica: O código geralmente tem 13 dígitos',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.grey[600],
               fontSize: 12,
             ),
           ),
