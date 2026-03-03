@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import 'barcode_scanner_screen.dart';
-import 'barcode_scanner_web.dart';
+import 'barcode_scanner_camera_web.dart';
 
 class CarrinhoVendaScreen extends StatefulWidget {
   const CarrinhoVendaScreen({super.key});
@@ -835,13 +833,9 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           try {
-            final codigo = await Navigator.push<String>(
-              context,
-              MaterialPageRoute(
-                builder: (_) => kIsWeb 
-                    ? const BarcodeScannerWeb() 
-                    : const BarcodeScannerScreen(),
-              ),
+            final codigo = await showDialog<String>(
+              context: context,
+              builder: (_) => const BarcodeScannerCameraWeb(),
             );
             
             if (codigo != null && mounted) {

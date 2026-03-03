@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../models/financeiro/cliente_model.dart';
 import '../../models/produto.dart';
 import '../../services/financeiro/cliente_service.dart';
@@ -11,6 +10,7 @@ import '../../services/produto_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
+import '../barcode_scanner_camera_web.dart';
 
 class VendaPrazoFormScreen extends StatefulWidget {
   const VendaPrazoFormScreen({super.key});
@@ -337,43 +337,27 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
   }
 
   Future<void> _abrirScanner() async {
-    await showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: SizedBox(
-          width: 400,
-          height: 500,
-          child: Column(
-            children: [
-              AppBar(
-                title: const Text('Escanear Código de Barras'),
-                automaticallyImplyLeading: false,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: MobileScanner(
-                  onDetect: (capture) {
-                    final List<Barcode> barcodes = capture.barcodes;
-                    if (barcodes.isNotEmpty) {
-                      final String? code = barcodes.first.rawValue;
-                      if (code != null) {
-                        Navigator.pop(context);
-                        _buscarProdutoPorCodigo(code);
-                      }
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
+    try {
+      final codigo = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const BarcodeScannerCameraWeb(),
         ),
-      ),
-    );
+      );
+      
+      if (codigo != null && mounted) {
+        _buscarProdutoPorCodigo(codigo);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir scanner: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _buscarProdutoPorCodigo(String codigo) {
@@ -944,47 +928,19 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                       ),
                       child: IconButton(
                         onPressed: () async {
-                          // Abrir scanner
-                          final codigo = await showDialog<String>(
-                            context: context,
-                            builder: (context) => Dialog(
-                              child: SizedBox(
-                                width: 400,
-                                height: 500,
-                                child: Column(
-                                  children: [
-                                    AppBar(
-                                      title: const Text('Escanear Código'),
-                                      automaticallyImplyLeading: false,
-                                      backgroundColor: Colors.green,
-                                      actions: [
-                                        IconButton(
-                                          icon: const Icon(Icons.close),
-                                          onPressed: () => Navigator.pop(context),
-                                        ),
-                                      ],
-                                    ),
-                                    Expanded(
-                                      child: MobileScanner(
-                                        onDetect: (capture) {
-                                          final List<Barcode> barcodes = capture.barcodes;
-                                          if (barcodes.isNotEmpty) {
-                                            final String? code = barcodes.first.rawValue;
-                                            if (code != null) {
-                                              Navigator.pop(context, code);
-                                            }
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          // Fechar dialog atual temporariamente
+                          Navigator.pop(context);
+                          
+                          // Abrir scanner da tela principal
+                          final parentContext = context;
+                          final codigo = await Navigator.push<String>(
+                            parentContext,
+                            MaterialPageRoute(
+                              builder: (_) => const BarcodeScannerCameraWeb(),
                             ),
                           );
                           
                           if (codigo != null) {
-                            _codigoBarrasController.text = codigo;
                             // Buscar produto
                             final produtoEncontrado = widget.produtos.firstWhere(
                               (p) => p.codigoBarras == codigo,
@@ -992,12 +948,35 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             );
                             
                             if (produtoEncontrado.codigoBarras == codigo) {
-                              setState(() {
-                                _produtoSelecionado = produtoEncontrado;
-                                _valorController.text = produtoEncontrado.preco.toStringAsFixed(2);
-                              });
+                              // Adicionar produto diretamente
+                              widget.onAdicionar(produtoEncontrado, 1, produtoEncontrado.preco);
+                              
+                              ScaffoldMessenger.of(parentContext).showSnackBar(
+                                SnackBar(
+                                  content: Text('✅ ${produtoEncontrado.nome} adicionado!'),
+                                  duration: const Duration(seconds: 1),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(parentContext).showSnackBar(
+                                SnackBar(
+                                  content: Text('Produto com código $codigo não encontrado'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
                             }
                           }
+                          
+                          // Reabrir dialog
+                          showDialog(
+                            context: parentContext,
+                            builder: (context) => _DialogAdicionarProduto(
+                              produtos: widget.produtos,
+                              onAdicionar: widget.onAdicionar,
+                              onProdutoCadastrado: widget.onProdutoCadastrado,
+                            ),
+                          );
                         },
                         icon: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
                       ),
