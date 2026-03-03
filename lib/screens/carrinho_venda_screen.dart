@@ -211,62 +211,120 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
     }
 
     String formaPagamento = 'DINHEIRO';
+    final valorPagoController = TextEditingController();
 
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: const Text('Finalizar Venda'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Total de itens: ${_carrinho.length}'),
-              const SizedBox(height: 8),
-              Text(
-                'Valor total: R\$ ${_formatarNumero(_calcularTotal())}',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: formaPagamento,
-                decoration: const InputDecoration(
-                  labelText: 'Forma de Pagamento',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.payment),
-                ),
-                items: const [
-                  DropdownMenuItem(value: 'DINHEIRO', child: Text('💵 Dinheiro')),
-                  DropdownMenuItem(value: 'PIX', child: Text('📱 PIX')),
-                  DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Cartão de Crédito')),
-                  DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Cartão de Débito')),
+        builder: (context, setDialogState) {
+          final valorTotal = _calcularTotal();
+          final valorPago = double.tryParse(valorPagoController.text.replaceAll(',', '.')) ?? 0;
+          final troco = valorPago - valorTotal;
+          
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            title: const Text('Finalizar Venda'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total de itens: ${_carrinho.length}'),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Valor total: R\$ ${_formatarNumero(valorTotal)}',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: formaPagamento,
+                    decoration: const InputDecoration(
+                      labelText: 'Forma de Pagamento',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.payment),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'DINHEIRO', child: Text('💵 Dinheiro')),
+                      DropdownMenuItem(value: 'PIX', child: Text('📱 PIX')),
+                      DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Cartão de Crédito')),
+                      DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Cartão de Débito')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setDialogState(() => formaPagamento = value);
+                      }
+                    },
+                  ),
+                  if (formaPagamento == 'DINHEIRO') ...[
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: valorPagoController,
+                      decoration: const InputDecoration(
+                        labelText: 'Valor Pago',
+                        border: OutlineInputBorder(),
+                        prefixText: 'R\$ ',
+                        prefixIcon: Icon(Icons.attach_money),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onChanged: (_) => setDialogState(() {}),
+                    ),
+                    if (valorPago > 0) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: troco >= 0 ? Colors.blue.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: troco >= 0 ? Colors.blue : Colors.red,
+                            width: 2,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Troco:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
+                              ),
+                            ),
+                            Text(
+                              'R\$ ${_formatarNumero(troco.abs())}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                  const SizedBox(height: 16),
+                  const Text('Confirma a venda?'),
                 ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setDialogState(() => formaPagamento = value);
-                  }
-                },
               ),
-              const SizedBox(height: 16),
-              const Text('Confirma a venda?'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10B981),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Confirmar Venda'),
+              ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF10B981),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Confirmar Venda'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
 
