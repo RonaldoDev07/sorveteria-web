@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'selecionar_produto_screen.dart';
+import 'financeiro/compra_vista_form_screen.dart';
 import 'financeiro/compra_prazo_form_screen.dart';
 
 /// Tela de menu para escolher tipo de compra (à vista ou a prazo)
@@ -63,7 +63,7 @@ class ComprasMenuScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const SelecionarProdutoScreen(tipo: 'ENTRADA'),
+                    builder: (_) => const CompraVistaFormScreen(),
                   ),
                 );
               },
