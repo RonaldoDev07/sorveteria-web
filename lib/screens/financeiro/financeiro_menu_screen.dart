@@ -183,8 +183,8 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
           ],
-        ),
-      );
+            ),
+          );
         },
       ),
     );
