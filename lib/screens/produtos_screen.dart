@@ -867,24 +867,57 @@ _isLoading
                 ],
               ),
       floatingActionButton: auth.canCadastrarProduto
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ComprasMenuScreen(),
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Botão Cadastrar Produto
+                if (auth.isAdmin)
+                  FloatingActionButton.extended(
+                    onPressed: () async {
+                      final resultado = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const CadastroProdutoScreen(),
+                        ),
+                      );
+                      if (resultado == true) {
+                        _loadProdutos();
+                      }
+                    },
+                    heroTag: 'cadastrar_produto',
+                    backgroundColor: const Color(0xFF3B82F6),
+                    icon: const Icon(Icons.add_circle_rounded, size: 24),
+                    label: const Text(
+                      'Cadastrar Produto',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                );
-              },
-              backgroundColor: const Color(0xFF14B8A6),
-              icon: const Icon(Icons.shopping_cart_rounded, size: 24),
-              label: const Text(
-                'Registrar Compra',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                if (auth.isAdmin) const SizedBox(height: 12),
+                // Botão Registrar Compra
+                FloatingActionButton.extended(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ComprasMenuScreen(),
+                      ),
+                    );
+                  },
+                  heroTag: 'registrar_compra',
+                  backgroundColor: const Color(0xFF14B8A6),
+                  icon: const Icon(Icons.shopping_cart_rounded, size: 24),
+                  label: const Text(
+                    'Registrar Compra',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             )
           : null,
     );
