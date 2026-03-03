@@ -220,9 +220,9 @@ class _CriarUsuarioScreenState extends State<CriarUsuarioScreen> {
                               value: 'VENDEDOR',
                               child: Row(
                                 children: [
-                                  Icon(Icons.shopping_bag, color: Colors.green),
-                                  SizedBox(width: 8),
-                                  Text('PROPRIETÁRIA (cadastra e vende)'),
+                                  const Icon(Icons.shopping_bag, color: Colors.green, size: 20),
+                                  const SizedBox(width: 8),
+                                  const Text('PROPRIETÁRIA (cadastra e vende)'),
                                 ],
                               ),
                             ),

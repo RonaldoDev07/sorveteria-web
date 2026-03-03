@@ -206,7 +206,7 @@ class _EditarUsuarioScreenState extends State<EditarUsuarioScreen> {
                                 children: [
                                   Icon(Icons.shopping_bag, color: Colors.green),
                                   SizedBox(width: 8),
-                                  Text('PROPRIETÁRIA'),
+                                  Text('PROPRIETÁRIA (cadastra e vende)'),
                                 ],
                               ),
                             ),

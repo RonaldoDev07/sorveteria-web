@@ -319,7 +319,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
-                                            'Perfil: ${usuario['perfil']}',
+                                            'Perfil: ${usuario['perfil'] == 'VENDEDOR' ? 'PROPRIETÁRIA' : usuario['perfil']}',
                                             style: TextStyle(
                                               color: isAtivo
                                                   ? (isAdmin 
