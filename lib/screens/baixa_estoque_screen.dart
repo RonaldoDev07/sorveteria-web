@@ -83,131 +83,184 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Registrar Venda'),
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green, Colors.lightGreen],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        backgroundColor: const Color(0xFF10B981),
+        foregroundColor: Colors.white,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.green.shade50, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.produto['nome'],
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
+      backgroundColor: const Color(0xFFF5F7FA),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Card do Produto
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.produto['nome'],
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF10B981),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Estoque atual: ${_formatarNumero(widget.produto['estoque_atual'])} ${widget.produto['unidade']}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Estoque atual: ${_formatarNumero(widget.produto['estoque_atual'])} ${widget.produto['unidade']}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF6B7280),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _quantidadeController,
-                  decoration: InputDecoration(
-                    labelText: 'Quantidade (Ex: 10)',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    helperText: 'Quantas unidades foram vendidas',
-                    filled: true,
-                    fillColor: Colors.white,
+              ),
+              const SizedBox(height: 20),
+              // Quantidade
+              TextFormField(
+                controller: _quantidadeController,
+                decoration: InputDecoration(
+                  labelText: 'Quantidade (Ex: 10)',
+                  hintText: 'Digite a quantidade',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (_) => setState(() {}), // Atualizar UI quando quantidade mudar
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                    final valorLimpo = value!.replaceAll(',', '.');
-                    final quantidade = double.tryParse(valorLimpo);
-                    if (quantidade == null || quantidade <= 0) {
-                      return 'Quantidade inválida';
-                    }
-                    return null;
+                  filled: true,
+                  fillColor: Colors.white,
+                  helperText: 'Quantas unidades foram vendidas',
+                  prefixIcon: const Icon(Icons.shopping_cart, color: Color(0xFF10B981)),
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                onChanged: (_) => setState(() {}),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                  final valorLimpo = value!.replaceAll(',', '.');
+                  final quantidade = double.tryParse(valorLimpo);
+                  if (quantidade == null || quantidade <= 0) {
+                    return 'Quantidade inválida';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              // Forma de Pagamento
+              DropdownButtonFormField<String>(
+                value: _formaPagamento,
+                decoration: InputDecoration(
+                  labelText: 'Forma de Pagamento',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  prefixIcon: Icon(
+                    _formaPagamento == 'DINHEIRO' ? Icons.money_rounded :
+                    _formaPagamento == 'PIX' ? Icons.pix_rounded :
+                    _formaPagamento == 'DEBITO' ? Icons.credit_card_rounded :
+                    Icons.credit_score_rounded,
+                    color: const Color(0xFF10B981),
+                  ),
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'DINHEIRO',
+                    child: Text('💵 Dinheiro'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'PIX',
+                    child: Text('📱 PIX'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'DEBITO',
+                    child: Text('💳 Cartão Débito'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'CREDITO',
+                    child: Text('💳 Cartão Crédito'),
+                  ),
+                ],
+                onChanged: (value) => setState(() {
+                  _formaPagamento = value!;
+                  _valorPagoController.clear();
+                }),
+              ),
+              // Valor Total
+              if (_quantidadeController.text.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Builder(
+                  builder: (context) {
+                    final quantidadeStr = _quantidadeController.text.replaceAll(',', '.');
+                    final quantidade = double.tryParse(quantidadeStr) ?? 0;
+                    final precoUnitario = double.parse(widget.produto['preco_venda'].toString());
+                    final valorTotal = quantidade * precoUnitario;
+                    
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: const Color(0xFF10B981),
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Valor Total:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF10B981),
+                            ),
+                          ),
+                          Text(
+                            'R\$ ${_formatarNumero(valorTotal)}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF10B981),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   },
                 ),
-                const SizedBox(height: 20),
-                // Seletor de forma de pagamento
-                DropdownButtonFormField<String>(
-                  value: _formaPagamento,
+              ],
+              // Campo de valor pago (apenas para dinheiro)
+              if (_formaPagamento == 'DINHEIRO') ...[
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _valorPagoController,
                   decoration: InputDecoration(
-                    labelText: 'Forma de Pagamento',
+                    labelText: 'Valor Pago',
+                    hintText: 'Quanto o cliente pagou',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    prefixIcon: Icon(
-                      _formaPagamento == 'DINHEIRO' ? Icons.money_rounded :
-                      _formaPagamento == 'PIX' ? Icons.pix_rounded :
-                      _formaPagamento == 'DEBITO' ? Icons.credit_card_rounded :
-                      Icons.credit_score_rounded,
-                      color: Colors.green,
-                    ),
+                    prefixText: 'R\$ ',
+                    prefixIcon: const Icon(Icons.attach_money, color: Color(0xFF10B981)),
                   ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'DINHEIRO',
-                      child: Text('💵 Dinheiro'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'PIX',
-                      child: Text('📱 PIX'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'DEBITO',
-                      child: Text('💳 Cartão Débito'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'CREDITO',
-                      child: Text('💳 Cartão Crédito'),
-                    ),
-                  ],
-                  onChanged: (value) => setState(() {
-                    _formaPagamento = value!;
-                    _valorPagoController.clear();
-                  }),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (_) => setState(() {}),
                 ),
-                // Exibir valor total sempre que houver quantidade
-                if (_quantidadeController.text.isNotEmpty) ...[
-                  const SizedBox(height: 20),
+                // Troco
+                if (_valorPagoController.text.isNotEmpty) ...[
+                  const SizedBox(height: 16),
                   Builder(
                     builder: (context) {
                       final quantidadeStr = _quantidadeController.text.replaceAll(',', '.');
@@ -215,13 +268,19 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                       final precoUnitario = double.parse(widget.produto['preco_venda'].toString());
                       final valorTotal = quantidade * precoUnitario;
                       
+                      final valorPagoStr = _valorPagoController.text.replaceAll(',', '.');
+                      final valorPago = double.tryParse(valorPagoStr) ?? 0;
+                      final troco = valorPago - valorTotal;
+                      
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          color: troco >= 0 
+                              ? const Color(0xFF10B981).withOpacity(0.1) 
+                              : Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.blue,
+                            color: troco >= 0 ? const Color(0xFF10B981) : Colors.red,
                             width: 2,
                           ),
                         ),
@@ -229,19 +288,19 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Valor Total:',
+                              troco >= 0 ? 'Troco:' : 'Falta:',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.blue[900],
+                                color: troco >= 0 ? const Color(0xFF10B981) : Colors.red,
                               ),
                             ),
                             Text(
-                              'R\$ ${_formatarNumero(valorTotal)}',
+                              'R\$ ${_formatarNumero(troco.abs())}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blue[900],
+                                color: troco >= 0 ? const Color(0xFF10B981) : Colors.red,
                               ),
                             ),
                           ],
@@ -250,109 +309,41 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     },
                   ),
                 ],
-                // Campo de valor pago e troco (apenas para dinheiro)
-                if (_formaPagamento == 'DINHEIRO') ...[
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _valorPagoController,
-                    decoration: InputDecoration(
-                      labelText: 'Valor Pago',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      prefixText: 'R\$ ',
-                      prefixIcon: const Icon(Icons.attach_money, color: Colors.green),
-                      helperText: 'Quanto o cliente pagou',
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  // Exibir troco se valor pago foi informado
-                  if (_valorPagoController.text.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Builder(
-                      builder: (context) {
-                        final quantidadeStr = _quantidadeController.text.replaceAll(',', '.');
-                        final quantidade = double.tryParse(quantidadeStr) ?? 0;
-                        final precoUnitario = double.parse(widget.produto['preco_venda'].toString());
-                        final valorTotal = quantidade * precoUnitario;
-                        
-                        final valorPagoStr = _valorPagoController.text.replaceAll(',', '.');
-                        final valorPago = double.tryParse(valorPagoStr) ?? 0;
-                        final troco = valorPago - valorTotal;
-                        
-                        return Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: troco >= 0 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: troco >= 0 ? Colors.green : Colors.red,
-                              width: 2,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                troco >= 0 ? 'Troco:' : 'Falta:',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: troco >= 0 ? Colors.green[900] : Colors.red[900],
-                                ),
-                              ),
-                              Text(
-                                'R\$ ${_formatarNumero(troco.abs())}',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: troco >= 0 ? Colors.green[900] : Colors.red[900],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ],
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleBaixa,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 4,
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            'Registrar Venda',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
               ],
-            ),
+              const SizedBox(height: 24),
+              // Botão
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleBaixa,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 2,
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Registrar Venda',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
