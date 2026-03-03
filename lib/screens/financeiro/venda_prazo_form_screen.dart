@@ -885,50 +885,125 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
               ),
               const SizedBox(height: 12),
               
-              // CAMPO DE CÓDIGO DE BARRAS
-              TextField(
-                controller: _codigoBarrasController,
-                decoration: InputDecoration(
-                  hintText: 'Código de barras...',
-                  prefixIcon: const Icon(Icons.qr_code_scanner),
-                  suffixIcon: _codigoBarrasController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _codigoBarrasController.clear();
-                            setState(() {});
-                          },
-                        )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+              // CAMPO DE CÓDIGO DE BARRAS COM BOTÃO SCANNER
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _codigoBarrasController,
+                      decoration: InputDecoration(
+                        hintText: 'Código de barras...',
+                        prefixIcon: const Icon(Icons.qr_code_scanner),
+                        suffixIcon: _codigoBarrasController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _codigoBarrasController.clear();
+                                  setState(() {});
+                                },
+                              )
+                            : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                      ),
+                      onChanged: (value) {
+                        if (value.isNotEmpty) {
+                          // Buscar produto por código de barras
+                          final produtoEncontrado = widget.produtos.firstWhere(
+                            (p) => p.codigoBarras == value,
+                            orElse: () => widget.produtos.first, // Fallback
+                          );
+                          
+                          if (produtoEncontrado.codigoBarras == value) {
+                            setState(() {
+                              _produtoSelecionado = produtoEncontrado;
+                              _valorController.text = produtoEncontrado.preco.toStringAsFixed(2);
+                              _filtroProduto = ''; // Limpar filtro de nome
+                            });
+                          }
+                        }
+                      },
+                      onSubmitted: (value) {
+                        if (_produtoSelecionado != null && _produtoSelecionado!.codigoBarras == value) {
+                          // Focar no campo de quantidade
+                          FocusScope.of(context).nextFocus();
+                        }
+                      },
+                    ),
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-                onChanged: (value) {
-                  if (value.isNotEmpty) {
-                    // Buscar produto por código de barras
-                    final produtoEncontrado = widget.produtos.firstWhere(
-                      (p) => p.codigoBarras == value,
-                      orElse: () => widget.produtos.first, // Fallback
-                    );
-                    
-                    if (produtoEncontrado.codigoBarras == value) {
-                      setState(() {
-                        _produtoSelecionado = produtoEncontrado;
-                        _valorController.text = produtoEncontrado.preco.toStringAsFixed(2);
-                        _filtroProduto = ''; // Limpar filtro de nome
-                      });
-                    }
-                  }
-                },
-                onSubmitted: (value) {
-                  if (_produtoSelecionado != null && _produtoSelecionado!.codigoBarras == value) {
-                    // Focar no campo de quantidade
-                    FocusScope.of(context).nextFocus();
-                  }
-                },
+                  const SizedBox(width: 8),
+                  Tooltip(
+                    message: 'Escanear código de barras',
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () async {
+                          // Abrir scanner
+                          final codigo = await showDialog<String>(
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: SizedBox(
+                                width: 400,
+                                height: 500,
+                                child: Column(
+                                  children: [
+                                    AppBar(
+                                      title: const Text('Escanear Código'),
+                                      automaticallyImplyLeading: false,
+                                      backgroundColor: Colors.green,
+                                      actions: [
+                                        IconButton(
+                                          icon: const Icon(Icons.close),
+                                          onPressed: () => Navigator.pop(context),
+                                        ),
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: MobileScanner(
+                                        onDetect: (capture) {
+                                          final List<Barcode> barcodes = capture.barcodes;
+                                          if (barcodes.isNotEmpty) {
+                                            final String? code = barcodes.first.rawValue;
+                                            if (code != null) {
+                                              Navigator.pop(context, code);
+                                            }
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                          
+                          if (codigo != null) {
+                            _codigoBarrasController.text = codigo;
+                            // Buscar produto
+                            final produtoEncontrado = widget.produtos.firstWhere(
+                              (p) => p.codigoBarras == codigo,
+                              orElse: () => widget.produtos.first,
+                            );
+                            
+                            if (produtoEncontrado.codigoBarras == codigo) {
+                              setState(() {
+                                _produtoSelecionado = produtoEncontrado;
+                                _valorController.text = produtoEncontrado.preco.toStringAsFixed(2);
+                              });
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             const SizedBox(height: 16),
             
