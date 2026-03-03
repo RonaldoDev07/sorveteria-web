@@ -6,6 +6,8 @@ import 'parcelas_screen.dart';
 import 'contas_receber_screen.dart';
 import 'contas_pagar_screen.dart';
 import '../relatorio_lucro_screen.dart';
+import 'vendas_prazo_list_screen.dart';
+import 'compras_prazo_list_screen.dart';
 
 /// Tela de menu do módulo financeiro
 class FinanceiroMenuScreen extends StatelessWidget {
@@ -103,6 +105,34 @@ class FinanceiroMenuScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const ContasPagarScreen(),
+                  ),
+                );
+              },
+            ),
+            _MenuCard(
+              emoji: '📋',
+              title: 'Vendas a Prazo',
+              subtitle: 'Histórico de vendas',
+              color: const Color(0xFF10B981), // Verde
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VendasPrazoListScreen(),
+                  ),
+                );
+              },
+            ),
+            _MenuCard(
+              emoji: '📦',
+              title: 'Compras a Prazo',
+              subtitle: 'Histórico de compras',
+              color: const Color(0xFF06B6D4), // Cyan
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ComprasPrazoListScreen(),
                   ),
                 );
               },
