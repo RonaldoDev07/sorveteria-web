@@ -36,6 +36,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
   bool _isLoadingProdutos = true;
   
   String _filtroProduto = '';
+  String _formaPagamento = 'dinheiro'; // Forma de pagamento padrão
   final _observacoesController = TextEditingController();
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
@@ -315,6 +316,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
           'dataVencimento': p.dataVencimento.toIso8601String().split('T')[0],
         }).toList(),
         observacoes: _observacoesController.text.isEmpty ? null : _observacoesController.text,
+        formaPagamento: _formaPagamento,
       );
 
       if (mounted) {
@@ -436,6 +438,32 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                         tooltip: 'Cadastrar novo cliente',
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Forma de Pagamento
+                  DropdownButtonFormField<String>(
+                    value: _formaPagamento,
+                    decoration: const InputDecoration(
+                      labelText: 'Forma de Pagamento',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.payment),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'dinheiro', child: Text('💵 Dinheiro')),
+                      DropdownMenuItem(value: 'pix', child: Text('📱 PIX')),
+                      DropdownMenuItem(value: 'cartao_credito', child: Text('💳 Cartão de Crédito')),
+                      DropdownMenuItem(value: 'cartao_debito', child: Text('💳 Cartão de Débito')),
+                      DropdownMenuItem(value: 'boleto', child: Text('📄 Boleto')),
+                      DropdownMenuItem(value: 'transferencia', child: Text('🏦 Transferência')),
+                      DropdownMenuItem(value: 'cheque', child: Text('📝 Cheque')),
+                      DropdownMenuItem(value: 'outro', child: Text('➕ Outro')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _formaPagamento = value);
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
                   

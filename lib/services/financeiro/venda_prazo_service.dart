@@ -78,17 +78,24 @@ class VendaPrazoService {
     required List<Map<String, dynamic>> produtos,
     required List<Map<String, dynamic>> parcelas,
     String? observacoes,
+    String? formaPagamento,
   }) async {
     try {
+      final body = {
+        'clienteId': clienteId,
+        'produtos': produtos,
+        'parcelas': parcelas,
+        'observacoes': observacoes,
+      };
+      
+      if (formaPagamento != null) {
+        body['formaPagamento'] = formaPagamento;
+      }
+      
       final response = await http.post(
         Uri.parse(_baseUrl),
         headers: _headers,
-        body: json.encode({
-          'clienteId': clienteId,
-          'produtos': produtos,
-          'parcelas': parcelas,
-          'observacoes': observacoes,
-        }),
+        body: json.encode(body),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

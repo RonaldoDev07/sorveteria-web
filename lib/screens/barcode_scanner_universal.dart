@@ -22,11 +22,8 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   @override
   void initState() {
     super.initState();
-    // No web, começar com campo de digitação
-    // No app, tentar abrir câmera automaticamente
-    if (!kIsWeb) {
-      _tentarAbrirCamera();
-    }
+    // Sempre tentar abrir câmera primeiro (web e app)
+    _tentarAbrirCamera();
   }
 
   @override
