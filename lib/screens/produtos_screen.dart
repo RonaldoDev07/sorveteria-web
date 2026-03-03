@@ -7,6 +7,7 @@ import 'baixa_estoque_screen.dart';
 import 'entrada_estoque_screen.dart';
 import 'editar_produto_screen.dart';
 import 'compras_menu_screen.dart';
+import 'cadastro_produto_screen.dart';
 
 class ProdutosScreen extends StatefulWidget {
   const ProdutosScreen({super.key});
@@ -434,6 +435,22 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
           ),
         ),
         actions: [
+          if (auth.isAdmin)
+            IconButton(
+              icon: const Icon(Icons.add_circle_rounded),
+              onPressed: () async {
+                final resultado = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CadastroProdutoScreen(),
+                  ),
+                );
+                if (resultado == true) {
+                  _loadProdutos();
+                }
+              },
+              tooltip: 'Cadastrar Produto',
+            ),
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: _loadProdutos,
