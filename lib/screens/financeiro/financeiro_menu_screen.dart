@@ -24,38 +24,12 @@ class FinanceiroMenuScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFEC4899),
         foregroundColor: Colors.white,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Calcular número de colunas baseado na largura
-          int crossAxisCount;
-          double childAspectRatio;
-          
-          if (constraints.maxWidth < 600) {
-            // Mobile: 2 colunas
-            crossAxisCount = 2;
-            childAspectRatio = 0.85;
-          } else if (constraints.maxWidth < 900) {
-            // Tablet: 3 colunas
-            crossAxisCount = 3;
-            childAspectRatio = 0.9;
-          } else if (constraints.maxWidth < 1200) {
-            // Desktop pequeno: 4 colunas
-            crossAxisCount = 4;
-            childAspectRatio = 0.95;
-          } else {
-            // Desktop grande: 4 colunas com mais espaço
-            crossAxisCount = 4;
-            childAspectRatio = 1.0;
-          }
-          
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: GridView.count(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: childAspectRatio,
-              children: [
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
             _MenuCard(
               emoji: '👤',
               title: 'Clientes',
@@ -183,9 +157,7 @@ class FinanceiroMenuScreen extends StatelessWidget {
               },
             ),
           ],
-            ),
-          );
-        },
+        ),
       ),
     );
   }
@@ -208,7 +180,10 @@ class _MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return SizedBox(
+      width: 180,
+      height: 180,
+      child: Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
