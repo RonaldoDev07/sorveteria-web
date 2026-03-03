@@ -1,21 +1,5 @@
 {
-  "version": 2,
-  "buildCommand": "echo 'Using pre-built files'",
+  "buildCommand": "flutter build web --release",
   "outputDirectory": "build/web",
-  "installCommand": "echo 'No install needed'",
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        },
-        {
-          "key": "X-Build-Version",
-          "value": "v19-ux-melhorias-2026-03-02"
-        }
-      ]
-    }
-  ]
+  "installCommand": "flutter pub get"
 }
