@@ -6,6 +6,7 @@ import '../utils/formatters.dart';
 import 'baixa_estoque_screen.dart';
 import 'entrada_estoque_screen.dart';
 import 'editar_produto_screen.dart';
+import 'compras_menu_screen.dart';
 
 class ProdutosScreen extends StatefulWidget {
   const ProdutosScreen({super.key});
@@ -848,6 +849,27 @@ _isLoading
                   ),
                 ],
               ),
+      floatingActionButton: auth.canCadastrarProduto
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ComprasMenuScreen(),
+                  ),
+                );
+              },
+              backgroundColor: const Color(0xFF14B8A6),
+              icon: const Icon(Icons.shopping_cart_rounded, size: 24),
+              label: const Text(
+                'Registrar Compra',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

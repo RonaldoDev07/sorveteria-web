@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/auth_wrapper.dart';
 import 'produtos_screen.dart';
-import 'selecionar_produto_screen.dart';
+import 'vendas_menu_screen.dart';
 import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
 import 'carrinho_venda_screen.dart';
@@ -313,11 +313,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       // Ações principais do dia a dia
                       _MenuCard(
                         emoji: '🛒',
-                        title: 'Venda Rápida',
+                        title: 'Vendas',
                         color: const Color(0xFF10B981), // Verde vibrante
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'SAIDA')),
+                          MaterialPageRoute(builder: (_) => const VendasMenuScreen()),
                         ),
                       ),
                       _MenuCard(

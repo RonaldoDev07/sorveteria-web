@@ -5,8 +5,6 @@ import 'dashboard_financeiro_screen.dart';
 import 'parcelas_screen.dart';
 import 'contas_receber_screen.dart';
 import 'contas_pagar_screen.dart';
-import 'vendas_prazo_screen.dart';
-import 'compras_prazo_screen.dart';
 
 /// Tela de menu do módulo financeiro
 class FinanceiroMenuScreen extends StatelessWidget {
@@ -76,34 +74,6 @@ class FinanceiroMenuScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const FornecedoresScreen(),
-                  ),
-                );
-              },
-            ),
-            _MenuCard(
-              emoji: '🛒',
-              title: 'Vendas a Prazo',
-              subtitle: 'Vendas parceladas',
-              color: const Color(0xFF10B981), // Verde
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const VendasPrazoScreen(),
-                  ),
-                );
-              },
-            ),
-            _MenuCard(
-              emoji: '🏪',
-              title: 'Compras a Prazo',
-              subtitle: 'Compras parceladas',
-              color: const Color(0xFF8B5CF6), // Roxo
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComprasPrazoScreen(),
                   ),
                 );
               },
