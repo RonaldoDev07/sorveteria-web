@@ -3,15 +3,11 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/auth_wrapper.dart';
 import 'produtos_screen.dart';
-import 'cadastro_produto_screen.dart';
 import 'selecionar_produto_screen.dart';
-import 'relatorio_lucro_screen.dart';
 import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
 import 'carrinho_venda_screen.dart';
 import 'financeiro/financeiro_menu_screen.dart';
-import 'financeiro/venda_prazo_form_screen.dart';
-import 'financeiro/compra_prazo_form_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -314,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     
                     // Criar lista de cards
                     final cards = <Widget>[
-                      // Ordem priorizada: ações do dia a dia primeiro
+                      // Ações principais do dia a dia
                       _MenuCard(
                         emoji: '🛒',
                         title: 'Venda Rápida',
@@ -334,59 +330,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       ),
                       _MenuCard(
-                        emoji: '💳',
-                        title: 'Venda a Prazo',
-                        color: const Color(0xFF3B82F6), // Azul
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const VendaPrazoFormScreen()),
-                        ),
-                      ),
-                      _MenuCard(
-                        emoji: '🏪',
-                        title: 'Compra a Prazo',
-                        color: const Color(0xFF8B5CF6), // Roxo
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const CompraPrazoFormScreen()),
-                        ),
-                      ),
-                      if (auth.canCadastrarProduto)
-                        _MenuCard(
-                          emoji: '📦',
-                          title: 'Registrar Compra',
-                          color: const Color(0xFFF97316), // Laranja
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const SelecionarProdutoScreen(tipo: 'ENTRADA')),
-                          ),
-                        ),
-                      _MenuCard(
-                        emoji: '📊',
+                        emoji: '📦',
                         title: 'Produtos',
                         color: const Color(0xFF2563EB), // Azul royal
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const ProdutosScreen()),
-                        ),
-                      ),
-                      if (auth.canCadastrarProduto)
-                        _MenuCard(
-                          emoji: '➕',
-                          title: 'Cadastrar Produto',
-                          color: const Color(0xFF6366F1), // Índigo
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const CadastroProdutoScreen()),
-                          ),
-                        ),
-                      _MenuCard(
-                        emoji: '💰',
-                        title: 'Relatório de Lucro',
-                        color: const Color(0xFFEC4899), // Rosa/Pink
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const RelatorioLucroScreen()),
                         ),
                       ),
                       _MenuCard(
@@ -396,6 +345,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
+                        ),
+                      ),
+                      _MenuCard(
+                        emoji: '💼',
+                        title: 'Financeiro',
+                        color: const Color(0xFFEC4899), // Rosa/Pink
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FinanceiroMenuScreen(),
+                          ),
                         ),
                       ),
                       if (auth.isAdmin)
@@ -408,18 +368,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             MaterialPageRoute(builder: (_) => const UsuariosScreen()),
                           ),
                         ),
-                      // Módulo Financeiro (isolado)
-                      _MenuCard(
-                        emoji: '💼',
-                        title: 'Financeiro',
-                        color: const Color(0xFFDB2777), // Magenta
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const FinanceiroMenuScreen(),
-                          ),
-                        ),
-                      ),
                     ];
                     
                     return GridView.count(
