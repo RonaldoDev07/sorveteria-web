@@ -210,39 +210,64 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
       return;
     }
 
+    String formaPagamento = 'DINHEIRO';
+
     final confirmar = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('Finalizar Venda'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Total de itens: ${_carrinho.length}'),
-            const SizedBox(height: 8),
-            Text(
-              'Valor total: R\$ ${_formatarNumero(_calcularTotal())}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Finalizar Venda'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Total de itens: ${_carrinho.length}'),
+              const SizedBox(height: 8),
+              Text(
+                'Valor total: R\$ ${_formatarNumero(_calcularTotal())}',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: formaPagamento,
+                decoration: const InputDecoration(
+                  labelText: 'Forma de Pagamento',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.payment),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'DINHEIRO', child: Text('💵 Dinheiro')),
+                  DropdownMenuItem(value: 'PIX', child: Text('📱 PIX')),
+                  DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Cartão de Crédito')),
+                  DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Cartão de Débito')),
+                  DropdownMenuItem(value: 'PRAZO', child: Text('📅 A Prazo')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setDialogState(() => formaPagamento = value);
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              const Text('Confirma a venda?'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
             ),
-            const SizedBox(height: 16),
-            const Text('Confirma a venda?'),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Confirmar Venda'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF10B981),
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Confirmar Venda'),
-          ),
-        ],
       ),
     );
 
@@ -265,7 +290,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
           -quantidade, // Negativo para saída
           precoUnitario,
           'SAIDA',
-          'Venda via carrinho',
+          'Venda via carrinho - $formaPagamento',
         );
       }
 
