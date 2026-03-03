@@ -79,7 +79,7 @@
   </div>
   
   <script>
-    // Limpar service workers antigos
+    // Limpar service workers antigos para forçar atualização
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(registrations) {
         for(let registration of registrations) {
@@ -89,16 +89,17 @@
     }
     
     window.addEventListener('load', function(ev) {
-      // Usar API moderna do Flutter
-      _flutter.loader.load({
-        serviceWorkerSettings: {
-          serviceWorkerVersion: "1799222469",
-        },
+      // Carregar Flutter
+      _flutter.loader.loadEntrypoint({
+        entrypointUrl: "main.dart.js",
         onEntrypointLoaded: async function(engineInitializer) {
           let appRunner = await engineInitializer.initializeEngine();
           await appRunner.runApp();
           // Remover loading screen
-          document.getElementById('loading').style.display = 'none';
+          let loadingEl = document.getElementById('loading');
+          if (loadingEl) {
+            loadingEl.style.display = 'none';
+          }
         }
       });
     });
