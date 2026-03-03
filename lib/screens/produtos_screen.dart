@@ -292,10 +292,10 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: quantidadeController,
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                     labelText: 'Quantidade',
-                    hintText: 'Ex: 5',
+                    hintText: 'Ex: 5 ou 3,5',
                     prefixIcon: Icon(
                       tipoAjuste == 'adicionar' ? Icons.add_rounded : Icons.remove_rounded,
                       color: tipoAjuste == 'adicionar' ? Colors.green : Colors.red,
@@ -652,27 +652,78 @@ _isLoading
                               children: [
                                 Row(
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(Icons.inventory_rounded, size: 14, color: Colors.orange[700]),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
-                                            style: TextStyle(
-                                              color: Colors.orange[900],
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
+                                    // Badge de estoque com alerta visual
+                                    Builder(
+                                      builder: (context) {
+                                        final estoque = produto['estoque_atual'];
+                                        final estoqueNum = estoque is num ? estoque.toDouble() : (double.tryParse(estoque.toString().replaceAll(',', '.')) ?? 0);
+                                        
+                                        Color corEstoque;
+                                        IconData iconeEstoque;
+                                        String textoAlerta = '';
+                                        
+                                        if (estoqueNum == 0) {
+                                          corEstoque = Colors.red;
+                                          iconeEstoque = Icons.error_outline;
+                                          textoAlerta = 'ESGOTADO';
+                                        } else if (estoqueNum <= 5) {
+                                          corEstoque = Colors.orange;
+                                          iconeEstoque = Icons.warning_amber;
+                                          textoAlerta = 'ESTOQUE BAIXO';
+                                        } else {
+                                          corEstoque = const Color(0xFF10B981);
+                                          iconeEstoque = Icons.check_circle_outline;
+                                          textoAlerta = '';
+                                        }
+                                        
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: corEstoque.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(6),
+                                                border: Border.all(color: corEstoque.withOpacity(0.3)),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(iconeEstoque, size: 14, color: corEstoque),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
+                                                    style: TextStyle(
+                                                      color: corEstoque,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                            if (textoAlerta.isNotEmpty) ...[
+                                              const SizedBox(height: 4),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: corEstoque,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: Text(
+                                                  textoAlerta,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        );
+                                      },
                                     ),
                                     const SizedBox(width: 8),
                                     Container(

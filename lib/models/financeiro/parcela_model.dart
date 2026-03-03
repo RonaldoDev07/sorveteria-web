@@ -17,6 +17,10 @@ class Parcela {
   final String status; // 'pendente', 'parcialmente_paga', 'paga', 'atrasada'
   final DateTime createdAt;
   final DateTime updatedAt;
+  
+  // Informações adicionais
+  final String? clienteNome;
+  final String? fornecedorNome;
 
   Parcela({
     required this.id,
@@ -29,6 +33,8 @@ class Parcela {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.clienteNome,
+    this.fornecedorNome,
   });
 
   factory Parcela.fromJson(Map<String, dynamic> json) {
@@ -43,6 +49,8 @@ class Parcela {
       status: json['status'],
       createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
       updatedAt: DateTime.parse(json['updatedAt'] ?? json['updated_at']),
+      clienteNome: json['clienteNome'] ?? json['cliente_nome'],
+      fornecedorNome: json['fornecedorNome'] ?? json['fornecedor_nome'],
     );
   }
 
@@ -50,4 +58,6 @@ class Parcela {
   bool get estaPaga => status == 'paga';
   bool get estaAtrasada => status == 'atrasada';
   bool get estaPendente => status == 'pendente';
+  
+  String get nomeRelacionado => clienteNome ?? fornecedorNome ?? 'N/A';
 }

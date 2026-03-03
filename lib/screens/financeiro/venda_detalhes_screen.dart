@@ -126,10 +126,22 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
     final formatoHora = DateFormat('HH:mm');
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Detalhes da Venda'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Detalhes da Venda',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF10B981), Color(0xFF34D399)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -255,6 +267,12 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                                    produtoMap['produtoId']?.toString() ?? 
                                    'N/A';
                   
+                  // Tentar pegar o nome do produto
+                  final produtoNome = produtoMap['produto_nome']?.toString() ?? 
+                                     produtoMap['produtoNome']?.toString() ?? 
+                                     produtoMap['nome']?.toString() ??
+                                     'Produto #$produtoId';
+                  
                   final quantidade = produtoMap['quantidade'] ?? 0;
                   
                   // Tentar pegar valor_unitario ou valorUnitario
@@ -271,7 +289,10 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                         backgroundColor: Colors.green,
                         child: Icon(Icons.shopping_bag, color: Colors.white, size: 20),
                       ),
-                      title: Text('Produto #$produtoId'),
+                      title: Text(
+                        produtoNome,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       subtitle: Text(
                         'Quantidade: $quantidade un.\n'
                         'Valor unitário: ${formatoMoeda.format(valorUnitario)}',

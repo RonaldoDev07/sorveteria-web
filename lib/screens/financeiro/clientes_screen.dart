@@ -113,10 +113,29 @@ class _ClientesScreenState extends State<ClientesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Clientes'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Clientes',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _carregarClientes,
+            tooltip: 'Atualizar',
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -125,13 +144,29 @@ class _ClientesScreenState extends State<ClientesScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                      Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
                       const SizedBox(height: 16),
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
+                      Text(
+                        'Erro ao carregar clientes',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _errorMessage!,
+                        style: TextStyle(color: Colors.grey.shade600),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
                         onPressed: _carregarClientes,
-                        child: const Text('Tentar novamente'),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Tentar novamente'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3B82F6),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
                       ),
                     ],
                   ),
@@ -141,14 +176,28 @@ class _ClientesScreenState extends State<ClientesScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.people_outline, size: 48, color: Colors.grey),
+                          Icon(Icons.people_outline, size: 80, color: Colors.grey.shade300),
                           const SizedBox(height: 16),
-                          const Text('Nenhum cliente cadastrado'),
-                          const SizedBox(height: 16),
+                          Text(
+                            'Nenhum cliente cadastrado',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Comece adicionando seu primeiro cliente',
+                            style: TextStyle(color: Colors.grey.shade500),
+                          ),
+                          const SizedBox(height: 24),
                           ElevatedButton.icon(
                             onPressed: () => _abrirFormulario(),
-                            icon: const Icon(Icons.add),
-                            label: const Text('Cadastrar primeiro cliente'),
+                            icon: const Icon(Icons.add_circle_outline),
+                            label: const Text('Cadastrar Cliente'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF3B82F6),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
                           ),
                         ],
                       ),
@@ -156,42 +205,94 @@ class _ClientesScreenState extends State<ClientesScreen> {
                   : RefreshIndicator(
                       onRefresh: _carregarClientes,
                       child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
                         itemCount: _clientes.length,
                         itemBuilder: (context, index) {
                           final cliente = _clientes[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
                             child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.blue,
-                                child: Text(
-                                  cliente.nome[0].toUpperCase(),
-                                  style: const TextStyle(color: Colors.white),
+                              contentPadding: const EdgeInsets.all(16),
+                              leading: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    cliente.nome[0].toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
                               title: Text(
                                 cliente.nome,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Color(0xFF1F2937),
+                                ),
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('CPF/CNPJ: ${cliente.cpfCnpj}'),
-                                  if (cliente.telefone != null)
-                                    Text('Tel: ${cliente.telefone}'),
-                                ],
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.badge_outlined, size: 14, color: Colors.grey.shade600),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          cliente.cpfCnpj,
+                                          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                                        ),
+                                      ],
+                                    ),
+                                    if (cliente.telefone != null) ...[
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.phone_outlined, size: 14, color: Colors.grey.shade600),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            cliente.telefone!,
+                                            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                               trailing: PopupMenuButton(
+                                icon: Icon(Icons.more_vert, color: Colors.grey.shade600),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 itemBuilder: (context) => [
                                   const PopupMenuItem(
                                     value: 'editar',
                                     child: Row(
                                       children: [
-                                        Icon(Icons.edit, size: 20),
-                                        SizedBox(width: 8),
+                                        Icon(Icons.edit_outlined, size: 20, color: Color(0xFF3B82F6)),
+                                        SizedBox(width: 12),
                                         Text('Editar'),
                                       ],
                                     ),
@@ -200,8 +301,8 @@ class _ClientesScreenState extends State<ClientesScreen> {
                                     value: 'excluir',
                                     child: Row(
                                       children: [
-                                        Icon(Icons.delete, size: 20, color: Colors.red),
-                                        SizedBox(width: 8),
+                                        Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                                        SizedBox(width: 12),
                                         Text('Excluir', style: TextStyle(color: Colors.red)),
                                       ],
                                     ),
@@ -220,10 +321,12 @@ class _ClientesScreenState extends State<ClientesScreen> {
                         },
                       ),
                     ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _abrirFormulario(),
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: const Color(0xFF3B82F6),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Novo Cliente', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+        elevation: 4,
       ),
     );
   }

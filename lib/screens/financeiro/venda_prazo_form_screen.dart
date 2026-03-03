@@ -37,6 +37,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
   
   String _filtroProduto = '';
   String _formaPagamento = 'dinheiro'; // Forma de pagamento padrão
+  DateTime _dataVenda = DateTime.now(); // Data da venda
   final _observacoesController = TextEditingController();
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
@@ -300,6 +301,67 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
       return;
     }
 
+    // Confirmação antes de criar a venda
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.help_outline, color: Color(0xFF10B981), size: 28),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Confirmar Venda',
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Cliente: ${_clienteSelecionado!.nome}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text('Produtos: ${_itensVenda.length}'),
+            Text('Valor Total: ${_formatoMoeda.format(_valorTotal)}'),
+            Text('Parcelas: ${_parcelas.length}x'),
+            const SizedBox(height: 16),
+            const Text(
+              'Deseja confirmar esta venda a prazo?',
+              style: TextStyle(fontSize: 15),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF10B981),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
     setState(() => _isLoading = true);
 
     try {
@@ -321,7 +383,10 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Venda criada com sucesso')),
+          const SnackBar(
+            content: Text('✅ Venda criada com sucesso!'),
+            backgroundColor: Color(0xFF10B981),
+          ),
         );
         Navigator.pop(context, true);
       }
@@ -400,202 +465,659 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FinanceiroStyles.appBar('Nova Venda a Prazo', FinanceiroStyles.corVenda),
+      backgroundColor: const Color(0xFFF5F7FA),
+      appBar: AppBar(
+        title: const Text(
+          'Nova Venda a Prazo',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF10B981), Color(0xFF34D399)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: _isLoadingClientes || _isLoadingProdutos
           ? const Center(child: CircularProgressIndicator())
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 children: [
-                  // Cliente
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<Cliente>(
-                          value: _clienteSelecionado,
-                          decoration: const InputDecoration(
-                            labelText: 'Cliente *',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person),
-                          ),
-                          items: _clientes.map((cliente) {
-                            return DropdownMenuItem(
-                              value: cliente,
-                              child: Text(cliente.nome),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() => _clienteSelecionado = value);
-                          },
-                          validator: (value) => value == null ? 'Selecione um cliente' : null,
+                  // Card Cliente e Forma de Pagamento
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: _cadastrarClienteRapido,
-                        icon: const Icon(Icons.add_circle, color: Colors.green, size: 32),
-                        tooltip: 'Cadastrar novo cliente',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Forma de Pagamento
-                  DropdownButtonFormField<String>(
-                    value: _formaPagamento,
-                    decoration: const InputDecoration(
-                      labelText: 'Forma de Pagamento',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.payment),
+                      ],
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'dinheiro', child: Text('💵 Dinheiro')),
-                      DropdownMenuItem(value: 'pix', child: Text('📱 PIX')),
-                      DropdownMenuItem(value: 'cartao_credito', child: Text('💳 Cartão de Crédito')),
-                      DropdownMenuItem(value: 'cartao_debito', child: Text('💳 Cartão de Débito')),
-                      DropdownMenuItem(value: 'boleto', child: Text('📄 Boleto')),
-                      DropdownMenuItem(value: 'transferencia', child: Text('🏦 Transferência')),
-                      DropdownMenuItem(value: 'cheque', child: Text('📝 Cheque')),
-                      DropdownMenuItem(value: 'outro', child: Text('➕ Outro')),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _formaPagamento = value);
-                      }
-                    },
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.person, color: Color(0xFF10B981), size: 24),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Cliente e Pagamento',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1F2937),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<Cliente>(
+                                value: _clienteSelecionado,
+                                decoration: InputDecoration(
+                                  labelText: 'Cliente *',
+                                  prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF10B981)),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(color: Colors.grey.shade300),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(color: Color(0xFF10B981), width: 2),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey.shade50,
+                                ),
+                                items: _clientes.map((cliente) {
+                                  return DropdownMenuItem(
+                                    value: cliente,
+                                    child: Text(cliente.nome),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() => _clienteSelecionado = value);
+                                },
+                                validator: (value) => value == null ? 'Selecione um cliente' : null,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: IconButton(
+                                onPressed: _cadastrarClienteRapido,
+                                icon: const Icon(Icons.add_circle, color: Colors.white, size: 28),
+                                tooltip: 'Cadastrar novo cliente',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: _formaPagamento,
+                          decoration: InputDecoration(
+                            labelText: 'Forma de Pagamento',
+                            prefixIcon: const Icon(Icons.payment, color: Color(0xFF10B981)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFF10B981), width: 2),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 'dinheiro', child: Text('💵 Dinheiro')),
+                            DropdownMenuItem(value: 'pix', child: Text('📱 PIX')),
+                            DropdownMenuItem(value: 'cartao_credito', child: Text('💳 Cartão de Crédito')),
+                            DropdownMenuItem(value: 'cartao_debito', child: Text('💳 Cartão de Débito')),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _formaPagamento = value);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        InkWell(
+                          onTap: () async {
+                            final data = await showDatePicker(
+                              context: context,
+                              initialDate: _dataVenda,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                              locale: const Locale('pt', 'BR'),
+                            );
+                            if (data != null) {
+                              setState(() => _dataVenda = data);
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.calendar_today, color: Color(0xFF10B981)),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Data da Venda',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        DateFormat('dd/MM/yyyy').format(_dataVenda),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF1F2937),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   
-                  // Produtos
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                  // Card Produtos
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10B981).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(Icons.shopping_cart, color: Color(0xFF10B981), size: 24),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'Produtos',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1F2937),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF10B981).withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: _adicionarProduto,
+                                icon: const Icon(Icons.add, size: 20),
+                                label: const Text('Adicionar'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        if (_itensVenda.isEmpty)
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey.shade400),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Nenhum produto adicionado',
+                                    style: TextStyle(color: Colors.grey.shade600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          ..._itensVenda.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final item = entry.value;
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade200),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF10B981).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.inventory_2, color: Color(0xFF10B981), size: 20),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.produto.nome,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${item.quantidade}x ${_formatoMoeda.format(item.valorUnitario)}',
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    _formatoMoeda.format(item.subtotal),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Color(0xFF10B981),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                    onPressed: () => _removerProduto(index),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        if (_itensVenda.isNotEmpty) ...[
+                          const Divider(height: 24),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Produtos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                              ElevatedButton.icon(
-                                onPressed: _adicionarProduto,
-                                icon: const Icon(FinanceiroStyles.iconeAdicionar, size: 20),
-                                label: const Text('Adicionar'),
-                                style: FinanceiroStyles.botaoComIcone(FinanceiroStyles.corVenda),
+                              const Text(
+                                'Total:',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1F2937),
+                                ),
+                              ),
+                              Text(
+                                _formatoMoeda.format(_valorTotal),
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF10B981),
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          if (_itensVenda.isEmpty)
-                            const Text('Nenhum produto adicionado', style: TextStyle(color: Colors.grey))
-                          else
-                            ..._itensVenda.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final item = entry.value;
-                              return ListTile(
-                                title: Text(item.produto.nome),
-                                subtitle: Text('${item.quantidade}x ${_formatoMoeda.format(item.valorUnitario)}'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(_formatoMoeda.format(item.subtotal), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => _removerProduto(index),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          const Divider(),
-                          Text('Total: ${_formatoMoeda.format(_valorTotal)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         ],
-                      ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   
-                  // Parcelas
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Parcelas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                              ElevatedButton.icon(
+                  // Card Parcelas
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(Icons.calendar_month, color: Colors.blue, size: 24),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'Parcelas',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1F2937),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Colors.blue, Colors.lightBlue],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blue.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
                                 onPressed: _gerarParcelas,
                                 icon: const Icon(Icons.calculate, size: 18),
                                 label: const Text('Gerar'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          if (_parcelas.isEmpty)
-                            const Text('Nenhuma parcela gerada', style: TextStyle(color: Colors.grey))
-                          else
-                            ..._parcelas.map((parcela) {
-                              return ListTile(
-                                title: Text('Parcela ${parcela.numero}'),
-                                subtitle: Text('Vencimento: ${DateFormat('dd/MM/yyyy').format(parcela.dataVencimento)}'),
-                                trailing: Text(_formatoMoeda.format(parcela.valor), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              );
-                            }),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        if (_parcelas.isEmpty)
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.event_note_outlined, size: 48, color: Colors.grey.shade400),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Nenhuma parcela gerada',
+                                    style: TextStyle(color: Colors.grey.shade600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          ..._parcelas.map((parcela) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.blue.shade100),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '${parcela.numero}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Parcela',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Vencimento: ${DateFormat('dd/MM/yyyy').format(parcela.dataVencimento)}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    _formatoMoeda.format(parcela.valor),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   
-                  // Observações
-                  TextField(
-                    controller: _observacoesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Observações',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.note),
+                  // Card Observações
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    maxLines: 3,
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.note, color: Colors.orange, size: 24),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Observações',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1F2937),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _observacoesController,
+                          decoration: InputDecoration(
+                            hintText: 'Adicione observações sobre esta venda...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.orange, width: 2),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                          ),
+                          maxLines: 3,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   
                   // Botão Salvar
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _salvar,
-                    style: FinanceiroStyles.botaoPrimario(FinanceiroStyles.corVenda).copyWith(
-                      padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 16)),
+                  Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF10B981).withOpacity(0.4),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
-                          )
-                        : const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(FinanceiroStyles.iconeSalvar, size: 22),
-                              SizedBox(width: 8),
-                              Text('Criar Venda a Prazo', style: TextStyle(fontSize: 17)),
-                            ],
-                          ),
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _salvar,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle, size: 24),
+                                SizedBox(width: 12),
+                                Text(
+                                  'Criar Venda a Prazo',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                    ),
                   ),
                 ],
               ),
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _abrirScanner,
-        backgroundColor: FinanceiroStyles.corVenda,
+        backgroundColor: const Color(0xFF10B981),
         icon: const Icon(Icons.qr_code_scanner),
         label: const Text('Escanear'),
+        elevation: 4,
       ),
     );
   }
@@ -722,29 +1244,32 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                 controller: custoController,
                 decoration: const InputDecoration(
                   labelText: 'Custo *',
+                  hintText: 'Ex: 5,50',
                   border: OutlineInputBorder(),
                   prefixText: 'R\$ ',
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: precoController,
                 decoration: const InputDecoration(
                   labelText: 'Preço de Venda *',
+                  hintText: 'Ex: 8,00',
                   border: OutlineInputBorder(),
                   prefixText: 'R\$ ',
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: estoqueController,
                 decoration: const InputDecoration(
                   labelText: 'Estoque Inicial',
+                  hintText: 'Ex: 10 ou 3,5',
                   border: OutlineInputBorder(),
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -1112,11 +1637,11 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             controller: _quantidadeController,
                             decoration: const InputDecoration(
                               labelText: 'Quantidade',
+                              hintText: 'Ex: 10',
                               border: OutlineInputBorder(),
                               isDense: true,
                             ),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -1125,11 +1650,12 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             controller: _valorController,
                             decoration: const InputDecoration(
                               labelText: 'Valor',
+                              hintText: 'Ex: 5,50',
                               prefixText: 'R\$ ',
                               border: OutlineInputBorder(),
                               isDense: true,
                             ),
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                       ],

@@ -218,10 +218,22 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Parcelas'),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Parcelas',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list),
@@ -283,37 +295,181 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                   : RefreshIndicator(
                       onRefresh: _carregarParcelas,
                       child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
                         itemCount: _parcelas.length,
                         itemBuilder: (context, index) {
                           final parcela = _parcelas[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          final cor = parcela.tipo == 'venda' ? const Color(0xFF10B981) : const Color(0xFF9333EA);
+                          final formatoHora = DateFormat('HH:mm');
+                          
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
                             child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: _getStatusColor(parcela.status),
-                                child: Text(
-                                  parcela.numeroParcela.toString(),
-                                  style: const TextStyle(color: Colors.white),
+                              contentPadding: const EdgeInsets.all(16),
+                              leading: Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [cor, cor.withOpacity(0.7)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      parcela.numeroParcela.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        parcela.tipo == 'venda' ? 'V' : 'C',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              title: Text(
-                                '${parcela.tipo == 'venda' ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${parcela.tipo == 'venda' ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              parcela.tipo == 'venda' ? Icons.person : Icons.business,
+                                              size: 14,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                parcela.nomeRelacionado,
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade700,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: _getStatusColor(parcela.status).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: _getStatusColor(parcela.status),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      _getStatusLabel(parcela.status),
+                                      style: TextStyle(
+                                        color: _getStatusColor(parcela.status),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Vencimento: ${_formatoData.format(parcela.dataVencimento)}'),
-                                  Text('Valor: ${_formatoMoeda.format(parcela.valorParcela)}'),
-                                  if (parcela.valorPago > 0)
-                                    Text('Pago: ${_formatoMoeda.format(parcela.valorPago)}'),
-                                  Text(
-                                    'Status: ${_getStatusLabel(parcela.status)}',
-                                    style: TextStyle(
-                                      color: _getStatusColor(parcela.status),
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.calendar_today, size: 14, color: Colors.grey.shade600),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Venc: ${_formatoData.format(parcela.dataVencimento)}',
+                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        formatoHora.format(parcela.createdAt),
+                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                      ),
+                                    ],
                                   ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Valor: ${_formatoMoeda.format(parcela.valorParcela)}',
+                                        style: TextStyle(
+                                          color: Colors.grey.shade800,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      if (parcela.valorPago > 0) ...[
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '• Pago: ${_formatoMoeda.format(parcela.valorPago)}',
+                                          style: const TextStyle(
+                                            color: Color(0xFF10B981),
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                  if (parcela.saldoRestante > 0) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Saldo: ${_formatoMoeda.format(parcela.saldoRestante)}',
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                               onTap: () {
@@ -331,7 +487,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                                       value: 'baixa',
                                       child: Row(
                                         children: [
-                                          Icon(Icons.payment, size: 20),
+                                          Icon(Icons.payment, size: 20, color: Color(0xFF10B981)),
                                           SizedBox(width: 8),
                                           Text('Dar Baixa'),
                                         ],

@@ -21,9 +21,24 @@ class AuthService extends ChangeNotifier {
   String? get username => _username;
   String? get fotoUrl => _fotoUrl;
   bool get isAuthenticated => _isAuthenticated;
+  
+  // Verificações de perfil
   bool get isAdmin => _perfil == 'ADMIN';
   bool get isVendedor => _perfil == 'VENDEDOR';
+  bool get isOperador => _perfil == 'OPERADOR';
+  
+  // Permissões específicas
   bool get canCadastrarProduto => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canEntradaEstoque => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canAjustarEstoque => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canVenderPrazo => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canComprarPrazo => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canGerenciarClientes => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canGerenciarFornecedores => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canVerRelatorios => _perfil == 'ADMIN' || _perfil == 'VENDEDOR';
+  bool get canGerenciarUsuarios => _perfil == 'ADMIN';
+  bool get canCancelarOperacoes => _perfil == 'ADMIN';
+  bool get canVenderVista => true; // Todos podem vender à vista
 
   AuthService() {
     _loadToken();

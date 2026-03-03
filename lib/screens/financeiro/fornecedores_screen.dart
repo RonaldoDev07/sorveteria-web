@@ -113,10 +113,29 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Fornecedores'),
-        backgroundColor: Colors.orange,
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Fornecedores',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _carregarFornecedores,
+            tooltip: 'Atualizar',
+          ),
+        ],
       ),
       body: _isLoading
           ? _buildLoadingSkeleton()
@@ -125,13 +144,29 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                      Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
                       const SizedBox(height: 16),
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
+                      Text(
+                        'Erro ao carregar fornecedores',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _errorMessage!,
+                        style: TextStyle(color: Colors.grey.shade600),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
                         onPressed: _carregarFornecedores,
-                        child: const Text('Tentar novamente'),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Tentar novamente'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF59E0B),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
                       ),
                     ],
                   ),
@@ -141,17 +176,27 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.business_outlined, size: 48, color: Colors.grey),
+                          Icon(Icons.business_outlined, size: 80, color: Colors.grey.shade300),
                           const SizedBox(height: 16),
-                          const Text('Nenhum fornecedor cadastrado'),
-                          const SizedBox(height: 16),
+                          Text(
+                            'Nenhum fornecedor cadastrado',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Comece adicionando seu primeiro fornecedor',
+                            style: TextStyle(color: Colors.grey.shade500),
+                          ),
+                          const SizedBox(height: 24),
                           ElevatedButton.icon(
                             onPressed: () => _abrirFormulario(),
-                            icon: const Icon(Icons.add),
-                            label: const Text('Cadastrar primeiro fornecedor'),
+                            icon: const Icon(Icons.add_circle_outline),
+                            label: const Text('Cadastrar Fornecedor'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
+                              backgroundColor: const Color(0xFFF59E0B),
                               foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                           ),
                         ],
@@ -160,42 +205,94 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
                   : RefreshIndicator(
                       onRefresh: _carregarFornecedores,
                       child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
                         itemCount: _fornecedores.length,
                         itemBuilder: (context, index) {
                           final fornecedor = _fornecedores[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
                             child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.orange,
-                                child: Text(
-                                  fornecedor.nome[0].toUpperCase(),
-                                  style: const TextStyle(color: Colors.white),
+                              contentPadding: const EdgeInsets.all(16),
+                              leading: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    fornecedor.nome[0].toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
                               title: Text(
                                 fornecedor.nome,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Color(0xFF1F2937),
+                                ),
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('CNPJ: ${fornecedor.cnpj}'),
-                                  if (fornecedor.telefone != null)
-                                    Text('Tel: ${fornecedor.telefone}'),
-                                ],
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.business_outlined, size: 14, color: Colors.grey.shade600),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          fornecedor.cnpj,
+                                          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                                        ),
+                                      ],
+                                    ),
+                                    if (fornecedor.telefone != null) ...[
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.phone_outlined, size: 14, color: Colors.grey.shade600),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            fornecedor.telefone!,
+                                            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                               trailing: PopupMenuButton(
+                                icon: Icon(Icons.more_vert, color: Colors.grey.shade600),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 itemBuilder: (context) => [
                                   const PopupMenuItem(
                                     value: 'editar',
                                     child: Row(
                                       children: [
-                                        Icon(Icons.edit, size: 20),
-                                        SizedBox(width: 8),
+                                        Icon(Icons.edit_outlined, size: 20, color: Color(0xFFF59E0B)),
+                                        SizedBox(width: 12),
                                         Text('Editar'),
                                       ],
                                     ),
@@ -204,8 +301,8 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
                                     value: 'excluir',
                                     child: Row(
                                       children: [
-                                        Icon(Icons.delete, size: 20, color: Colors.red),
-                                        SizedBox(width: 8),
+                                        Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                                        SizedBox(width: 12),
                                         Text('Excluir', style: TextStyle(color: Colors.red)),
                                       ],
                                     ),
@@ -224,10 +321,12 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
                         },
                       ),
                     ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _abrirFormulario(),
-        backgroundColor: Colors.orange,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: const Color(0xFFF59E0B),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Novo Fornecedor', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+        elevation: 4,
       ),
     );
   }

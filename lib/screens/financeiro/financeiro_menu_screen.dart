@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 import 'clientes_screen.dart';
 import 'fornecedores_screen.dart';
 import 'dashboard_financeiro_screen.dart';
@@ -15,8 +17,12 @@ class FinanceiroMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthService>(context);
+    
     // Debug: verificar se código novo está sendo executado
-    print('🔥 FINANCEIRO MENU V3 - 9 CARDS');
+    print('🔥 FINANCEIRO MENU V3 - COM PERMISSÕES');
+    print('   Perfil: ${auth.perfil}');
+    print('   Pode gerenciar clientes: ${auth.canGerenciarClientes}');
     
     return Scaffold(
       appBar: AppBar(
@@ -30,34 +36,40 @@ class FinanceiroMenuScreen extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            _MenuCard(
-              emoji: '👤',
-              title: 'Clientes',
-              subtitle: 'Cadastro de clientes',
-              color: const Color(0xFF3B82F6), // Azul
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ClientesScreen(),
-                  ),
-                );
-              },
-            ),
-            _MenuCard(
-              emoji: '🏢',
-              title: 'Fornecedores',
-              subtitle: 'Cadastro de fornecedores',
-              color: const Color(0xFFF97316), // Laranja
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FornecedoresScreen(),
-                  ),
-                );
-              },
-            ),
+            // Clientes e Fornecedores - apenas ADMIN e VENDEDOR
+            if (auth.canGerenciarClientes) ...[
+              _MenuCard(
+                emoji: '👤',
+                title: 'Clientes',
+                subtitle: 'Cadastro de clientes',
+                color: const Color(0xFF3B82F6), // Azul
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ClientesScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            if (auth.canGerenciarFornecedores) ...[
+              _MenuCard(
+                emoji: '🏢',
+                title: 'Fornecedores',
+                subtitle: 'Cadastro de fornecedores',
+                color: const Color(0xFFF97316), // Laranja
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FornecedoresScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            // Contas a Receber e Pagar - todos podem ver
             _MenuCard(
               emoji: '💰',
               title: 'Contas a Receber',
@@ -86,34 +98,40 @@ class FinanceiroMenuScreen extends StatelessWidget {
                 );
               },
             ),
-            _MenuCard(
-              emoji: '📋',
-              title: 'Vendas a Prazo',
-              subtitle: 'Histórico de vendas',
-              color: const Color(0xFF10B981), // Verde
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const VendasPrazoListScreen(),
-                  ),
-                );
-              },
-            ),
-            _MenuCard(
-              emoji: '📦',
-              title: 'Compras a Prazo',
-              subtitle: 'Histórico de compras',
-              color: const Color(0xFF06B6D4), // Cyan
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ComprasPrazoListScreen(),
-                  ),
-                );
-              },
-            ),
+            // Vendas e Compras a Prazo - apenas ADMIN e VENDEDOR
+            if (auth.canVenderPrazo) ...[
+              _MenuCard(
+                emoji: '📋',
+                title: 'Vendas a Prazo',
+                subtitle: 'Histórico de vendas',
+                color: const Color(0xFF10B981), // Verde
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const VendasPrazoListScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            if (auth.canComprarPrazo) ...[
+              _MenuCard(
+                emoji: '📦',
+                title: 'Compras a Prazo',
+                subtitle: 'Histórico de compras',
+                color: const Color(0xFF06B6D4), // Cyan
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ComprasPrazoListScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            // Parcelas - todos podem ver
             _MenuCard(
               emoji: '📅',
               title: 'Parcelas',
@@ -128,34 +146,37 @@ class FinanceiroMenuScreen extends StatelessWidget {
                 );
               },
             ),
-            _MenuCard(
-              emoji: '📈',
-              title: 'Relatório de Lucro',
-              subtitle: 'Análise de vendas e lucros',
-              color: const Color(0xFF8B5CF6), // Roxo
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RelatorioLucroScreen(),
-                  ),
-                );
-              },
-            ),
-            _MenuCard(
-              emoji: '📊',
-              title: 'Dashboard',
-              subtitle: 'Visão geral financeira',
-              color: const Color(0xFFEC4899), // Pink
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DashboardFinanceiroScreen(),
-                  ),
-                );
-              },
-            ),
+            // Relatórios - apenas ADMIN e VENDEDOR
+            if (auth.canVerRelatorios) ...[
+              _MenuCard(
+                emoji: '📈',
+                title: 'Relatório de Lucro',
+                subtitle: 'Análise de vendas e lucros',
+                color: const Color(0xFF8B5CF6), // Roxo
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RelatorioLucroScreen(),
+                    ),
+                  );
+                },
+              ),
+              _MenuCard(
+                emoji: '📊',
+                title: 'Dashboard',
+                subtitle: 'Visão geral financeira',
+                color: const Color(0xFFEC4899), // Pink
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DashboardFinanceiroScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
           ],
         ),
       ),

@@ -377,19 +377,21 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
               controller: _quantidadeController,
               decoration: const InputDecoration(
                 labelText: 'Quantidade *',
+                hintText: 'Ex: 10 ou 3,5',
                 border: OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _valorController,
               decoration: const InputDecoration(
                 labelText: 'Valor Unitário *',
+                hintText: 'Ex: 5,50',
                 border: OutlineInputBorder(),
                 prefixText: 'R\$ ',
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
           ],
         ),

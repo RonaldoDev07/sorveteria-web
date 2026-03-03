@@ -152,6 +152,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     fillColor: Colors.white,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (_) => setState(() {}), // Atualizar UI quando quantidade mudar
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Campo obrigatório';
                     final valorLimpo = value!.replaceAll(',', '.');
@@ -204,6 +205,51 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     _valorPagoController.clear();
                   }),
                 ),
+                // Exibir valor total sempre que houver quantidade
+                if (_quantidadeController.text.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Builder(
+                    builder: (context) {
+                      final quantidadeStr = _quantidadeController.text.replaceAll(',', '.');
+                      final quantidade = double.tryParse(quantidadeStr) ?? 0;
+                      final precoUnitario = double.parse(widget.produto['preco_venda'].toString());
+                      final valorTotal = quantidade * precoUnitario;
+                      
+                      return Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.blue,
+                            width: 2,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Valor Total:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blue[900],
+                              ),
+                            ),
+                            Text(
+                              'R\$ ${_formatarNumero(valorTotal)}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue[900],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
                 // Campo de valor pago e troco (apenas para dinheiro)
                 if (_formaPagamento == 'DINHEIRO') ...[
                   const SizedBox(height: 20),
@@ -240,59 +286,31 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                         return Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: troco >= 0 ? Colors.blue.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                            color: troco >= 0 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: troco >= 0 ? Colors.blue : Colors.red,
+                              color: troco >= 0 ? Colors.green : Colors.red,
                               width: 2,
                             ),
                           ),
-                          child: Column(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Valor Total:',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                  Text(
-                                    'R\$ ${_formatarNumero(valorTotal)}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[900],
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                troco >= 0 ? 'Troco:' : 'Falta:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: troco >= 0 ? Colors.green[900] : Colors.red[900],
+                                ),
                               ),
-                              const SizedBox(height: 8),
-                              const Divider(),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    troco >= 0 ? 'Troco:' : 'Falta:',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
-                                    ),
-                                  ),
-                                  Text(
-                                    'R\$ ${_formatarNumero(troco.abs())}',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                'R\$ ${_formatarNumero(troco.abs())}',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: troco >= 0 ? Colors.green[900] : Colors.red[900],
+                                ),
                               ),
                             ],
                           ),

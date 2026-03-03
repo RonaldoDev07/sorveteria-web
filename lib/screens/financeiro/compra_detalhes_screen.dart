@@ -107,10 +107,22 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
     final formatoHora = DateFormat('HH:mm');
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Detalhes da Compra'),
-        backgroundColor: Colors.purple,
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Detalhes da Compra',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF9333EA), Color(0xFFA855F7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -230,6 +242,13 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
                 // Acessar como Map para evitar erro de tipo
                 final produtoMap = produto as Map<String, dynamic>;
                 final produtoId = produtoMap['produto_id']?.toString() ?? 'N/A';
+                
+                // Tentar pegar o nome do produto
+                final produtoNome = produtoMap['produto_nome']?.toString() ?? 
+                                   produtoMap['produtoNome']?.toString() ?? 
+                                   produtoMap['nome']?.toString() ??
+                                   'Produto #$produtoId';
+                
                 final quantidade = produtoMap['quantidade'] ?? 0;
                 final valorUnitario = _toDouble(produtoMap['valor_unitario']);
                 final subtotal = _toDouble(produtoMap['subtotal']);
@@ -241,14 +260,32 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
                       backgroundColor: Colors.purple,
                       child: Icon(Icons.inventory, color: Colors.white, size: 20),
                     ),
-                    title: Text('Produto ID: $produtoId'),
-                    subtitle: Text('${quantidade}x ${formatoMoeda.format(valorUnitario)}'),
-                    trailing: Text(
-                      formatoMoeda.format(subtotal),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                    title: Text(
+                      produtoNome,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      'Quantidade: $quantidade un.\n'
+                      'Valor unitário: ${formatoMoeda.format(valorUnitario)}',
+                    ),
+                    isThreeLine: true,
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          'Subtotal',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        Text(
+                          formatoMoeda.format(subtotal),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.purple,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
