@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
+import '../../services/auth_service.dart';
 import 'clientes_screen.dart';
 import 'fornecedores_screen.dart';
 import 'dashboard_financeiro_screen.dart';

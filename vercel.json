@@ -1,5 +1,5 @@
 {
-  "buildCommand": "flutter build web --release --web-renderer canvaskit",
+  "buildCommand": "echo 'Using pre-built files from build/web'",
   "outputDirectory": "build/web",
-  "installCommand": "flutter pub get"
+  "installCommand": "echo 'No install needed'"
 }
