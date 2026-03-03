@@ -60,14 +60,38 @@ class _DashboardFinanceiroScreenState extends State<DashboardFinanceiroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text('Dashboard Financeiro'),
-        backgroundColor: const Color(0xFFEC4899),
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Dashboard Financeiro',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        elevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(24),
+          ),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(24),
+            ),
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: _carregarDashboard,
+            tooltip: 'Atualizar',
           ),
         ],
       ),
@@ -94,47 +118,86 @@ class _DashboardFinanceiroScreenState extends State<DashboardFinanceiroScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      // Saldo Líquido
-                      Card(
-                        elevation: 4,
-                        color: _dashboard!.saldoLiquido >= 0 
-                            ? Colors.green.shade50 
-                            : Colors.red.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            children: [
-                              const Text(
-                                'Saldo Líquido',
+                      // Saldo Líquido - Card Principal
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: _dashboard!.saldoLiquido >= 0
+                                ? [const Color(0xFF10B981), const Color(0xFF34D399)]
+                                : [const Color(0xFFEF4444), const Color(0xFFF87171)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (_dashboard!.saldoLiquido >= 0 
+                                  ? const Color(0xFF10B981) 
+                                  : const Color(0xFFEF4444)).withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.account_balance_wallet_rounded,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'Saldo Líquido',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              _formatoMoeda.format(_dashboard!.saldoLiquido),
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: -1,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text(
+                                'A Receber - A Pagar',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 13,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                _formatoMoeda.format(_dashboard!.saldoLiquido),
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: _dashboard!.saldoLiquido >= 0 
-                                      ? Colors.green.shade700 
-                                      : Colors.red.shade700,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'A Receber - A Pagar',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                       
                       // Contas a Receber e Pagar
                       Row(
@@ -143,22 +206,22 @@ class _DashboardFinanceiroScreenState extends State<DashboardFinanceiroScreen> {
                             child: _CardValor(
                               titulo: 'A Receber',
                               valor: _dashboard!.totalAReceber,
-                              cor: Colors.green,
-                              icone: Icons.arrow_downward,
+                              cor: const Color(0xFF10B981),
+                              icone: Icons.arrow_downward_rounded,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: _CardValor(
                               titulo: 'A Pagar',
                               valor: _dashboard!.totalAPagar,
-                              cor: Colors.red,
-                              icone: Icons.arrow_upward,
+                              cor: const Color(0xFFEF4444),
+                              icone: Icons.arrow_upward_rounded,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       
                       // Contas Atrasadas
                       Row(
@@ -167,22 +230,22 @@ class _DashboardFinanceiroScreenState extends State<DashboardFinanceiroScreen> {
                             child: _CardContador(
                               titulo: 'Atrasadas\n(Receber)',
                               valor: _dashboard!.contasAtrasadasReceber,
-                              cor: Colors.orange,
-                              icone: Icons.warning,
+                              cor: const Color(0xFFF59E0B),
+                              icone: Icons.warning_rounded,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: _CardContador(
                               titulo: 'Atrasadas\n(Pagar)',
                               valor: _dashboard!.contasAtrasadasPagar,
-                              cor: Colors.deepOrange,
-                              icone: Icons.warning,
+                              cor: const Color(0xFFDC2626),
+                              icone: Icons.warning_rounded,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       
                       // Vencimentos
                       Row(
@@ -191,62 +254,124 @@ class _DashboardFinanceiroScreenState extends State<DashboardFinanceiroScreen> {
                             child: _CardContador(
                               titulo: 'Vencendo\nHoje',
                               valor: _dashboard!.contasVencendoHoje,
-                              cor: Colors.blue,
-                              icone: Icons.today,
+                              cor: const Color(0xFF3B82F6),
+                              icone: Icons.today_rounded,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: _CardContador(
                               titulo: 'Vencendo\nesta Semana',
                               valor: _dashboard!.contasVencendoSemana,
-                              cor: Colors.purple,
-                              icone: Icons.date_range,
+                              cor: const Color(0xFF8B5CF6),
+                              icone: Icons.date_range_rounded,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       
                       // Resumo
-                      Card(
-                        elevation: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Resumo',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.summarize_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'Resumo',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              const Divider(),
-                              _LinhaResumo(
+                              child: _LinhaResumo(
                                 label: 'Total a Receber:',
                                 valor: _formatoMoeda.format(_dashboard!.totalAReceber),
-                                cor: Colors.green,
+                                cor: const Color(0xFF10B981),
                               ),
-                              _LinhaResumo(
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEF4444).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: _LinhaResumo(
                                 label: 'Total a Pagar:',
                                 valor: _formatoMoeda.format(_dashboard!.totalAPagar),
-                                cor: Colors.red,
+                                cor: const Color(0xFFEF4444),
                               ),
-                              const Divider(),
-                              _LinhaResumo(
+                            ),
+                            const SizedBox(height: 16),
+                            const Divider(),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: _dashboard!.saldoLiquido >= 0
+                                      ? [const Color(0xFF10B981).withOpacity(0.1), const Color(0xFF34D399).withOpacity(0.1)]
+                                      : [const Color(0xFFEF4444).withOpacity(0.1), const Color(0xFFF87171).withOpacity(0.1)],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _dashboard!.saldoLiquido >= 0 
+                                      ? const Color(0xFF10B981) 
+                                      : const Color(0xFFEF4444),
+                                  width: 2,
+                                ),
+                              ),
+                              child: _LinhaResumo(
                                 label: 'Saldo Líquido:',
                                 valor: _formatoMoeda.format(_dashboard!.saldoLiquido),
                                 cor: _dashboard!.saldoLiquido >= 0 
-                                    ? Colors.green 
-                                    : Colors.red,
+                                    ? const Color(0xFF10B981) 
+                                    : const Color(0xFFEF4444),
                                 negrito: true,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -271,33 +396,49 @@ class _CardValor extends StatelessWidget {
   Widget build(BuildContext context) {
     final formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     
-    return Card(
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icone, color: cor, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              titulo,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: cor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 4),
-            Text(
-              formatoMoeda.format(valor),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: cor,
-              ),
-              textAlign: TextAlign.center,
+            child: Icon(icone, color: cor, size: 28),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            titulo,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            formatoMoeda.format(valor),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: cor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -318,33 +459,49 @@ class _CardContador extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icone, color: cor, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              titulo,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: cor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 4),
-            Text(
-              valor.toString(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: cor,
-              ),
+            child: Icon(icone, color: cor, size: 28),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            titulo,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            valor.toString(),
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: cor,
+            ),
+          ),
+        ],
       ),
     );
   }
