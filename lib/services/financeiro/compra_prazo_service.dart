@@ -56,6 +56,23 @@ class CompraPrazoService {
     }
   }
 
+  Future<CompraPrazo> buscarCompra(String id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/$id'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        return CompraPrazo.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+      } else {
+        throw Exception('Erro ao buscar compra: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erro ao conectar com a API: $e');
+    }
+  }
+
   Future<CompraPrazo> criarCompra({
     required String fornecedorId,
     required List<Map<String, dynamic>> produtos,

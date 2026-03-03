@@ -57,8 +57,10 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
           _isLoading = false;
         });
       } else if (_parcela.tipo == 'COMPRA' || _parcela.tipo == 'compra') {
-        // Para compras, não temos método buscarCompra, então vamos listar e filtrar
+        final service = CompraPrazoService(auth);
+        final compra = await service.buscarCompra(_parcela.referenciaId);
         setState(() {
+          _compra = compra;
           _isLoading = false;
         });
       } else {

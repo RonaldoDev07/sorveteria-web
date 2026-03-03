@@ -5,6 +5,7 @@ import '../../models/financeiro/venda_prazo_model.dart';
 import '../../models/financeiro/pagamento_model.dart';
 import '../../services/financeiro/pagamento_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/api_service.dart';
 
 // Função helper para parsing defensivo de números
 double _toDouble(dynamic v) {
