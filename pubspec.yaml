@@ -1,8 +1,8 @@
 name: estoque_mobile
 description: Sorveteria Camila - Sistema de Controle de Estoque
 publish_to: 'none'
-version: 1.0.2+3
-# FORCE REBUILD: 2026-03-02 - Add vendas/compras prazo list
+version: 1.0.3+4
+# FORCE REBUILD: 2026-03-03 - Melhorias visuais e permissões completas
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
