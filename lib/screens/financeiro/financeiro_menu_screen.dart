@@ -184,10 +184,10 @@ class _MenuCard extends StatelessWidget {
       width: 180,
       height: 180,
       child: Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -247,6 +247,7 @@ class _MenuCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

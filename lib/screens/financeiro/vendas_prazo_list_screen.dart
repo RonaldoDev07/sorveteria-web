@@ -250,7 +250,7 @@ class _VendaCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            venda.cliente.nome,
+                            venda.cliente?.nome ?? 'Cliente',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

@@ -250,7 +250,7 @@ class _CompraCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            compra.fornecedor.nome,
+                            compra.fornecedor?.nome ?? 'Fornecedor',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
