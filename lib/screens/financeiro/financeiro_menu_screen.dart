@@ -15,6 +15,9 @@ class FinanceiroMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Debug: verificar se código novo está sendo executado
+    print('🔥 FINANCEIRO MENU V3 - 9 CARDS');
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gestão Financeira'),
