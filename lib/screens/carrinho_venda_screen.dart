@@ -241,7 +241,6 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                   DropdownMenuItem(value: 'PIX', child: Text('📱 PIX')),
                   DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Cartão de Crédito')),
                   DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Cartão de Débito')),
-                  DropdownMenuItem(value: 'PRAZO', child: Text('📅 A Prazo')),
                 ],
                 onChanged: (value) {
                   if (value != null) {
