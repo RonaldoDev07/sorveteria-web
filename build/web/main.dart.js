@@ -52400,7 +52400,7 @@ A.akJ.prototype={
 $1(a){return B.ng},
 $S:220}
 A.ej.prototype={
-hG(){var s=this,r=A.ap(["nome",s.b,"cpf_cnpj",s.c],t.N,t.z),q=s.d
+hG(){var s=this,r=A.ap(["nome",s.b,"cpfCnpj",s.c],t.N,t.z),q=s.d
 if(q!=null&&q.length!==0)r.p(0,"telefone",q)
 q=s.e
 if(q!=null&&q.length!==0)r.p(0,"endereco",q)

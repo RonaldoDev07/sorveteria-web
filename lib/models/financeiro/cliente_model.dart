@@ -40,7 +40,7 @@ class Cliente {
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       'nome': nome,
-      'cpf_cnpj': cpfCnpj,
+      'cpfCnpj': cpfCnpj,
     };
     
     if (telefone != null && telefone!.isNotEmpty) {
