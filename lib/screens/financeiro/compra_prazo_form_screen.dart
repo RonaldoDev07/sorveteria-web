@@ -264,10 +264,13 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
 
       try {
         final novoFornecedor = Fornecedor(
-          nome: nomeController.text,
-          cnpj: cnpjController.text,
-          telefone: telefoneController.text.isEmpty ? null : telefoneController.text,
+          nome: nomeController.text.trim(),
+          cnpj: cnpjController.text.trim(),
+          telefone: telefoneController.text.trim().isEmpty ? null : telefoneController.text.trim(),
         );
+        
+        print('🔍 Criando fornecedor: ${novoFornecedor.toJson()}');
+        
         await _fornecedorService.criarFornecedor(novoFornecedor);
 
         // Recarregar lista de fornecedores
@@ -286,9 +289,14 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           );
         }
       } catch (e) {
+        print('❌ Erro ao criar fornecedor: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('Erro ao criar fornecedor: ${e.toString().replaceAll('Exception: ', '')}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
           );
         }
       }

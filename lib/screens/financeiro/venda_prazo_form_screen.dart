@@ -275,10 +275,13 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
 
       try {
         final novoCliente = Cliente(
-          nome: nomeController.text,
-          cpfCnpj: cpfCnpjController.text,
-          telefone: telefoneController.text.isEmpty ? null : telefoneController.text,
+          nome: nomeController.text.trim(),
+          cpfCnpj: cpfCnpjController.text.trim(),
+          telefone: telefoneController.text.trim().isEmpty ? null : telefoneController.text.trim(),
         );
+        
+        print('🔍 Criando cliente: ${novoCliente.toJson()}');
+        
         await _clienteService.criarCliente(novoCliente);
 
         // Recarregar lista de clientes
@@ -297,9 +300,14 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
           );
         }
       } catch (e) {
+        print('❌ Erro ao criar cliente: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('Erro ao criar cliente: ${e.toString().replaceAll('Exception: ', '')}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
           );
         }
       }
