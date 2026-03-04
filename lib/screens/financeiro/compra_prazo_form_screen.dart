@@ -480,7 +480,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(10),
                 children: [
                   // Card Fornecedor e Forma de Pagamento
                   Container(
@@ -520,7 +520,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
                             Expanded(
@@ -674,7 +674,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -684,14 +684,14 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(8),
+                                  padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF9333EA).withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(Icons.shopping_bag, color: Color(0xFF9333EA), size: 20),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 8),
                                 const Text(
                                   'Produtos',
                                   style: TextStyle(
@@ -851,7 +851,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -861,14 +861,14 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(8),
+                                  padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: Colors.blue.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(Icons.calendar_month, color: Colors.blue, size: 20),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 8),
                                 const Text(
                                   'Parcelas',
                                   style: TextStyle(
@@ -1004,21 +1004,21 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: Colors.orange.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(Icons.note, color: Colors.orange, size: 20),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8),
                             const Text(
                               'Observações',
                               style: TextStyle(

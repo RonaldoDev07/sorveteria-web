@@ -234,7 +234,7 @@ _isLoading
             : Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _searchController,
                       onChanged: _filtrarProdutos,
@@ -282,7 +282,7 @@ _isLoading
                             itemBuilder: (context, index) {
                               final produto = _produtosFiltrados[index];
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
+                        margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
@@ -295,9 +295,9 @@ _isLoading
                           ],
                         ),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(20),
+                          contentPadding: const EdgeInsets.all(14),
                           leading: Container(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: widget.tipo == 'ENTRADA'
@@ -317,7 +317,7 @@ _isLoading
                           title: Text(
                             produto['nome'],
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.2,
                             ),

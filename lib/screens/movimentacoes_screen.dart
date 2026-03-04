@@ -355,20 +355,20 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       // Card de resumo por vendedor
                       if (_calcularResumoVendedores().isNotEmpty) ...[
                         Container(
-                          margin: const EdgeInsets.all(12),
-                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.orange.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
+                                color: Colors.orange.withOpacity(0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
@@ -378,14 +378,14 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(6),
+                                    padding: const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
                                       color: Colors.white.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
-                                    child: const Icon(Icons.leaderboard_rounded, color: Colors.white, size: 18),
+                                    child: const Icon(Icons.leaderboard_rounded, color: Colors.white, size: 16),
                                   ),
-                                  const SizedBox(width: 10),
+                                  const SizedBox(width: 8),
                                   Text(
                                     _periodoSelecionado == 'hoje' 
                                       ? 'Vendas de Hoje'
@@ -396,58 +396,58 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                           : 'Vendas do Ano',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 10),
                               ..._calcularResumoVendedores().entries.map((entry) {
                                 final vendedor = entry.key;
                                 final dados = entry.value;
                                 return Container(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  padding: const EdgeInsets.all(10),
+                                  margin: const EdgeInsets.only(bottom: 6),
+                                  padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          Icon(Icons.person_rounded, color: Colors.white.withOpacity(0.9), size: 18),
-                                          const SizedBox(width: 6),
+                                          Icon(Icons.person_rounded, color: Colors.white.withOpacity(0.9), size: 16),
+                                          const SizedBox(width: 5),
                                           Expanded(
                                             child: Text(
                                               vendedor,
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 15,
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ),
                                           Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                             decoration: BoxDecoration(
                                               color: Colors.white.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(6),
                                             ),
                                             child: Text(
                                               '${dados['quantidade']?.toInt() ?? 0} ${(dados['quantidade']?.toInt() ?? 0) == 1 ? 'venda' : 'vendas'}',
                                               style: TextStyle(
                                                 color: Colors.white.withOpacity(0.95),
-                                                fontSize: 12,
+                                                fontSize: 10,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: 6),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -458,14 +458,14 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                                 'Total Vendido',
                                                 style: TextStyle(
                                                   color: Colors.white.withOpacity(0.8),
-                                                  fontSize: 12,
+                                                  fontSize: 10,
                                                 ),
                                               ),
                                               Text(
                                                 BrazilianFormatters.formatCurrency(dados['total'] ?? 0),
                                                 style: const TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -478,14 +478,14 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                                 'Lucro',
                                                 style: TextStyle(
                                                   color: Colors.white.withOpacity(0.8),
-                                                  fontSize: 12,
+                                                  fontSize: 10,
                                                 ),
                                               ),
                                               Text(
                                                 BrazilianFormatters.formatCurrency(dados['lucro'] ?? 0),
                                                 style: const TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 16,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),

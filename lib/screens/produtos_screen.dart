@@ -464,7 +464,7 @@ _isLoading
             : Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _searchController,
                       onChanged: _filtrarProdutos,
@@ -607,7 +607,7 @@ _isLoading
                             itemBuilder: (context, index) {
                               final produto = _produtosFiltrados[index];
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
+                        margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
@@ -620,9 +620,9 @@ _isLoading
                           ],
                         ),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(20),
+                          contentPadding: const EdgeInsets.all(14),
                           leading: Container(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
@@ -640,7 +640,7 @@ _isLoading
                           title: Text(
                             produto['nome'],
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.2,
                             ),
@@ -937,16 +937,16 @@ _isLoading
                     },
                     heroTag: 'cadastrar_produto',
                     backgroundColor: const Color(0xFF3B82F6),
-                    icon: const Icon(Icons.add_circle_rounded, size: 24),
+                    icon: const Icon(Icons.add_circle_rounded, size: 20),
                     label: const Text(
                       'Cadastrar Produto',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                if (auth.isAdmin) const SizedBox(height: 12),
+                if (auth.isAdmin) const SizedBox(height: 10),
                 // Botão Registrar Compra
                 FloatingActionButton.extended(
                   onPressed: () {
@@ -959,11 +959,11 @@ _isLoading
                   },
                   heroTag: 'registrar_compra',
                   backgroundColor: const Color(0xFF14B8A6),
-                  icon: const Icon(Icons.shopping_cart_rounded, size: 24),
+                  icon: const Icon(Icons.shopping_cart_rounded, size: 20),
                   label: const Text(
                     'Registrar Compra',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

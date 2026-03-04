@@ -487,7 +487,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(10),
                 children: [
                   // Card Cliente e Forma de Pagamento
                   Container(
