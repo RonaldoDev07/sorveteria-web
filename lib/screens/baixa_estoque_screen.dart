@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import '../utils/formatters.dart';
+import '../utils/text_formatters.dart';
 
 class BaixaEstoqueScreen extends StatefulWidget {
   final Map<String, dynamic> produto;
@@ -28,7 +28,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
   }
 
   String _formatarMoeda(dynamic valor) {
-    return BrazilianFormatters.formatCurrency(valor).replaceAll('R\$ ', '');
+    return formatarMoeda(valor).replaceAll('R\$ ', '');
   }
 
   String _formatarNumero(dynamic valor) {

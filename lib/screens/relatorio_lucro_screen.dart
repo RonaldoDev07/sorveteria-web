@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import '../utils/formatters.dart';
+import '../utils/text_formatters.dart';
 
 class RelatorioLucroScreen extends StatefulWidget {
   const RelatorioLucroScreen({super.key});
@@ -449,7 +449,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        BrazilianFormatters.formatCurrency(resumo['receita_semanal']),
+                        formatarMoeda(resumo['receita_semanal']),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -466,7 +466,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                       ),
                       const Divider(color: Colors.white38, height: 16),
                       Text(
-                        BrazilianFormatters.formatCurrency(resumo['lucro_semanal']),
+                        formatarMoeda(resumo['lucro_semanal']),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -522,7 +522,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        BrazilianFormatters.formatCurrency(resumo['receita_mensal']),
+                        formatarMoeda(resumo['receita_mensal']),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -539,7 +539,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                       ),
                       const Divider(color: Colors.white38, height: 16),
                       Text(
-                        BrazilianFormatters.formatCurrency(resumo['lucro_mensal']),
+                        formatarMoeda(resumo['lucro_mensal']),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -600,7 +600,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        BrazilianFormatters.formatCurrency(resumo['receita_anual']),
+                        formatarMoeda(resumo['receita_anual']),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -630,7 +630,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                     children: [
                       const SizedBox(height: 32),
                       Text(
-                        BrazilianFormatters.formatCurrency(resumo['lucro_anual']),
+                        formatarMoeda(resumo['lucro_anual']),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -823,7 +823,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
         Text(
           isPercentual
               ? '${valor.toStringAsFixed(2).replaceAll('.', ',')}%'
-              : BrazilianFormatters.formatCurrency(valor),
+              : formatarMoeda(valor),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: cor,
@@ -936,14 +936,14 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
             const SizedBox(height: 16),
             _buildProdutoRow(
               'Receita',
-              BrazilianFormatters.formatCurrency(produto['receita_total']),
+              formatarMoeda(produto['receita_total']),
               Colors.blue,
               Icons.arrow_upward,
             ),
             const SizedBox(height: 8),
             _buildProdutoRow(
               'Lucro',
-              BrazilianFormatters.formatCurrency(produto['lucro_total']),
+              formatarMoeda(produto['lucro_total']),
               Colors.green,
               Icons.monetization_on,
             ),
@@ -957,7 +957,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
             const SizedBox(height: 8),
             _buildProdutoRow(
               'Quantidade',
-              BrazilianFormatters.formatNumber(produto['quantidade_vendida']),
+              produto['quantidade_vendida'].toString(),
               Colors.grey.shade700,
               Icons.inventory,
             ),

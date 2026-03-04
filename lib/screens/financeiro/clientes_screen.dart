@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/financeiro/cliente_model.dart';
 import '../../services/financeiro/cliente_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/text_formatters.dart';
 import 'cliente_form_screen.dart';
 
 class ClientesScreen extends StatefulWidget {
@@ -264,7 +265,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
                                         Icon(Icons.badge_outlined, size: 14, color: Colors.grey.shade600),
                                         const SizedBox(width: 4),
                                         Text(
-                                          cliente.cpfCnpj,
+                                          formatarCpfCnpj(cliente.cpfCnpj),
                                           style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                                         ),
                                       ],
@@ -276,8 +277,21 @@ class _ClientesScreenState extends State<ClientesScreen> {
                                           Icon(Icons.phone_outlined, size: 14, color: Colors.grey.shade600),
                                           const SizedBox(width: 4),
                                           Text(
-                                            cliente.telefone!,
+                                            formatarTelefone(cliente.telefone!),
                                             style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                    if (cliente.createdAt != null) ...[
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade600),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Cadastrado em ${formatarDataHora(cliente.createdAt!)}',
+                                            style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                                           ),
                                         ],
                                       ),

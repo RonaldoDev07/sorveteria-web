@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import '../utils/formatters.dart';
+import '../utils/text_formatters.dart';
 
 class EditarProdutoScreen extends StatefulWidget {
   final Map<String, dynamic> produto;
@@ -180,7 +180,7 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
                         const SizedBox(height: 8),
                         _buildInfoRow(
                           'Custo Médio',
-                          BrazilianFormatters.formatCurrency(widget.produto['custo_medio']),
+                          formatarMoeda(widget.produto['custo_medio']),
                         ),
                         const SizedBox(height: 8),
                         Container(

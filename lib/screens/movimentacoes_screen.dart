@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import '../utils/formatters.dart';
+import '../utils/text_formatters.dart';
 
 class MovimentacoesScreen extends StatefulWidget {
   const MovimentacoesScreen({super.key});
@@ -463,7 +463,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                BrazilianFormatters.formatCurrency(dados['total'] ?? 0),
+                                                formatarMoeda(dados['total'] ?? 0),
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 14,
@@ -483,7 +483,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                BrazilianFormatters.formatCurrency(dados['lucro'] ?? 0),
+                                                formatarMoeda(dados['lucro'] ?? 0),
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 14,
@@ -624,14 +624,14 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                   const SizedBox(height: 8),
                                   _buildInfoRow(
                                     'Valor Unitário',
-                                    BrazilianFormatters.formatCurrency(mov['valor_unitario']),
+                                    formatarMoeda(mov['valor_unitario']),
                                     Icons.payments_rounded,
                                   ),
                                   if (!isEntrada && mov['lucro_total'] != null) ...[
                                     const SizedBox(height: 8),
                                     _buildInfoRow(
                                       'Lucro Total',
-                                      BrazilianFormatters.formatCurrency(mov['lucro_total']),
+                                      formatarMoeda(mov['lucro_total']),
                                       Icons.monetization_on,
                                       valueColor: Colors.green,
                                     ),

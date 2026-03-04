@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/financeiro/fornecedor_model.dart';
 import '../../services/financeiro/fornecedor_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/text_formatters.dart';
 import 'fornecedor_form_screen.dart';
 
 class FornecedoresScreen extends StatefulWidget {
@@ -264,7 +265,7 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
                                         Icon(Icons.business_outlined, size: 14, color: Colors.grey.shade600),
                                         const SizedBox(width: 4),
                                         Text(
-                                          fornecedor.cnpj,
+                                          formatarCnpj(fornecedor.cnpj),
                                           style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                                         ),
                                       ],
@@ -276,8 +277,21 @@ class _FornecedoresScreenState extends State<FornecedoresScreen> {
                                           Icon(Icons.phone_outlined, size: 14, color: Colors.grey.shade600),
                                           const SizedBox(width: 4),
                                           Text(
-                                            fornecedor.telefone!,
+                                            formatarTelefone(fornecedor.telefone!),
                                             style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                    if (fornecedor.createdAt != null) ...[
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade600),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Cadastrado em ${formatarDataHora(fornecedor.createdAt!)}',
+                                            style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                                           ),
                                         ],
                                       ),

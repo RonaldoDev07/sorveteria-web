@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import '../utils/formatters.dart';
+import '../utils/text_formatters.dart';
 import 'baixa_estoque_screen.dart';
 import 'entrada_estoque_screen.dart';
 import 'editar_produto_screen.dart';
