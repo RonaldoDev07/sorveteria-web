@@ -152,21 +152,21 @@ class _TipoCompraCardState extends State<_TipoCompraCard> {
               splashColor: Colors.white.withOpacity(0.1),
               highlightColor: Colors.white.withOpacity(0.05),
               child: Padding(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         widget.emoji,
-                        style: const TextStyle(fontSize: 32),
+                        style: const TextStyle(fontSize: 26),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,17 +174,16 @@ class _TipoCompraCardState extends State<_TipoCompraCard> {
                           Text(
                             widget.title,
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
-                              letterSpacing: 0.3,
                             ),
                           ),
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 2),
                           Text(
                             widget.subtitle,
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 12,
                               color: Colors.white.withOpacity(0.9),
                               fontWeight: FontWeight.w500,
                             ),
@@ -195,7 +194,7 @@ class _TipoCompraCardState extends State<_TipoCompraCard> {
                     Icon(
                       Icons.arrow_forward_ios_rounded,
                       color: Colors.white.withOpacity(0.8),
-                      size: 20,
+                      size: 18,
                     ),
                   ],
                 ),

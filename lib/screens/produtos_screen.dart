@@ -924,49 +924,43 @@ _isLoading
               children: [
                 // Botão Cadastrar Produto
                 if (auth.isAdmin)
-                  FloatingActionButton.extended(
-                    onPressed: () async {
-                      final resultado = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const CadastroProdutoScreen(),
-                        ),
-                      );
-                      if (resultado == true) {
-                        _loadProdutos();
-                      }
-                    },
-                    heroTag: 'cadastrar_produto',
-                    backgroundColor: const Color(0xFF3B82F6),
-                    icon: const Icon(Icons.add_circle_rounded, size: 20),
-                    label: const Text(
-                      'Cadastrar Produto',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: FloatingActionButton(
+                      onPressed: () async {
+                        final resultado = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const CadastroProdutoScreen(),
+                          ),
+                        );
+                        if (resultado == true) {
+                          _loadProdutos();
+                        }
+                      },
+                      heroTag: 'cadastrar_produto',
+                      backgroundColor: const Color(0xFF3B82F6),
+                      child: const Icon(Icons.add, size: 22),
                     ),
                   ),
-                if (auth.isAdmin) const SizedBox(height: 10),
+                if (auth.isAdmin) const SizedBox(height: 8),
                 // Botão Registrar Compra
-                FloatingActionButton.extended(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const ComprasMenuScreen(),
-                      ),
-                    );
-                  },
-                  heroTag: 'registrar_compra',
-                  backgroundColor: const Color(0xFF14B8A6),
-                  icon: const Icon(Icons.shopping_cart_rounded, size: 20),
-                  label: const Text(
-                    'Registrar Compra',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ComprasMenuScreen(),
+                        ),
+                      );
+                    },
+                    heroTag: 'registrar_compra',
+                    backgroundColor: const Color(0xFF14B8A6),
+                    child: const Icon(Icons.shopping_cart, size: 22),
                   ),
                 ),
               ],
