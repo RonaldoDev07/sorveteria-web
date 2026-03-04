@@ -413,6 +413,32 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () async {
+              try {
+                final codigo = await showDialog<String>(
+                  context: context,
+                  builder: (_) => const BarcodeScannerUniversal(),
+                );
+                
+                if (codigo != null && mounted) {
+                  _codigoBarrasController.text = codigo;
+                  _buscarPorCodigoBarras(codigo);
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao abrir scanner: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            tooltip: 'Escanear código de barras',
+          ),
           if (_carrinho.isNotEmpty)
             Center(
               child: Container(
@@ -922,39 +948,6 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
               ),
             )
           : null,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          try {
-            final codigo = await showDialog<String>(
-              context: context,
-              builder: (_) => const BarcodeScannerUniversal(),
-            );
-            
-            if (codigo != null && mounted) {
-              _codigoBarrasController.text = codigo;
-              _buscarPorCodigoBarras(codigo);
-            }
-          } catch (e) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Erro ao abrir scanner: $e'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          }
-        },
-        backgroundColor: const Color(0xFF10B981),
-        icon: const Icon(Icons.qr_code_scanner, size: 28),
-        label: const Text(
-          'Escanear',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
     );
   }
 }
