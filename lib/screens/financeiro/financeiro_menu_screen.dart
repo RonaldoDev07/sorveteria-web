@@ -236,14 +236,14 @@ class _MenuCard extends StatelessWidget {
                   ),
                   child: Text(
                     emoji,
-                    style: const TextStyle(fontSize: 22),
+                    style: const TextStyle(fontSize: 26),
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 6),
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 14.5,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -251,11 +251,11 @@ class _MenuCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: 8,
+                    fontSize: 10,
                     color: Colors.white.withOpacity(0.85),
                   ),
                   textAlign: TextAlign.center,

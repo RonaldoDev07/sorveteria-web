@@ -39,6 +39,23 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
     return numero.toStringAsFixed(3).replaceAll(RegExp(r'\.?0+$'), '');
   }
 
+  String _formatarPreco(dynamic valor) {
+    if (valor == null) return '0,00';
+    final numero = double.parse(valor.toString());
+    return numero.toStringAsFixed(2).replaceAll('.', ',');
+  }
+
+  double _calcularValorTotalEstoque() {
+    double total = 0;
+    for (var produto in _produtosFiltrados) {
+      final estoque = produto['estoque_atual'];
+      final estoqueNum = estoque is num ? estoque.toDouble() : (double.tryParse(estoque.toString().replaceAll(',', '.')) ?? 0);
+      final preco = double.parse(produto['preco_venda'].toString());
+      total += estoqueNum * preco;
+    }
+    return total;
+  }
+
   // Calcular status da validade
   Map<String, dynamic>? _calcularStatusValidade(dynamic dataValidade) {
     if (dataValidade == null) return null;
@@ -582,6 +599,21 @@ _isLoading
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
+                                    Icon(Icons.attach_money_rounded, size: 14, color: Colors.white.withOpacity(0.9)),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'R\$ ${_formatarPreco(_calcularValorTotalEstoque())}',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.9),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
                                     Icon(Icons.check_circle_rounded, size: 14, color: Colors.white.withOpacity(0.9)),
                                     const SizedBox(width: 4),
                                     Text(
@@ -781,7 +813,7 @@ _isLoading
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        'R\$ ${_formatarNumero(produto['preco_venda'])}',
+                                        'R\$ ${_formatarPreco(produto['preco_venda'])}',
                                         style: const TextStyle(
                                           color: Color(0xFF10B981),
                                           fontSize: 12,
