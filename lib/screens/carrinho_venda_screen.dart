@@ -462,49 +462,55 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                // Carrinho (parte superior)
-                if (_carrinho.isNotEmpty)
-                  Container(
-                    constraints: const BoxConstraints(maxHeight: 250),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.shopping_cart, color: Color(0xFF10B981)),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Itens no Carrinho',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                              ),
-                              const Spacer(),
-                              TextButton.icon(
-                                onPressed: () {
-                                  setState(() => _carrinho.clear());
-                                },
-                                icon: const Icon(Icons.delete_outline, size: 18),
-                                label: const Text('Limpar'),
-                                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                              ),
-                            ],
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Carrinho (parte superior)
+                  if (_carrinho.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.shopping_cart, color: Color(0xFF10B981), size: 18),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  'Itens no Carrinho',
+                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                ),
+                                const Spacer(),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    setState(() => _carrinho.clear());
+                                  },
+                                  icon: const Icon(Icons.delete_outline, size: 14),
+                                  label: const Text('Limpar', style: TextStyle(fontSize: 11)),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             itemCount: _carrinho.length,
                             itemBuilder: (context, index) {
                               final item = _carrinho[index];
@@ -651,80 +657,87 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                               );
                             },
                           ),
+                        ],
+                      ),
+                    ),
+                  
+                  // Campos de pesquisa
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      children: [
+                        // Campo de código de barras
+                        TextField(
+                          controller: _codigoBarrasController,
+                          decoration: InputDecoration(
+                            hintText: 'Código de barras',
+                            hintStyle: const TextStyle(fontSize: 13),
+                            prefixIcon: const Icon(Icons.qr_code_scanner, color: Color(0xFF10B981), size: 20),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.search, size: 20),
+                              onPressed: () => _buscarPorCodigoBarras(_codigoBarrasController.text),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFF10B981)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: const Color(0xFF10B981).withOpacity(0.3)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFF10B981), width: 2),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            isDense: true,
+                          ),
+                          style: const TextStyle(fontSize: 13),
+                          onSubmitted: _buscarPorCodigoBarras,
+                          keyboardType: TextInputType.number,
+                        ),
+                        const SizedBox(height: 8),
+                        // Campo de pesquisa por nome
+                        TextField(
+                          controller: _searchController,
+                          onChanged: _filtrarProdutos,
+                          style: const TextStyle(fontSize: 13),
+                          decoration: InputDecoration(
+                            hintText: 'Pesquisar produto por nome...',
+                            hintStyle: const TextStyle(fontSize: 13),
+                            prefixIcon: const Icon(Icons.search, size: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            isDense: true,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                
-                // Lista de produtos
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      // Campo de código de barras
-                      TextField(
-                        controller: _codigoBarrasController,
-                        decoration: InputDecoration(
-                          hintText: 'Código de barras',
-                          prefixIcon: const Icon(Icons.qr_code_scanner, color: Color(0xFF10B981)),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.search),
-                            onPressed: () => _buscarPorCodigoBarras(_codigoBarrasController.text),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(color: Color(0xFF10B981)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: const Color(0xFF10B981).withOpacity(0.3)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(color: Color(0xFF10B981), width: 2),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        onSubmitted: _buscarPorCodigoBarras,
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 12),
-                      // Campo de pesquisa por nome
-                      TextField(
-                        controller: _searchController,
-                        onChanged: _filtrarProdutos,
-                        decoration: InputDecoration(
-                          hintText: 'Pesquisar produto por nome...',
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                Expanded(
-                  child: _produtosFiltrados.isEmpty
-                      ? Center(
+                  
+                  // Lista de produtos
+                  _produtosFiltrados.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.all(40),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.inventory_2_outlined,
-                                size: 80,
+                                size: 60,
                                 color: Colors.grey[300],
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               Text(
                                 'Nenhum produto disponível',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: Colors.grey[600],
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -733,7 +746,9 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           itemCount: _produtosFiltrados.length,
                           itemBuilder: (context, index) {
                             final produto = _produtosFiltrados[index];
@@ -886,8 +901,8 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                             );
                           },
                         ),
-                ),
-              ],
+                ],
+              ),
             ),
       bottomNavigationBar: _carrinho.isNotEmpty
           ? Container(
