@@ -434,18 +434,6 @@ _isLoading
                   ),
                 ],
               ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _escanearCodigoBarras,
-        backgroundColor: cor,
-        icon: const Icon(Icons.qr_code_scanner, size: 28),
-        label: const Text(
-          'Escanear',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
     );
   }
 }

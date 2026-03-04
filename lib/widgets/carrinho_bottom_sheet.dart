@@ -12,7 +12,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
     final formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.45,
+      height: MediaQuery.of(context).size.height * 0.35,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.white, Color(0xFFF9FAFB)],
@@ -32,14 +32,14 @@ class CarrinhoBottomSheet extends StatelessWidget {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFF10B981), Color(0xFF34D399)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -47,21 +47,21 @@ class CarrinhoBottomSheet extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Icon(
                         Icons.shopping_cart_rounded,
                         color: Colors.white,
-                        size: 14),
+                        size: 12),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     const Text(
                       'Carrinho',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -69,7 +69,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 16),
+                  icon: const Icon(Icons.close_rounded, size: 14),
                   color: Colors.white,
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
@@ -119,39 +119,39 @@ class CarrinhoBottomSheet extends StatelessWidget {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(4),
                     itemCount: carrinho.itens.length,
                     itemBuilder: (context, index) {
                       final item = carrinho.itens[index];
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: const EdgeInsets.only(bottom: 3),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                           border: Border.all(
                             color: const Color(0xFF10B981).withOpacity(0.2),
                           ),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(4),
                           child: Row(
                             children: [
                               Container(
-                                width: 28,
-                                height: 28,
+                                width: 22,
+                                height: 22,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
                                     colors: [Color(0xFF10B981), Color(0xFF34D399)],
                                   ),
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: const Icon(
                                   Icons.shopping_bag_rounded,
                                   color: Colors.white,
-                                  size: 14,
+                                  size: 11,
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 4),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +160,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                                       item.nomeProduto,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 11,
+                                        fontSize: 9,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -168,7 +168,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                                     Text(
                                       formatoMoeda.format(item.precoUnitario),
                                       style: const TextStyle(
-                                        fontSize: 9,
+                                        fontSize: 8,
                                         color: Color(0xFF10B981),
                                       ),
                                     ),
@@ -179,14 +179,14 @@ class CarrinhoBottomSheet extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    width: 20,
-                                    height: 20,
+                                    width: 18,
+                                    height: 18,
                                     decoration: BoxDecoration(
                                       color: Colors.red.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(4),
+                                      borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: IconButton(
-                                      icon: const Icon(Icons.remove, size: 10),
+                                      icon: const Icon(Icons.remove, size: 8),
                                       onPressed: () {
                                         carrinho.atualizarQuantidade(
                                           item.produtoId,
@@ -198,24 +198,24 @@ class CarrinhoBottomSheet extends StatelessWidget {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 3),
                                     child: Text(
                                       '${item.quantidade}',
                                       style: const TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 9,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
                                   Container(
-                                    width: 20,
-                                    height: 20,
+                                    width: 18,
+                                    height: 18,
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF10B981).withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(4),
+                                      borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: IconButton(
-                                      icon: const Icon(Icons.add, size: 10),
+                                      icon: const Icon(Icons.add, size: 8),
                                       onPressed: () {
                                         carrinho.atualizarQuantidade(
                                           item.produtoId,
@@ -228,25 +228,25 @@ class CarrinhoBottomSheet extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 3),
                               Text(
                                 formatoMoeda.format(item.subtotal),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 11,
+                                  fontSize: 9,
                                   color: Color(0xFF10B981),
                                 ),
                               ),
-                              const SizedBox(width: 3),
+                              const SizedBox(width: 2),
                               Container(
-                                width: 22,
-                                height: 22,
+                                width: 18,
+                                height: 18,
                                 decoration: BoxDecoration(
                                   color: Colors.red.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: IconButton(
-                                  icon: const Icon(Icons.delete_rounded, size: 12),
+                                  icon: const Icon(Icons.delete_rounded, size: 10),
                                   color: Colors.red,
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
@@ -265,14 +265,14 @@ class CarrinhoBottomSheet extends StatelessWidget {
           // Footer com total
           if (!carrinho.isEmpty)
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, -3),
+                    blurRadius: 6,
+                    offset: const Offset(0, -2),
                   ),
                 ],
               ),
@@ -288,14 +288,14 @@ class CarrinhoBottomSheet extends StatelessWidget {
                             Text(
                               'Total (${carrinho.totalItens} itens)',
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: 8,
                                 color: Colors.grey[600],
                               ),
                             ),
                             const Text(
                               'TOTAL',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 9,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF10B981),
                               ),
@@ -305,62 +305,63 @@ class CarrinhoBottomSheet extends StatelessWidget {
                         Text(
                           formatoMoeda.format(carrinho.valorTotal),
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF10B981),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         Expanded(
                           child: Container(
-                            height: 36,
+                            height: 30,
                             decoration: BoxDecoration(
                               border: Border.all(
                                 color: Colors.red.withOpacity(0.3),
-                                width: 2,
+                                width: 1.5,
                               ),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             child: OutlinedButton.icon(
                               onPressed: () {
                                 carrinho.limparCarrinho();
                               },
-                              icon: const Icon(Icons.delete_outline_rounded, size: 14),
-                              label: const Text('Limpar', style: TextStyle(fontSize: 11)),
+                              icon: const Icon(Icons.delete_outline_rounded, size: 12),
+                              label: const Text('Limpar', style: TextStyle(fontSize: 9)),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.red,
                                 side: BorderSide.none,
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 4),
                         Expanded(
                           flex: 2,
                           child: Container(
-                            height: 36,
+                            height: 30,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF10B981), Color(0xFF34D399)],
                               ),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
-                              icon: const Icon(Icons.check_circle_rounded, size: 14),
+                              icon: const Icon(Icons.check_circle_rounded, size: 12),
                               label: const Text(
                                 'Continuar',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -368,8 +369,9 @@ class CarrinhoBottomSheet extends StatelessWidget {
                                 backgroundColor: Colors.transparent,
                                 foregroundColor: Colors.white,
                                 shadowColor: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                               ),
                             ),
