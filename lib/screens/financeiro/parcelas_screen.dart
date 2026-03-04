@@ -97,6 +97,16 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.done,
+              autofocus: true,
+              onTap: () {
+                if (valorController.text.isNotEmpty) {
+                  valorController.selection = TextSelection(
+                    baseOffset: 0,
+                    extentOffset: valorController.text.length,
+                  );
+                }
+              },
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(

@@ -268,6 +268,15 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
                     fillColor: Colors.white,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.done,
+                  onTap: () {
+                    if (_precoController.text.isNotEmpty) {
+                      _precoController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _precoController.text.length,
+                      );
+                    }
+                  },
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Campo obrigatório';
                     final valorLimpo = value!.replaceAll(',', '.');

@@ -721,6 +721,15 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             ),
                             style: const TextStyle(fontSize: 14),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textInputAction: TextInputAction.next,
+                            onTap: () {
+                              if (_quantidadeController.text.isNotEmpty) {
+                                _quantidadeController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: _quantidadeController.text.length,
+                                );
+                              }
+                            },
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -737,6 +746,15 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             ),
                             style: const TextStyle(fontSize: 14),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textInputAction: TextInputAction.done,
+                            onTap: () {
+                              if (_valorController.text.isNotEmpty) {
+                                _valorController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: _valorController.text.length,
+                                );
+                              }
+                            },
                           ),
                         ),
                       ],

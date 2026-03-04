@@ -303,6 +303,14 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: TextInputType.number,
+                  onTap: () {
+                    if (_codigoBarrasController.text.isNotEmpty) {
+                      _codigoBarrasController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _codigoBarrasController.text.length,
+                      );
+                    }
+                  },
                 ),
               ),
               const SizedBox(height: 20),
@@ -405,6 +413,15 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
+                  onTap: () {
+                    if (_custoController.text.isNotEmpty) {
+                      _custoController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _custoController.text.length,
+                      );
+                    }
+                  },
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Campo obrigatório';
                     final valorLimpo = value!.replaceAll(',', '.');
@@ -465,6 +482,15 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
+                  onTap: () {
+                    if (_precoController.text.isNotEmpty) {
+                      _precoController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _precoController.text.length,
+                      );
+                    }
+                  },
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Campo obrigatório';
                     final valorLimpo = value!.replaceAll(',', '.');
@@ -522,6 +548,15 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.done,
+                  onTap: () {
+                    if (_estoqueController.text.isNotEmpty) {
+                      _estoqueController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _estoqueController.text.length,
+                      );
+                    }
+                  },
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Campo obrigatório';
                     final valorLimpo = value!.replaceAll(',', '.');
@@ -539,7 +574,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                 onTap: () async {
                   final data = await showDatePicker(
                     context: context,
-                    initialDate: _dataValidade ?? DateTime.now().add(const Duration(days: 30)),
+                    initialDate: _dataValidade ?? DateTime.now(),
                     firstDate: DateTime.now(),
                     lastDate: DateTime.now().add(const Duration(days: 3650)),
                     locale: const Locale('pt', 'BR'),

@@ -296,7 +296,16 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                 TextField(
                   controller: quantidadeController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(fontSize: 13),
+                  onTap: () {
+                    if (quantidadeController.text.isNotEmpty) {
+                      quantidadeController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: quantidadeController.text.length,
+                      );
+                    }
+                  },
                   decoration: InputDecoration(
                     labelText: 'Quantidade',
                     labelStyle: const TextStyle(fontSize: 12),
@@ -318,6 +327,15 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                 TextField(
                   controller: motivoController,
                   style: const TextStyle(fontSize: 13),
+                  textInputAction: TextInputAction.done,
+                  onTap: () {
+                    if (motivoController.text.isNotEmpty) {
+                      motivoController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: motivoController.text.length,
+                      );
+                    }
+                  },
                   decoration: InputDecoration(
                     labelText: 'Motivo do ajuste',
                     labelStyle: const TextStyle(fontSize: 12),

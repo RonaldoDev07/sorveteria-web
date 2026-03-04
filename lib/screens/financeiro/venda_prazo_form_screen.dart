@@ -1642,6 +1642,15 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                               isDense: true,
                             ),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textInputAction: TextInputAction.next,
+                            onTap: () {
+                              if (_quantidadeController.text.isNotEmpty) {
+                                _quantidadeController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: _quantidadeController.text.length,
+                                );
+                              }
+                            },
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -1656,6 +1665,15 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                               isDense: true,
                             ),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textInputAction: TextInputAction.done,
+                            onTap: () {
+                              if (_valorController.text.isNotEmpty) {
+                                _valorController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: _valorController.text.length,
+                                );
+                              }
+                            },
                           ),
                         ),
                       ],
@@ -1788,7 +1806,16 @@ class __DialogGerarParcelasState extends State<_DialogGerarParcelas> {
               border: OutlineInputBorder(),
             ),
             keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onTap: () {
+              if (_numeroParcelasController.text.isNotEmpty) {
+                _numeroParcelasController.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: _numeroParcelasController.text.length,
+                );
+              }
+            },
           ),
           const SizedBox(height: 16),
           ListTile(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../utils/formatters.dart';
 
 class BaixaEstoqueScreen extends StatefulWidget {
   final Map<String, dynamic> produto;
@@ -24,6 +25,10 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
     _quantidadeController.dispose();
     _valorPagoController.dispose();
     super.dispose();
+  }
+
+  String _formatarMoeda(dynamic valor) {
+    return BrazilianFormatters.formatCurrency(valor).replaceAll('R\$ ', '');
   }
 
   String _formatarNumero(dynamic valor) {
@@ -244,7 +249,17 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     ),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
                   onChanged: (_) => setState(() {}),
+                  onTap: () {
+                    // Garantir que o campo receba foco ao clicar
+                    if (_quantidadeController.text.isNotEmpty) {
+                      _quantidadeController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _quantidadeController.text.length,
+                      );
+                    }
+                  },
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Campo obrigatório';
                     final valorLimpo = value!.replaceAll(',', '.');
@@ -398,7 +413,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                             ],
                           ),
                           Text(
-                            'R\$ ${_formatarNumero(valorTotal)}',
+                            'R\$ ${_formatarMoeda(valorTotal)}',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -467,7 +482,17 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                       ),
                     ),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    textInputAction: TextInputAction.done,
                     onChanged: (_) => setState(() {}),
+                    onTap: () {
+                      // Garantir que o campo receba foco ao clicar
+                      if (_valorPagoController.text.isNotEmpty) {
+                        _valorPagoController.selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset: _valorPagoController.text.length,
+                        );
+                      }
+                    },
                   ),
                 ),
                 // Troco
@@ -550,7 +575,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                               ],
                             ),
                             Text(
-                              'R\$ ${_formatarNumero(troco.abs())}',
+                              'R\$ ${_formatarMoeda(troco.abs())}',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,

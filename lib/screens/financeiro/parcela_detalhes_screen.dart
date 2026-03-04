@@ -589,7 +589,16 @@ class _DialogDarBaixaState extends State<_DialogDarBaixa> {
               border: OutlineInputBorder(),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.done,
             autofocus: true,
+            onTap: () {
+              if (_valorController.text.isNotEmpty) {
+                _valorController.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: _valorController.text.length,
+                );
+              }
+            },
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(

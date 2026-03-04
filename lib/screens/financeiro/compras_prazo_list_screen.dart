@@ -205,13 +205,15 @@ class _CompraCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPago = compra.status == 'PAGO';
+    final isPago = compra.status == 'PAGO' || compra.status == 'quitada';
+    final isCancelada = compra.status == 'cancelada' || compra.status == 'CANCELADA';
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: isCancelada ? Border.all(color: Colors.red, width: 2) : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -235,12 +237,12 @@ class _CompraCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: (isPago ? Colors.green : Colors.red).withOpacity(0.1),
+                        color: (isCancelada ? Colors.red : isPago ? Colors.green : Colors.red).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        isPago ? Icons.check_circle : Icons.schedule,
-                        color: isPago ? Colors.green : Colors.red,
+                        isCancelada ? Icons.cancel : isPago ? Icons.check_circle : Icons.schedule,
+                        color: isCancelada ? Colors.red : isPago ? Colors.green : Colors.red,
                         size: 24,
                       ),
                     ),
@@ -251,9 +253,11 @@ class _CompraCard extends StatelessWidget {
                         children: [
                           Text(
                             compra.fornecedor?.nome ?? 'Fornecedor',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              decoration: isCancelada ? TextDecoration.lineThrough : null,
+                              color: isCancelada ? Colors.grey : null,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -272,25 +276,26 @@ class _CompraCard extends StatelessWidget {
                       children: [
                         Text(
                           formatoMoeda.format(compra.valorTotal),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFEF4444),
+                            color: isCancelada ? Colors.grey : const Color(0xFFEF4444),
+                            decoration: isCancelada ? TextDecoration.lineThrough : null,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: (isPago ? Colors.green : Colors.red).withOpacity(0.1),
+                            color: (isCancelada ? Colors.red : isPago ? Colors.green : Colors.red).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            isPago ? 'Pago' : 'Pendente',
+                            isCancelada ? 'Cancelada' : isPago ? 'Pago' : 'Pendente',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isPago ? Colors.green : Colors.red,
+                              color: isCancelada ? Colors.red : isPago ? Colors.green : Colors.red,
                             ),
                           ),
                         ),

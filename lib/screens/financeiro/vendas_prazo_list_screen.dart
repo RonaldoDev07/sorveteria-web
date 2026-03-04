@@ -205,13 +205,15 @@ class _VendaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPago = venda.status == 'PAGO';
+    final isPago = venda.status == 'PAGO' || venda.status == 'quitada';
+    final isCancelada = venda.status == 'cancelada' || venda.status == 'CANCELADA';
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: isCancelada ? Border.all(color: Colors.red, width: 2) : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -235,12 +237,12 @@ class _VendaCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: (isPago ? Colors.green : Colors.orange).withOpacity(0.1),
+                        color: (isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        isPago ? Icons.check_circle : Icons.schedule,
-                        color: isPago ? Colors.green : Colors.orange,
+                        isCancelada ? Icons.cancel : isPago ? Icons.check_circle : Icons.schedule,
+                        color: isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange,
                         size: 24,
                       ),
                     ),
@@ -251,9 +253,11 @@ class _VendaCard extends StatelessWidget {
                         children: [
                           Text(
                             venda.cliente?.nome ?? 'Cliente',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              decoration: isCancelada ? TextDecoration.lineThrough : null,
+                              color: isCancelada ? Colors.grey : null,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -272,25 +276,26 @@ class _VendaCard extends StatelessWidget {
                       children: [
                         Text(
                           formatoMoeda.format(venda.valorTotal),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF10B981),
+                            color: isCancelada ? Colors.grey : const Color(0xFF10B981),
+                            decoration: isCancelada ? TextDecoration.lineThrough : null,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: (isPago ? Colors.green : Colors.orange).withOpacity(0.1),
+                            color: (isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            isPago ? 'Pago' : 'Pendente',
+                            isCancelada ? 'Cancelada' : isPago ? 'Pago' : 'Pendente',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isPago ? Colors.green : Colors.orange,
+                              color: isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange,
                             ),
                           ),
                         ),

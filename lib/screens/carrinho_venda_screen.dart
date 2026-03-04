@@ -275,6 +275,15 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                         isDense: true,
                       ),
                       keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      onTap: () {
+                        if (valorPagoController.text.isNotEmpty) {
+                          valorPagoController.selection = TextSelection(
+                            baseOffset: 0,
+                            extentOffset: valorPagoController.text.length,
+                          );
+                        }
+                      },
                       onChanged: (_) => setDialogState(() {}),
                     ),
                     if (valorPago > 0) ...[
@@ -697,6 +706,14 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                           style: const TextStyle(fontSize: 13),
                           onSubmitted: _buscarPorCodigoBarras,
                           keyboardType: TextInputType.number,
+                          onTap: () {
+                            if (_codigoBarrasController.text.isNotEmpty) {
+                              _codigoBarrasController.selection = TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _codigoBarrasController.text.length,
+                              );
+                            }
+                          },
                         ),
                         const SizedBox(height: 8),
                         // Campo de pesquisa por nome

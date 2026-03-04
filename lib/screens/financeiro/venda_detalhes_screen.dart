@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../models/financeiro/venda_prazo_model.dart';
 import '../../models/financeiro/pagamento_model.dart';
 import '../../services/financeiro/pagamento_service.dart';
+import '../../services/financeiro/venda_prazo_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 
@@ -51,6 +52,83 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao carregar pagamentos: $e')),
         );
+      }
+    }
+  }
+
+  Future<void> _mostrarDialogCancelarVenda() async {
+    if (_venda.status == 'cancelada') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Venda já está cancelada!')),
+      );
+      return;
+    }
+
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancelar Venda'),
+        content: const Text(
+          'Tem certeza que deseja cancelar esta venda?\n\n'
+          'Esta ação irá:\n'
+          '• Reverter o estoque dos produtos\n'
+          '• Cancelar todas as parcelas pendentes\n'
+          '• Marcar a venda como cancelada\n\n'
+          'Esta ação não pode ser desfeita!',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Não'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Sim, Cancelar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar == true && mounted) {
+      try {
+        final auth = Provider.of<AuthService>(context, listen: false);
+        final service = VendaPrazoService(auth);
+        
+        // Mostrar loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+        
+        await service.cancelarVenda(_venda.id);
+        
+        if (mounted) {
+          Navigator.pop(context); // Fechar loading
+          Navigator.pop(context, true); // Voltar para lista
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Venda cancelada com sucesso!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          Navigator.pop(context); // Fechar loading
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao cancelar venda: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }
@@ -180,18 +258,36 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                     _buildInfoRow('Valor Pago', formatoMoeda.format(_venda.valorPago), color: Colors.green),
                     _buildInfoRow('Saldo Devedor', formatoMoeda.format(_venda.saldoDevedor), color: Colors.red),
                     
-                    // Botão de registrar pagamento
-                    if (_venda.saldoDevedor > 0 && _venda.status != 'cancelada') ...[
+                    // Botões de ação
+                    if (_venda.status != 'cancelada') ...[
                       const SizedBox(height: 16),
+                      // Botão de registrar pagamento
+                      if (_venda.saldoDevedor > 0) ...[
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: _mostrarDialogPagamento,
+                            icon: const Icon(Icons.payment),
+                            label: const Text('Registrar Pagamento'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      // Botão de cancelar venda (apenas ADMIN ou VENDEDOR)
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: _mostrarDialogPagamento,
-                          icon: const Icon(Icons.payment),
-                          label: const Text('Registrar Pagamento'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                        child: OutlinedButton.icon(
+                          onPressed: _mostrarDialogCancelarVenda,
+                          icon: const Icon(Icons.cancel, color: Colors.red),
+                          label: const Text('Cancelar Venda'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            side: const BorderSide(color: Colors.red),
                             padding: const EdgeInsets.all(12),
                           ),
                         ),
@@ -510,7 +606,16 @@ class _DialogRegistrarPagamentoState extends State<_DialogRegistrarPagamento> {
               border: OutlineInputBorder(),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.done,
             autofocus: true,
+            onTap: () {
+              if (_valorController.text.isNotEmpty) {
+                _valorController.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: _valorController.text.length,
+                );
+              }
+            },
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(

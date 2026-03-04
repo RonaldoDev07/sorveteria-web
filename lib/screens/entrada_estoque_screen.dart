@@ -298,6 +298,15 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
                           helperText: 'Quantas unidades você comprou',
                         ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        textInputAction: TextInputAction.next,
+                        onTap: () {
+                          if (_quantidadeController.text.isNotEmpty) {
+                            _quantidadeController.selection = TextSelection(
+                              baseOffset: 0,
+                              extentOffset: _quantidadeController.text.length,
+                            );
+                          }
+                        },
                         validator: (value) {
                           if (value?.isEmpty ?? true) return 'Campo obrigatório';
                           final valorLimpo = value!.replaceAll(',', '.');
@@ -334,6 +343,15 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
                           helperText: 'Quanto você PAGOU por unidade',
                         ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        textInputAction: TextInputAction.done,
+                        onTap: () {
+                          if (_custoController.text.isNotEmpty) {
+                            _custoController.selection = TextSelection(
+                              baseOffset: 0,
+                              extentOffset: _custoController.text.length,
+                            );
+                          }
+                        },
                         validator: (value) {
                           if (value?.isEmpty ?? true) return 'Campo obrigatório';
                           final valorLimpo = value!.replaceAll(',', '.');
