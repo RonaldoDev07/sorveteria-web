@@ -41,6 +41,12 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
     return numero.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
   }
 
+  String _formatarPreco(dynamic valor) {
+    if (valor == null) return '0,00';
+    final numero = double.parse(valor.toString());
+    return numero.toStringAsFixed(2).replaceAll('.', ',');
+  }
+
   double _calcularTotal() {
     double total = 0;
     for (var item in _carrinho) {
@@ -233,7 +239,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                   Text('Total de itens: ${_carrinho.length}', style: const TextStyle(fontSize: 12)),
                   const SizedBox(height: 6),
                   Text(
-                    'Valor total: R\$ ${_formatarNumero(valorTotal)}',
+                    'Valor total: R\$ ${_formatarPreco(valorTotal)}',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
                   ),
                   const SizedBox(height: 12),
@@ -310,7 +316,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                               ),
                             ),
                             Text(
-                              'R\$ ${_formatarNumero(troco.abs())}',
+                              'R\$ ${_formatarPreco(troco.abs())}',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -591,7 +597,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                                                     borderRadius: BorderRadius.circular(6),
                                                   ),
                                                   child: Text(
-                                                    'R\$ ${_formatarNumero(preco)}',
+                                                    'R\$ ${_formatarPreco(preco)}',
                                                     style: const TextStyle(
                                                       fontSize: 12,
                                                       fontWeight: FontWeight.w600,
@@ -616,7 +622,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                                       Column(
                                         children: [
                                           Text(
-                                            'R\$ ${_formatarNumero(subtotal)}',
+                                            'R\$ ${_formatarPreco(subtotal)}',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Color(0xFF10B981),
@@ -875,7 +881,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                                                       borderRadius: BorderRadius.circular(6),
                                                     ),
                                                     child: Text(
-                                                      'R\$ ${_formatarNumero(preco)}',
+                                                      'R\$ ${_formatarPreco(preco)}',
                                                       style: const TextStyle(
                                                         fontSize: 12,
                                                         fontWeight: FontWeight.bold,
@@ -946,7 +952,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
                         Text(
-                          'R\$ ${_formatarNumero(_calcularTotal())}',
+                          'R\$ ${_formatarPreco(_calcularTotal())}',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,

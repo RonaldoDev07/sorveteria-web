@@ -38,6 +38,12 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
     return numero.toStringAsFixed(3).replaceAll(RegExp(r'\.?0+$'), '');
   }
 
+  String _formatarPreco(dynamic valor) {
+    if (valor == null) return '0,00';
+    final numero = double.parse(valor.toString());
+    return numero.toStringAsFixed(2).replaceAll('.', ',');
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -361,7 +367,7 @@ _isLoading
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        'R\$ ${_formatarNumero(produto['preco_venda'])}',
+                                        'R\$ ${_formatarPreco(produto['preco_venda'])}',
                                         style: const TextStyle(
                                           color: Color(0xFF10B981),
                                           fontSize: 12,
