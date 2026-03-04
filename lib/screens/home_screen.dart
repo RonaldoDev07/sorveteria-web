@@ -372,10 +372,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     
                     return GridView.count(
                       crossAxisCount: crossAxisCount,
-                      padding: const EdgeInsets.all(12),
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 1.15, // Mais largo que alto
+                      padding: const EdgeInsets.all(8),
+                      mainAxisSpacing: 6,
+                      crossAxisSpacing: 6,
+                      childAspectRatio: 1.25, // Mais largo que alto
                       children: cards,
                     );
                   },
@@ -424,7 +424,7 @@ class _MenuCardState extends State<_MenuCard> {
         curve: Curves.easeInOut,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
               colors: [
                 widget.color,
@@ -436,8 +436,8 @@ class _MenuCardState extends State<_MenuCard> {
             boxShadow: [
               BoxShadow(
                 color: widget.color.withOpacity(0.25),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -445,36 +445,36 @@ class _MenuCardState extends State<_MenuCard> {
             color: Colors.transparent,
             child: InkWell(
               onTap: widget.onTap,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               splashColor: Colors.white.withOpacity(0.1),
               highlightColor: Colors.white.withOpacity(0.05),
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         widget.emoji,
-                        style: const TextStyle(fontSize: 28),
+                        style: const TextStyle(fontSize: 22),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 5),
                     Text(
                       widget.title,
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 10,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
-                        height: 1.2,
+                        height: 1.1,
                       ),
                     ),
                   ],
