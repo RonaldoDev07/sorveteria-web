@@ -63,19 +63,26 @@ class FornecedorService {
   /// Cria um novo fornecedor
   Future<Fornecedor> criarFornecedor(Fornecedor fornecedor) async {
     try {
+      print('📤 Enviando para API: ${json.encode(fornecedor.toJson())}');
+      
       final response = await http.post(
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode(fornecedor.toJson()),
       );
 
+      print('📥 Status: ${response.statusCode}');
+      print('📥 Response: ${utf8.decode(response.bodyBytes)}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Fornecedor.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       } else {
         final error = json.decode(utf8.decode(response.bodyBytes));
-        throw Exception(error['detail'] ?? 'Erro ao criar fornecedor');
+        print('❌ Erro do backend: $error');
+        throw Exception(error['detail'] ?? error['message'] ?? 'Erro ao criar fornecedor');
       }
     } catch (e) {
+      print('❌ Exceção: $e');
       throw Exception('Erro ao criar fornecedor: $e');
     }
   }

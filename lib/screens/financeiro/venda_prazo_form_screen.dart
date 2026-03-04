@@ -276,8 +276,8 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
       try {
         final novoCliente = Cliente(
           nome: nomeController.text.trim(),
-          cpfCnpj: cpfCnpjController.text.trim(),
-          telefone: telefoneController.text.trim().isEmpty ? null : telefoneController.text.trim(),
+          cpfCnpj: cpfCnpjController.text.trim().replaceAll(RegExp(r'[^0-9]'), ''), // Apenas números
+          telefone: telefoneController.text.trim().isEmpty ? null : telefoneController.text.trim().replaceAll(RegExp(r'[^0-9]'), ''),
         );
         
         print('🔍 Criando cliente: ${novoCliente.toJson()}');

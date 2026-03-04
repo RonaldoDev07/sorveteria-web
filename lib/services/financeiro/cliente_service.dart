@@ -63,19 +63,26 @@ class ClienteService {
   /// Cria um novo cliente
   Future<Cliente> criarCliente(Cliente cliente) async {
     try {
+      print('📤 Enviando para API: ${json.encode(cliente.toJson())}');
+      
       final response = await http.post(
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode(cliente.toJson()),
       );
 
+      print('📥 Status: ${response.statusCode}');
+      print('📥 Response: ${utf8.decode(response.bodyBytes)}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Cliente.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       } else {
         final error = json.decode(utf8.decode(response.bodyBytes));
-        throw Exception(error['detail'] ?? 'Erro ao criar cliente');
+        print('❌ Erro do backend: $error');
+        throw Exception(error['detail'] ?? error['message'] ?? 'Erro ao criar cliente');
       }
     } catch (e) {
+      print('❌ Exceção: $e');
       throw Exception('Erro ao criar cliente: $e');
     }
   }
