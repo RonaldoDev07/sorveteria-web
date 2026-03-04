@@ -38,13 +38,22 @@ class Cliente {
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final json = <String, dynamic>{
       'nome': nome,
       'cpf_cnpj': cpfCnpj,
-      'telefone': telefone,
-      'endereco': endereco,
-      'email': email,
     };
+    
+    if (telefone != null && telefone!.isNotEmpty) {
+      json['telefone'] = telefone;
+    }
+    if (endereco != null && endereco!.isNotEmpty) {
+      json['endereco'] = endereco;
+    }
+    if (email != null && email!.isNotEmpty) {
+      json['email'] = email;
+    }
+    
+    return json;
   }
 
   Cliente copyWith({
