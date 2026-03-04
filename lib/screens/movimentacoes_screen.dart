@@ -262,17 +262,17 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                     children: [
                       // Campo de pesquisa
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         child: TextField(
                           controller: _searchController,
                           onChanged: _filtrarPorVendedor,
                           decoration: InputDecoration(
                             hintText: 'Pesquisar por pessoa...',
                             hintStyle: TextStyle(color: Colors.grey[400]),
-                            prefixIcon: const Icon(Icons.search_rounded, color: Colors.orange),
+                            prefixIcon: const Icon(Icons.search_rounded, color: Colors.orange, size: 20),
                             suffixIcon: _searchController.text.isNotEmpty
                                 ? IconButton(
-                                    icon: const Icon(Icons.clear_rounded),
+                                    icon: const Icon(Icons.clear_rounded, size: 20),
                                     onPressed: () {
                                       _searchController.clear();
                                       _filtrarPorVendedor('');
@@ -280,18 +280,18 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                   )
                                 : null,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
                             filled: true,
                             fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                         ),
                       ),
                       // Chips de período
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Row(
                           children: [
                             Expanded(
@@ -355,8 +355,8 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       // Card de resumo por vendedor
                       if (_calcularResumoVendedores().isNotEmpty) ...[
                         Container(
-                          margin: const EdgeInsets.all(16),
-                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
@@ -378,14 +378,14 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
                                       color: Colors.white.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(6),
                                     ),
-                                    child: const Icon(Icons.leaderboard_rounded, color: Colors.white, size: 20),
+                                    child: const Icon(Icons.leaderboard_rounded, color: Colors.white, size: 18),
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 10),
                                   Text(
                                     _periodoSelecionado == 'hoje' 
                                       ? 'Vendas de Hoje'
@@ -396,19 +396,19 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                           : 'Vendas do Ano',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               ..._calcularResumoVendedores().entries.map((entry) {
                                 final vendedor = entry.key;
                                 final dados = entry.value;
                                 return Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.all(12),
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.15),
                                     borderRadius: BorderRadius.circular(12),
@@ -504,7 +504,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       // Lista de movimentações
                       Expanded(
                         child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(12),
                           itemCount: _movimentacoesFiltradas.length,
                     itemBuilder: (context, index) {
                       final mov = _movimentacoesFiltradas[index];
@@ -521,14 +521,14 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
 
                       return Card(
                         elevation: 4,
-                        margin: const EdgeInsets.only(bottom: 16),
+                        margin: const EdgeInsets.only(bottom: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [cor.shade100, cor.shade50],
@@ -611,7 +611,7 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(12),
                               child: Column(
                                 children: [
                                   _buildInfoRow(

@@ -487,7 +487,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(14),
                 children: [
                   // Card Cliente e Forma de Pagamento
                   Container(
@@ -509,25 +509,25 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF10B981).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(Icons.person, color: Color(0xFF10B981), size: 24),
+                              child: const Icon(Icons.person, color: Color(0xFF10B981), size: 20),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             const Text(
                               'Cliente e Pagamento',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1F2937),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         Row(
                           children: [
                             Expanded(
@@ -666,7 +666,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   
                   // Card Produtos
                   Container(

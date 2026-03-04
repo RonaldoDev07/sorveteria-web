@@ -32,7 +32,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFF10B981), Color(0xFF34D399)],
@@ -124,7 +124,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     itemCount: carrinho.itens.length,
                     itemBuilder: (context, index) {
                       final item = carrinho.itens[index];
@@ -153,7 +153,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                           ],
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(12),
                           child: Row(
                             children: [
                               Container(
@@ -171,7 +171,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                                   size: 24,
                                 ),
                               ),
-                              const SizedBox(width: 14),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

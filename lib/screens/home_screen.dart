@@ -471,7 +471,7 @@ class _MenuCardState extends State<_MenuCard> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                         height: 1.1,
