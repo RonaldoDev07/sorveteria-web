@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../models/financeiro/fornecedor_model.dart';
@@ -8,6 +9,7 @@ import '../../services/produto_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
+import '../../utils/input_formatters.dart';
 import '../barcode_scanner_universal.dart';
 
 /// Tela de compra à vista - similar à compra a prazo mas sem parcelas

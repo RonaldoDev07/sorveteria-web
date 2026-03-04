@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/financeiro/fornecedor_model.dart';
 import '../../services/financeiro/fornecedor_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/input_formatters.dart';
 
 class FornecedorFormScreen extends StatefulWidget {
   final Fornecedor? fornecedor;
@@ -264,11 +265,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
                     ),
                     validator: _validarCnpj,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(14),
-                      _CnpjInputFormatter(),
-                    ],
+                    inputFormatters: [CnpjInputFormatter()],
                     enabled: !_isEdicao,
                   ),
                 ],
@@ -336,6 +333,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
                       fillColor: Colors.grey.shade50,
                     ),
                     keyboardType: TextInputType.phone,
+                    inputFormatters: [TelefoneInputFormatter()],
                   ),
                   const SizedBox(height: 16),
                   TextFormField(

@@ -10,6 +10,7 @@ import '../../services/produto_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
+import '../../utils/input_formatters.dart';
 import '../barcode_scanner_universal.dart';
 
 class CompraPrazoFormScreen extends StatefulWidget {
@@ -211,6 +212,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                 ),
                 style: const TextStyle(fontSize: 14),
                 keyboardType: TextInputType.number,
+                inputFormatters: [CnpjInputFormatter()],
               ),
               const SizedBox(height: 10),
               TextField(
@@ -227,6 +229,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                 ),
                 style: const TextStyle(fontSize: 14),
                 keyboardType: TextInputType.phone,
+                inputFormatters: [TelefoneInputFormatter()],
               ),
             ],
           ),

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/financeiro/cliente_model.dart';
 import '../../services/financeiro/cliente_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/input_formatters.dart';
 
 class ClienteFormScreen extends StatefulWidget {
   final Cliente? cliente;
@@ -264,11 +265,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
                     ),
                     validator: _validarCpfCnpj,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(14),
-                      _CpfCnpjInputFormatter(),
-                    ],
+                    inputFormatters: [CpfCnpjInputFormatter()],
                     enabled: !_isEdicao,
                   ),
                 ],
@@ -336,6 +333,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
                       fillColor: Colors.grey.shade50,
                     ),
                     keyboardType: TextInputType.phone,
+                    inputFormatters: [TelefoneInputFormatter()],
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
