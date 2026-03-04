@@ -918,54 +918,7 @@ _isLoading
                   ),
                 ],
               ),
-      floatingActionButton: auth.canCadastrarProduto
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Botão Cadastrar Produto
-                if (auth.isAdmin)
-                  SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: FloatingActionButton(
-                      onPressed: () async {
-                        final resultado = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const CadastroProdutoScreen(),
-                          ),
-                        );
-                        if (resultado == true) {
-                          _loadProdutos();
-                        }
-                      },
-                      heroTag: 'cadastrar_produto',
-                      backgroundColor: const Color(0xFF3B82F6),
-                      child: const Icon(Icons.add, size: 22),
-                    ),
-                  ),
-                if (auth.isAdmin) const SizedBox(height: 8),
-                // Botão Registrar Compra
-                SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ComprasMenuScreen(),
-                        ),
-                      );
-                    },
-                    heroTag: 'registrar_compra',
-                    backgroundColor: const Color(0xFF14B8A6),
-                    child: const Icon(Icons.shopping_cart, size: 22),
-                  ),
-                ),
-              ],
-            )
-          : null,
+      floatingActionButton: null,
     );
   }
 }
