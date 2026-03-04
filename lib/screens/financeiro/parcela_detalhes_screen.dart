@@ -312,6 +312,8 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                                 ),
                                 title: Text(
                                   produtoNome,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 subtitle: Text(

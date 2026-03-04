@@ -212,6 +212,8 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                                       ),
                                       title: Text(
                                         compra.fornecedor?.nome ?? 'Fornecedor',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(fontWeight: FontWeight.bold),
                                       ),
                                       subtitle: Column(

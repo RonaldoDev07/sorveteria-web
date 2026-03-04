@@ -212,6 +212,8 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                                       ),
                                       title: Text(
                                         venda.cliente?.nome ?? 'Cliente',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(fontWeight: FontWeight.bold),
                                       ),
                                       subtitle: Column(

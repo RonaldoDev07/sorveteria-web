@@ -251,6 +251,8 @@ class _ClientesScreenState extends State<ClientesScreen> {
                                   fontSize: 16,
                                   color: Color(0xFF1F2937),
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 8),

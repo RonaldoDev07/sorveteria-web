@@ -381,6 +381,8 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                                       children: [
                                         Text(
                                           '${parcela.tipo == 'venda' ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}',
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
@@ -398,12 +400,13 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                                             Expanded(
                                               child: Text(
                                                 parcela.nomeRelacionado,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                   color: Colors.grey.shade700,
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w500,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ],

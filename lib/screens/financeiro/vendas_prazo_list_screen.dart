@@ -253,6 +253,8 @@ class _VendaCard extends StatelessWidget {
                         children: [
                           Text(
                             venda.cliente?.nome ?? 'Cliente',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

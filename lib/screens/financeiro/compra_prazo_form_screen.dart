@@ -152,35 +152,80 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
     final resultado = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cadastrar Fornecedor'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF9333EA), Color(0xFFA855F7)],
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.business, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text(
+                'Cadastrar Fornecedor',
+                style: TextStyle(fontSize: 18),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nomeController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Nome *',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  prefixIcon: const Icon(Icons.business, color: Color(0xFF9333EA), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 textCapitalization: TextCapitalization.words,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: cnpjController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'CNPJ *',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  prefixIcon: const Icon(Icons.badge, color: Color(0xFF9333EA), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: telefoneController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Telefone',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  prefixIcon: const Icon(Icons.phone, color: Color(0xFF9333EA), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 keyboardType: TextInputType.phone,
               ),
             ],
@@ -189,15 +234,21 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+            child: const Text('Cancelar', style: TextStyle(fontSize: 14)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
+              backgroundColor: const Color(0xFF9333EA),
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 2,
             ),
-            child: const Text('Cadastrar'),
+            child: const Text('Cadastrar', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -1197,68 +1248,138 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
     final resultado = await showDialog<bool>(
       context: dialogContext,
       builder: (context) => AlertDialog(
-        title: const Text('Cadastro Rápido de Produto'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF9333EA), Color(0xFFA855F7)],
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.inventory_2, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text(
+                'Cadastro Rápido',
+                style: TextStyle(fontSize: 18),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nomeController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Nome do Produto *',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  prefixIcon: const Icon(Icons.label, color: Color(0xFF9333EA), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 textCapitalization: TextCapitalization.words,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: unidadeController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Unidade *',
-                  border: OutlineInputBorder(),
-                  hintText: 'UN, KG, L, etc',
+                  labelStyle: const TextStyle(fontSize: 14),
+                  hintText: 'UN, KG, L',
+                  hintStyle: const TextStyle(fontSize: 13),
+                  prefixIcon: const Icon(Icons.straighten, color: Color(0xFF9333EA), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 textCapitalization: TextCapitalization.characters,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: custoController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Custo *',
-                  hintText: 'Ex: 5,50',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  hintText: '5,50',
+                  hintStyle: const TextStyle(fontSize: 13),
+                  prefixIcon: const Icon(Icons.attach_money, color: Color(0xFFEF4444), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                   prefixText: 'R\$ ',
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: precoController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Preço de Venda *',
-                  hintText: 'Ex: 8,00',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  hintText: '8,00',
+                  hintStyle: const TextStyle(fontSize: 13),
+                  prefixIcon: const Icon(Icons.sell, color: Color(0xFF10B981), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                   prefixText: 'R\$ ',
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: estoqueController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Estoque Inicial',
-                  hintText: 'Ex: 10 ou 3,5',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  hintText: '10 ou 3,5',
+                  hintStyle: const TextStyle(fontSize: 13),
+                  prefixIcon: const Icon(Icons.inventory, color: Color(0xFF3B82F6), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: codigoBarrasController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Código de Barras',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(fontSize: 14),
+                  prefixIcon: const Icon(Icons.qr_code_2, color: Color(0xFF9333EA), size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  isDense: true,
                 ),
+                style: const TextStyle(fontSize: 14),
               ),
             ],
           ),
@@ -1266,15 +1387,21 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+            child: const Text('Cancelar', style: TextStyle(fontSize: 14)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
+              backgroundColor: const Color(0xFF9333EA),
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 2,
             ),
-            child: const Text('Cadastrar'),
+            child: const Text('Cadastrar', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -1543,6 +1670,8 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             ),
                             title: Text(
                               produto.nome,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                             ),
                             subtitle: Row(

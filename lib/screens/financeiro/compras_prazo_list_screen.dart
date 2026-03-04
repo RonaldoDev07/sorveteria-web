@@ -253,6 +253,8 @@ class _CompraCard extends StatelessWidget {
                         children: [
                           Text(
                             compra.fornecedor?.nome ?? 'Fornecedor',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
