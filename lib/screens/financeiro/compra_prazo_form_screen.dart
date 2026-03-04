@@ -480,7 +480,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(14),
                 children: [
                   // Card Fornecedor e Forma de Pagamento
                   Container(
@@ -495,32 +495,32 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF9333EA).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.business, color: Color(0xFF9333EA), size: 24),
+                              child: const Icon(Icons.business, color: Color(0xFF9333EA), size: 20),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             const Text(
                               'Fornecedor e Pagamento',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1F2937),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 14),
                         Row(
                           children: [
                             Expanded(
@@ -674,7 +674,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -684,18 +684,18 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF9333EA).withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(Icons.shopping_bag, color: Color(0xFF9333EA), size: 24),
+                                  child: const Icon(Icons.shopping_bag, color: Color(0xFF9333EA), size: 20),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 10),
                                 const Text(
                                   'Produtos',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF1F2937),
                                   ),
@@ -851,7 +851,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -861,18 +861,18 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     color: Colors.blue.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(Icons.calendar_month, color: Colors.blue, size: 24),
+                                  child: const Icon(Icons.calendar_month, color: Colors.blue, size: 20),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 10),
                                 const Text(
                                   'Parcelas',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF1F2937),
                                   ),
@@ -1004,25 +1004,25 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.orange.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.note, color: Colors.orange, size: 24),
+                              child: const Icon(Icons.note, color: Colors.orange, size: 20),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             const Text(
                               'Observações',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1F2937),
                               ),
@@ -1350,10 +1350,11 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
         .toList();
     
     return AlertDialog(
-      title: const Text('Adicionar Produto'),
+      contentPadding: const EdgeInsets.all(16),
+      title: const Text('Adicionar Produto', style: TextStyle(fontSize: 18)),
       content: SizedBox(
         width: double.maxFinite,
-        height: 500,
+        height: 420,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1364,35 +1365,39 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Pesquisar produto...',
-                      prefixIcon: const Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search, size: 20),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       filled: true,
                       fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      isDense: true,
                     ),
                     onChanged: (value) {
                       setState(() => _filtroProduto = value.toLowerCase());
                     },
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 Tooltip(
                   message: 'Cadastrar novo produto',
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.purple,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: IconButton(
                       onPressed: () => _cadastrarProdutoRapido(context),
-                      icon: const Icon(Icons.add_circle, color: Colors.white, size: 28),
+                      icon: const Icon(Icons.add_circle, color: Colors.white, size: 24),
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             
             // CAMPO DE CÓDIGO DE BARRAS COM BOTÃO SCANNER
             Row(
@@ -1402,10 +1407,10 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                     controller: _codigoBarrasController,
                     decoration: InputDecoration(
                       hintText: 'Código de barras...',
-                      prefixIcon: const Icon(Icons.qr_code_scanner),
+                      prefixIcon: const Icon(Icons.qr_code_scanner, size: 20),
                       suffixIcon: _codigoBarrasController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear),
+                              icon: const Icon(Icons.clear, size: 18),
                               onPressed: () {
                                 _codigoBarrasController.clear();
                                 setState(() {});
@@ -1413,10 +1418,12 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             )
                           : null,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       filled: true,
                       fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      isDense: true,
                     ),
                     onChanged: (value) {
                       if (value.isNotEmpty) {
@@ -1443,13 +1450,13 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                     },
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 Tooltip(
                   message: 'Escanear código de barras',
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.purple,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: IconButton(
                       onPressed: () async {
@@ -1501,13 +1508,15 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                           ),
                         );
                       },
-                      icon: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
+                      icon: const Icon(Icons.camera_alt, color: Colors.white, size: 24),
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             
             // LISTA DE PRODUTOS
             Expanded(
@@ -1520,20 +1529,22 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                         final isSelected = _produtoSelecionado?.id == produto.id;
                         
                         return Card(
-                          margin: const EdgeInsets.only(bottom: 8),
+                          margin: const EdgeInsets.only(bottom: 6),
                           color: isSelected ? Colors.purple.shade50 : null,
                           child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             leading: Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: Colors.purple,
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Icon(Icons.inventory_2, color: Colors.white, size: 20),
+                              child: const Icon(Icons.inventory_2, color: Colors.white, size: 18),
                             ),
                             title: Text(
                               produto.nome,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                             subtitle: Row(
                               children: [
@@ -1585,12 +1596,12 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                     ),
             ),
             
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             
             // PRODUTO SELECIONADO
             if (_produtoSelecionado != null) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.purple.shade50,
                   borderRadius: BorderRadius.circular(8),
@@ -1600,8 +1611,8 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Selecionado: ${_produtoSelecionado!.nome}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      _produtoSelecionado!.nome,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -1610,11 +1621,13 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                           child: TextField(
                             controller: _quantidadeController,
                             decoration: const InputDecoration(
-                              labelText: 'Quantidade',
+                              labelText: 'Quantidade *',
                               hintText: 'Ex: 10',
                               border: OutlineInputBorder(),
                               isDense: true,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             ),
+                            style: const TextStyle(fontSize: 14),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
@@ -1623,12 +1636,14 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                           child: TextField(
                             controller: _valorController,
                             decoration: const InputDecoration(
-                              labelText: 'Valor',
+                              labelText: 'Valor Unitário *',
                               hintText: 'Ex: 5,50',
                               prefixText: 'R\$ ',
                               border: OutlineInputBorder(),
                               isDense: true,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             ),
+                            style: const TextStyle(fontSize: 14),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
@@ -1644,7 +1659,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Concluir'),
+          child: const Text('Cancelar'),
         ),
         ElevatedButton(
           onPressed: () {

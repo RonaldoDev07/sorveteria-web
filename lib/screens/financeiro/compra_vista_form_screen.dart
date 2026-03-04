@@ -173,7 +173,7 @@ class _CompraVistaFormScreenState extends State<CompraVistaFormScreen> {
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 children: [
                   // Fornecedor
                   DropdownButtonFormField<Fornecedor>(
@@ -225,51 +225,58 @@ class _CompraVistaFormScreenState extends State<CompraVistaFormScreen> {
                   // Produtos
                   Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Produtos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              const Text('Produtos', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                               ElevatedButton.icon(
                                 onPressed: _adicionarProduto,
-                                icon: const Icon(FinanceiroStyles.iconeAdicionar, size: 20),
-                                label: const Text('Adicionar'),
+                                icon: const Icon(FinanceiroStyles.iconeAdicionar, size: 18),
+                                label: const Text('Adicionar', style: TextStyle(fontSize: 14)),
                                 style: FinanceiroStyles.botaoComIcone(FinanceiroStyles.corCompra),
                               ),
                             ],
                           ),
                           const SizedBox(height: 8),
                           if (_itensCompra.isEmpty)
-                            const Text('Nenhum produto adicionado', style: TextStyle(color: Colors.grey))
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              child: Text('Nenhum produto adicionado', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                            )
                           else
                             ..._itensCompra.asMap().entries.map((entry) {
                               final index = entry.key;
                               final item = entry.value;
                               return ListTile(
-                                title: Text(item.produto.nome),
-                                subtitle: Text('${item.quantidade}x ${_formatoMoeda.format(item.valorUnitario)}'),
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                title: Text(item.produto.nome, style: const TextStyle(fontSize: 14)),
+                                subtitle: Text('${item.quantidade}x ${_formatoMoeda.format(item.valorUnitario)}', style: const TextStyle(fontSize: 12)),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(_formatoMoeda.format(item.subtotal), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(_formatoMoeda.format(item.subtotal), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                     IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                                      padding: const EdgeInsets.all(4),
+                                      constraints: const BoxConstraints(),
                                       onPressed: () => _removerProduto(index),
                                     ),
                                   ],
                                 ),
                               );
                             }),
-                          const Divider(),
-                          Text('Total: ${_formatoMoeda.format(_valorTotal)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const Divider(height: 16),
+                          Text('Total: ${_formatoMoeda.format(_valorTotal)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   
                   // Observações
                   TextField(
@@ -278,29 +285,30 @@ class _CompraVistaFormScreenState extends State<CompraVistaFormScreen> {
                       labelText: 'Observações',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.note),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     ),
-                    maxLines: 3,
+                    maxLines: 2,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   
                   // Botão Salvar
                   ElevatedButton(
                     onPressed: _isLoading ? null : _salvar,
                     style: FinanceiroStyles.botaoPrimario(FinanceiroStyles.corCompra).copyWith(
-                      padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 16)),
+                      padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 14)),
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
+                            height: 18,
+                            width: 18,
                             child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
                           )
                         : const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(FinanceiroStyles.iconeSalvar, size: 22),
+                              Icon(FinanceiroStyles.iconeSalvar, size: 20),
                               SizedBox(width: 8),
-                              Text('Registrar Compra à Vista', style: TextStyle(fontSize: 17)),
+                              Text('Registrar Compra à Vista', style: TextStyle(fontSize: 16)),
                             ],
                           ),
                   ),
@@ -328,10 +336,12 @@ class _ItemCompra {
 class _DialogAdicionarProduto extends StatefulWidget {
   final List<Produto> produtos;
   final Function(Produto, int, double) onAdicionar;
+  final Produto? produtoInicial;
 
   const _DialogAdicionarProduto({
     required this.produtos,
     required this.onAdicionar,
+    this.produtoInicial,
   });
 
   @override
@@ -342,57 +352,397 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
   Produto? _produtoSelecionado;
   final _quantidadeController = TextEditingController(text: '1');
   final _valorController = TextEditingController();
+  final _codigoBarrasController = TextEditingController();
+  String _filtroProduto = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.produtoInicial != null) {
+      _produtoSelecionado = widget.produtoInicial;
+      _valorController.text = widget.produtoInicial!.preco.toStringAsFixed(2);
+    }
+  }
+
+  Future<void> _cadastrarProdutoRapido(BuildContext dialogContext) async {
+    final nomeController = TextEditingController();
+    final unidadeController = TextEditingController(text: 'UN');
+    final custoController = TextEditingController();
+    final precoController = TextEditingController();
+    final estoqueController = TextEditingController(text: '0');
+    final codigoBarrasController = TextEditingController();
+
+    final resultado = await showDialog<bool>(
+      context: dialogContext,
+      builder: (context) => AlertDialog(
+        title: const Text('Cadastro Rápido de Produto'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nomeController,
+                decoration: const InputDecoration(
+                  labelText: 'Nome do Produto *',
+                  border: OutlineInputBorder(),
+                ),
+                textCapitalization: TextCapitalization.words,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: unidadeController,
+                decoration: const InputDecoration(
+                  labelText: 'Unidade *',
+                  border: OutlineInputBorder(),
+                  hintText: 'UN, KG, L, etc',
+                ),
+                textCapitalization: TextCapitalization.characters,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: custoController,
+                decoration: const InputDecoration(
+                  labelText: 'Custo *',
+                  hintText: 'Ex: 5,50',
+                  border: OutlineInputBorder(),
+                  prefixText: 'R\$ ',
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: precoController,
+                decoration: const InputDecoration(
+                  labelText: 'Preço de Venda *',
+                  hintText: 'Ex: 8,00',
+                  border: OutlineInputBorder(),
+                  prefixText: 'R\$ ',
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: estoqueController,
+                decoration: const InputDecoration(
+                  labelText: 'Estoque Inicial',
+                  hintText: 'Ex: 10 ou 3,5',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: codigoBarrasController,
+                decoration: const InputDecoration(
+                  labelText: 'Código de Barras',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Cadastrar'),
+          ),
+        ],
+      ),
+    );
+
+    if (resultado == true) {
+      if (nomeController.text.isEmpty || 
+          unidadeController.text.isEmpty ||
+          custoController.text.isEmpty ||
+          precoController.text.isEmpty) {
+        ScaffoldMessenger.of(dialogContext).showSnackBar(
+          const SnackBar(content: Text('Preencha todos os campos obrigatórios')),
+        );
+        return;
+      }
+
+      try {
+        final authService = Provider.of<AuthService>(dialogContext, listen: false);
+        final custo = double.tryParse(custoController.text.replaceAll(',', '.')) ?? 0;
+        final preco = double.tryParse(precoController.text.replaceAll(',', '.')) ?? 0;
+        final estoque = double.tryParse(estoqueController.text) ?? 0;
+
+        await ApiService.criarProduto(
+          authService.token!,
+          nomeController.text,
+          unidadeController.text,
+          custo,
+          preco,
+          estoque,
+          codigoBarras: codigoBarrasController.text.isEmpty ? null : codigoBarrasController.text,
+        );
+
+        if (mounted) {
+          ScaffoldMessenger.of(dialogContext).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Produto cadastrado!'),
+              backgroundColor: Colors.purple,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          Navigator.pop(dialogContext);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(dialogContext).showSnackBar(
+            SnackBar(
+              content: Text('Erro ao cadastrar produto: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final produtosFiltrados = widget.produtos
+        .where((produto) => 
+            _filtroProduto.isEmpty || 
+            produto.nome.toLowerCase().contains(_filtroProduto))
+        .toList();
+    
     return AlertDialog(
-      title: const Text('Adicionar Produto'),
-      content: SingleChildScrollView(
+      contentPadding: const EdgeInsets.all(16),
+      title: const Text('Adicionar Produto', style: TextStyle(fontSize: 18)),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 420,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            DropdownButtonFormField<Produto>(
-              value: _produtoSelecionado,
-              decoration: const InputDecoration(
-                labelText: 'Produto *',
-                border: OutlineInputBorder(),
+            // CAMPO DE PESQUISA
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Pesquisar produto...',
+                      prefixIcon: const Icon(Icons.search, size: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      isDense: true,
+                    ),
+                    onChanged: (value) {
+                      setState(() => _filtroProduto = value.toLowerCase());
+                    },
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Tooltip(
+                  message: 'Cadastrar novo produto',
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.purple,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      onPressed: () => _cadastrarProdutoRapido(context),
+                      icon: const Icon(Icons.add_circle, color: Colors.white, size: 24),
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            
+            // CAMPO DE CÓDIGO DE BARRAS
+            TextField(
+              controller: _codigoBarrasController,
+              decoration: InputDecoration(
+                hintText: 'Código de barras...',
+                prefixIcon: const Icon(Icons.qr_code_scanner, size: 20),
+                suffixIcon: _codigoBarrasController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          _codigoBarrasController.clear();
+                          setState(() {});
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                isDense: true,
               ),
-              items: widget.produtos.map((produto) {
-                return DropdownMenuItem(
-                  value: produto,
-                  child: Text(produto.nome),
-                );
-              }).toList(),
               onChanged: (value) {
-                setState(() {
-                  _produtoSelecionado = value;
-                  if (value != null) {
-                    _valorController.text = value.preco.toStringAsFixed(2);
+                if (value.isNotEmpty) {
+                  final produtoEncontrado = widget.produtos.firstWhere(
+                    (p) => p.codigoBarras == value,
+                    orElse: () => widget.produtos.first,
+                  );
+                  
+                  if (produtoEncontrado.codigoBarras == value) {
+                    setState(() {
+                      _produtoSelecionado = produtoEncontrado;
+                      _valorController.text = produtoEncontrado.preco.toStringAsFixed(2);
+                      _filtroProduto = '';
+                    });
                   }
-                });
+                }
               },
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _quantidadeController,
-              decoration: const InputDecoration(
-                labelText: 'Quantidade *',
-                hintText: 'Ex: 10 ou 3,5',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            const SizedBox(height: 10),
+            
+            // LISTA DE PRODUTOS
+            Expanded(
+              child: produtosFiltrados.isEmpty
+                  ? const Center(child: Text('Nenhum produto encontrado'))
+                  : ListView.builder(
+                      itemCount: produtosFiltrados.length,
+                      itemBuilder: (context, index) {
+                        final produto = produtosFiltrados[index];
+                        final isSelected = _produtoSelecionado?.id == produto.id;
+                        
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          color: isSelected ? Colors.purple.shade50 : null,
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            leading: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.purple,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(Icons.inventory_2, color: Colors.white, size: 18),
+                            ),
+                            title: Text(
+                              produto.nome,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.shade100,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    '${produto.quantidade} UN',
+                                    style: TextStyle(
+                                      color: Colors.orange.shade900,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.purple.shade100,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    'R\$ ${produto.preco.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color: Colors.purple.shade900,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: isSelected 
+                                ? const Icon(Icons.check_circle, color: Colors.purple)
+                                : const Icon(Icons.arrow_forward_ios, size: 16),
+                            onTap: () {
+                              setState(() {
+                                _produtoSelecionado = produto;
+                                _valorController.text = produto.preco.toStringAsFixed(2);
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _valorController,
-              decoration: const InputDecoration(
-                labelText: 'Valor Unitário *',
-                hintText: 'Ex: 5,50',
-                border: OutlineInputBorder(),
-                prefixText: 'R\$ ',
+            
+            const SizedBox(height: 10),
+            
+            // PRODUTO SELECIONADO
+            if (_produtoSelecionado != null) ...[
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.purple),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _produtoSelecionado!.nome,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _quantidadeController,
+                            decoration: const InputDecoration(
+                              labelText: 'Quantidade *',
+                              hintText: 'Ex: 10',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                            ),
+                            style: const TextStyle(fontSize: 14),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _valorController,
+                            decoration: const InputDecoration(
+                              labelText: 'Valor Unitário *',
+                              hintText: 'Ex: 5,50',
+                              prefixText: 'R\$ ',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                            ),
+                            style: const TextStyle(fontSize: 14),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
+            ],
           ],
         ),
       ),
@@ -403,33 +753,52 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
         ),
         ElevatedButton(
           onPressed: () {
-            if (_produtoSelecionado == null ||
-                _quantidadeController.text.isEmpty ||
-                _valorController.text.isEmpty) {
+            if (_produtoSelecionado == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Preencha todos os campos')),
+                const SnackBar(
+                  content: Text('Selecione um produto'),
+                  duration: Duration(seconds: 2),
+                ),
               );
               return;
             }
-
+            
             final quantidade = int.tryParse(_quantidadeController.text) ?? 0;
             final valor = double.tryParse(_valorController.text.replaceAll(',', '.')) ?? 0;
-
+            
             if (quantidade <= 0 || valor <= 0) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Quantidade e valor devem ser maiores que zero')),
+                const SnackBar(
+                  content: Text('Quantidade e valor devem ser maiores que zero'),
+                  duration: Duration(seconds: 2),
+                ),
               );
               return;
             }
-
+            
             widget.onAdicionar(_produtoSelecionado!, quantidade, valor);
-            Navigator.pop(context);
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('✅ ${_produtoSelecionado!.nome} adicionado!'),
+                duration: const Duration(seconds: 1),
+                backgroundColor: Colors.purple,
+              ),
+            );
+            
+            setState(() {
+              _produtoSelecionado = null;
+              _quantidadeController.text = '1';
+              _valorController.clear();
+              _codigoBarrasController.clear();
+              _filtroProduto = '';
+            });
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.purple,
             foregroundColor: Colors.white,
           ),
-          child: const Text('Adicionar'),
+          child: const Text('Adicionar Outro'),
         ),
       ],
     );
