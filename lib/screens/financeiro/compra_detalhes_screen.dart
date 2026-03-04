@@ -240,56 +240,89 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
               ),
               const SizedBox(height: 8),
               ..._compra.produtos!.map((produto) {
-                // Acessar como Map para evitar erro de tipo
-                final produtoMap = produto as Map<String, dynamic>;
-                final produtoId = produtoMap['produto_id']?.toString() ?? 'N/A';
-                
-                // Tentar pegar o nome do produto
-                final produtoNome = produtoMap['produto_nome']?.toString() ?? 
-                                   produtoMap['produtoNome']?.toString() ?? 
-                                   produtoMap['nome']?.toString() ??
-                                   'Produto #$produtoId';
-                
-                final quantidade = produtoMap['quantidade'] ?? 0;
-                final valorUnitario = _toDouble(produtoMap['valor_unitario']);
-                final subtotal = _toDouble(produtoMap['subtotal']);
-                
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: Colors.purple,
-                      child: Icon(Icons.inventory, color: Colors.white, size: 20),
-                    ),
-                    title: Text(
-                      produtoNome,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      'Quantidade: $quantidade un.\n'
-                      'Valor unitário: ${formatoMoeda.format(valorUnitario)}',
-                    ),
-                    isThreeLine: true,
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text(
-                          'Subtotal',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                        Text(
-                          formatoMoeda.format(subtotal),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.purple,
+                try {
+                  // Acessar como Map para evitar erro de tipo
+                  final produtoMap = produto as Map<String, dynamic>;
+                  
+                  // Debug: imprimir estrutura do produto
+                  print('🔍 Produto da compra recebido: $produtoMap');
+                  
+                  final produtoId = produtoMap['produto_id']?.toString() ?? 
+                                   produtoMap['produtoId']?.toString() ?? 
+                                   produtoMap['id']?.toString() ??
+                                   'N/A';
+                  
+                  // Tentar pegar o nome do produto de várias formas possíveis
+                  final produtoNome = produtoMap['produto_nome']?.toString() ?? 
+                                     produtoMap['produtoNome']?.toString() ?? 
+                                     produtoMap['nome']?.toString() ??
+                                     produtoMap['produto']?.toString() ??
+                                     produtoMap['name']?.toString() ??
+                                     (produtoMap['produto_info'] != null ? 
+                                       (produtoMap['produto_info'] as Map<String, dynamic>)['nome']?.toString() : null) ??
+                                     'Produto ID: $produtoId';
+                  
+                  final quantidade = produtoMap['quantidade'] ?? 0;
+                  final valorUnitario = _toDouble(
+                    produtoMap['valor_unitario'] ?? 
+                    produtoMap['valorUnitario'] ??
+                    produtoMap['preco_unitario'] ??
+                    produtoMap['precoUnitario']
+                  );
+                  final subtotal = _toDouble(produtoMap['subtotal']);
+                  
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: ListTile(
+                      leading: const CircleAvatar(
+                        backgroundColor: Colors.purple,
+                        child: Icon(Icons.inventory, color: Colors.white, size: 20),
+                      ),
+                      title: Text(
+                        produtoNome,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        'ID: $produtoId\n'
+                        'Quantidade: $quantidade un.\n'
+                        'Valor unitário: ${formatoMoeda.format(valorUnitario)}',
+                      ),
+                      isThreeLine: true,
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'Subtotal',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
-                        ),
-                      ],
+                          Text(
+                            formatoMoeda.format(subtotal),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.purple,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } catch (e) {
+                  print('❌ Erro ao processar produto da compra: $e');
+                  print('📄 Produto data: $produto');
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: ListTile(
+                      leading: const CircleAvatar(
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.error, color: Colors.white, size: 20),
+                      ),
+                      title: const Text('Erro ao carregar produto'),
+                      subtitle: Text('Detalhes: $e'),
+                    ),
+                  );
+                }
               }),
             ],
 

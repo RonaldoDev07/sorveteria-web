@@ -44,6 +44,9 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     });
 
     try {
+      print('🔄 Carregando parcelas...');
+      print('📋 Filtros: tipo=$_filtroTipo, status=$_filtroStatus');
+      
       final parcelas = await _parcelaService!.listarParcelas(
         tipo: _filtroTipo,
         status: _filtroStatus,
@@ -51,15 +54,20 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       
       if (!mounted) return;
       
+      print('✅ Parcelas carregadas: ${parcelas.length}');
+      
       setState(() {
         _parcelas = parcelas;
         _isLoading = false;
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ Erro ao carregar parcelas: $e');
+      print('📍 Stack trace: $stackTrace');
+      
       if (!mounted) return;
       
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = 'Erro ao carregar parcelas: ${e.toString().replaceAll('Exception: ', '')}';
         _isLoading = false;
       });
     }

@@ -38,20 +38,35 @@ class Parcela {
   });
 
   factory Parcela.fromJson(Map<String, dynamic> json) {
-    return Parcela(
-      id: json['id'],
-      tipo: json['tipo'],
-      referenciaId: json['referenciaId'] ?? json['referencia_id'],
-      numeroParcela: json['numeroParcela'] ?? json['numero_parcela'],
-      valorParcela: _toDouble(json['valorParcela'] ?? json['valor_parcela']),
-      valorPago: _toDouble(json['valorPago'] ?? json['valor_pago']),
-      dataVencimento: DateTime.parse(json['dataVencimento'] ?? json['data_vencimento']),
-      status: json['status'],
-      createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
-      updatedAt: DateTime.parse(json['updatedAt'] ?? json['updated_at']),
-      clienteNome: json['clienteNome'] ?? json['cliente_nome'],
-      fornecedorNome: json['fornecedorNome'] ?? json['fornecedor_nome'],
-    );
+    try {
+      // Debug: imprimir dados recebidos
+      print('🔍 Parcela JSON recebido: $json');
+      
+      return Parcela(
+        id: json['id'],
+        tipo: json['tipo'],
+        referenciaId: json['referenciaId'] ?? json['referencia_id'],
+        numeroParcela: json['numeroParcela'] ?? json['numero_parcela'],
+        valorParcela: _toDouble(json['valorParcela'] ?? json['valor_parcela']),
+        valorPago: _toDouble(json['valorPago'] ?? json['valor_pago']),
+        dataVencimento: DateTime.parse(json['dataVencimento'] ?? json['data_vencimento']),
+        status: json['status'],
+        createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
+        updatedAt: DateTime.parse(json['updatedAt'] ?? json['updated_at']),
+        clienteNome: json['clienteNome'] ?? 
+                    json['cliente_nome'] ?? 
+                    (json['cliente'] != null ? json['cliente']['nome'] : null) ??
+                    (json['venda'] != null && json['venda']['cliente'] != null ? json['venda']['cliente']['nome'] : null),
+        fornecedorNome: json['fornecedorNome'] ?? 
+                       json['fornecedor_nome'] ?? 
+                       (json['fornecedor'] != null ? json['fornecedor']['nome'] : null) ??
+                       (json['compra'] != null && json['compra']['fornecedor'] != null ? json['compra']['fornecedor']['nome'] : null),
+      );
+    } catch (e) {
+      print('❌ Erro ao processar parcela: $e');
+      print('📄 JSON da parcela: $json');
+      rethrow;
+    }
   }
 
   double get saldoRestante => valorParcela - valorPago;

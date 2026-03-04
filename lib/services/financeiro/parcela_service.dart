@@ -28,6 +28,9 @@ class ParcelaService {
     int limit = 100,
   }) async {
     try {
+      print('🔄 Listando parcelas...');
+      print('📋 Parâmetros: tipo=$tipo, status=$status, referenciaId=$referenciaId');
+      
       final queryParams = <String, String>{
         'skip': skip.toString(),
         'limit': limit.toString(),
@@ -41,16 +44,35 @@ class ParcelaService {
       }
 
       final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParams);
+      print('🌐 URL: $uri');
+      
       final response = await http.get(uri, headers: _headers);
+      print('📡 Status da resposta: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        return data.map((json) => Parcela.fromJson(json)).toList();
+        print('✅ Parcelas recebidas: ${data.length}');
+        
+        return data.map((json) {
+          try {
+            return Parcela.fromJson(json);
+          } catch (e) {
+            print('❌ Erro ao processar parcela: $e');
+            print('📄 Dados da parcela: $json');
+            rethrow;
+          }
+        }).toList();
       } else {
-        throw Exception('Erro ao listar parcelas: ${response.statusCode}');
+        final errorBody = utf8.decode(response.bodyBytes);
+        print('❌ Erro na API: ${response.statusCode} - $errorBody');
+        throw Exception('Erro ${response.statusCode}: Falha ao listar parcelas');
       }
     } catch (e) {
-      throw Exception('Erro ao conectar com a API: $e');
+      print('❌ Erro em listarParcelas: $e');
+      if (e.toString().contains('SocketException') || e.toString().contains('TimeoutException')) {
+        throw Exception('Erro de conexão. Verifique sua internet.');
+      }
+      throw Exception('Erro ao listar parcelas: $e');
     }
   }
 

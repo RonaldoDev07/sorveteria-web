@@ -289,6 +289,12 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                                              produtoMap['produtoId']?.toString() ?? 
                                              'N/A';
                             
+                            // Tentar pegar o nome do produto
+                            final produtoNome = produtoMap['produtoNome']?.toString() ?? 
+                                               produtoMap['produto_nome']?.toString() ?? 
+                                               produtoMap['nome']?.toString() ??
+                                               'Produto #$produtoId';
+                            
                             final quantidade = produtoMap['quantidade'] ?? 0;
                             
                             final valorUnitario = _toDouble(
@@ -304,7 +310,10 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                                   backgroundColor: Colors.blue,
                                   child: Icon(Icons.shopping_bag, color: Colors.white, size: 20),
                                 ),
-                                title: Text('Produto #$produtoId'),
+                                title: Text(
+                                  produtoNome,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
                                 subtitle: Text(
                                   'Quantidade: $quantidade un.\n'
                                   'Valor unitário: ${formatoMoeda.format(valorUnitario)}',

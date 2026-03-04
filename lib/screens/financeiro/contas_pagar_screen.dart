@@ -48,23 +48,32 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
     });
 
     try {
+      print('🔄 Carregando contas a pagar...');
       final resultado = await _relatorioService!.contasPagar(status: _filtroStatus);
       
       if (!mounted) return;
       
+      print('✅ Dados recebidos: ${resultado.keys}');
+      print('📊 Total compras: ${(resultado['compras'] as List).length}');
+      
       setState(() {
         _compras = resultado['compras'] as List<CompraPrazo>;
-        _totalAPagar = resultado['total_a_pagar'];
-        _totalPago = resultado['total_pago'];
-        _totalEmAberto = resultado['total_em_aberto'];
-        _contasAtrasadas = resultado['contas_atrasadas'];
+        _totalAPagar = resultado['total_a_pagar'] ?? 0.0;
+        _totalPago = resultado['total_pago'] ?? 0.0;
+        _totalEmAberto = resultado['total_em_aberto'] ?? 0.0;
+        _contasAtrasadas = resultado['contas_atrasadas'] ?? 0;
         _isLoading = false;
       });
-    } catch (e) {
+      
+      print('✅ Contas a pagar carregadas: ${_compras.length} compras');
+    } catch (e, stackTrace) {
+      print('❌ Erro ao carregar contas a pagar: $e');
+      print('📍 Stack trace: $stackTrace');
+      
       if (!mounted) return;
       
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = 'Erro ao carregar dados: ${e.toString().replaceAll('Exception: ', '')}';
         _isLoading = false;
       });
     }

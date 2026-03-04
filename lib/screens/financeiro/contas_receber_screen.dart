@@ -48,23 +48,32 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
     });
 
     try {
+      print('🔄 Carregando contas a receber...');
       final resultado = await _relatorioService!.contasReceber(status: _filtroStatus);
       
       if (!mounted) return;
       
+      print('✅ Dados recebidos: ${resultado.keys}');
+      print('📊 Total vendas: ${(resultado['vendas'] as List).length}');
+      
       setState(() {
         _vendas = resultado['vendas'] as List<VendaPrazo>;
-        _totalAReceber = resultado['total_a_receber'];
-        _totalRecebido = resultado['total_recebido'];
-        _totalEmAberto = resultado['total_em_aberto'];
-        _contasAtrasadas = resultado['contas_atrasadas'];
+        _totalAReceber = resultado['total_a_receber'] ?? 0.0;
+        _totalRecebido = resultado['total_recebido'] ?? 0.0;
+        _totalEmAberto = resultado['total_em_aberto'] ?? 0.0;
+        _contasAtrasadas = resultado['contas_atrasadas'] ?? 0;
         _isLoading = false;
       });
-    } catch (e) {
+      
+      print('✅ Contas a receber carregadas: ${_vendas.length} vendas');
+    } catch (e, stackTrace) {
+      print('❌ Erro ao carregar contas a receber: $e');
+      print('📍 Stack trace: $stackTrace');
+      
       if (!mounted) return;
       
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = 'Erro ao carregar dados: ${e.toString().replaceAll('Exception: ', '')}';
         _isLoading = false;
       });
     }

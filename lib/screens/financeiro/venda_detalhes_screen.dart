@@ -263,22 +263,33 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                   // Acessar como Map para evitar erro de tipo
                   final produtoMap = produto as Map<String, dynamic>;
                   
+                  // Debug: imprimir estrutura do produto
+                  print('🔍 Produto recebido: $produtoMap');
+                  
                   // Tentar pegar produto_id ou produtoId
                   final produtoId = produtoMap['produto_id']?.toString() ?? 
                                    produtoMap['produtoId']?.toString() ?? 
+                                   produtoMap['id']?.toString() ??
                                    'N/A';
                   
-                  // Tentar pegar o nome do produto
+                  // Tentar pegar o nome do produto de várias formas possíveis
                   final produtoNome = produtoMap['produto_nome']?.toString() ?? 
                                      produtoMap['produtoNome']?.toString() ?? 
                                      produtoMap['nome']?.toString() ??
-                                     'Produto #$produtoId';
+                                     produtoMap['produto']?.toString() ??
+                                     produtoMap['name']?.toString() ??
+                                     (produtoMap['produto_info'] != null ? 
+                                       (produtoMap['produto_info'] as Map<String, dynamic>)['nome']?.toString() : null) ??
+                                     'Produto ID: $produtoId';
                   
                   final quantidade = produtoMap['quantidade'] ?? 0;
                   
                   // Tentar pegar valor_unitario ou valorUnitario
                   final valorUnitario = _toDouble(
-                    produtoMap['valor_unitario'] ?? produtoMap['valorUnitario']
+                    produtoMap['valor_unitario'] ?? 
+                    produtoMap['valorUnitario'] ??
+                    produtoMap['preco_unitario'] ??
+                    produtoMap['precoUnitario']
                   );
                   
                   final subtotal = _toDouble(produtoMap['subtotal']);
@@ -295,6 +306,7 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
+                        'ID: $produtoId\n'
                         'Quantidade: $quantidade un.\n'
                         'Valor unitário: ${formatoMoeda.format(valorUnitario)}',
                       ),
@@ -320,8 +332,8 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                     ),
                   );
                 } catch (e) {
-                  print('Erro ao processar produto: $e');
-                  print('Produto data: $produto');
+                  print('❌ Erro ao processar produto: $e');
+                  print('📄 Produto data: $produto');
                   return Card(
                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: ListTile(
