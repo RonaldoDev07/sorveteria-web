@@ -65,40 +65,42 @@ class FotoPerfilWidget extends StatelessWidget {
       showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         builder: (context) => Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 40,
-                height: 4,
+                width: 32,
+                height: 3,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               const Text(
                 'Foto de Perfil',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 leading: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: const Color(0xFFE91E63).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.photo_library_rounded, color: Color(0xFFE91E63)),
+                  child: const Icon(Icons.photo_library_rounded, color: Color(0xFFE91E63), size: 20),
                 ),
-                title: const Text('Escolher da galeria'),
+                title: const Text('Escolher da galeria', style: TextStyle(fontSize: 13)),
                 onTap: () {
                   Navigator.pop(context);
                   _selecionarFotoWeb(context);
@@ -106,21 +108,23 @@ class FotoPerfilWidget extends StatelessWidget {
               ),
               if (auth.fotoUrl != null)
                 ListTile(
+                  dense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   leading: Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.delete_rounded, color: Colors.red),
+                    child: const Icon(Icons.delete_rounded, color: Colors.red, size: 20),
                   ),
-                  title: const Text('Remover foto'),
+                  title: const Text('Remover foto', style: TextStyle(fontSize: 13)),
                   onTap: () {
                     Navigator.pop(context);
                     _removerFoto(context);
                   },
                 ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
             ],
           ),
         ),

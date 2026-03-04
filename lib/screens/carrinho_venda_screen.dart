@@ -222,32 +222,37 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
           final troco = valorPago - valorTotal;
           
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            title: const Text('Finalizar Venda'),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            contentPadding: const EdgeInsets.all(16),
+            title: const Text('Finalizar Venda', style: TextStyle(fontSize: 16)),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Total de itens: ${_carrinho.length}'),
-                  const SizedBox(height: 8),
+                  Text('Total de itens: ${_carrinho.length}', style: const TextStyle(fontSize: 12)),
+                  const SizedBox(height: 6),
                   Text(
                     'Valor total: R\$ ${_formatarNumero(valorTotal)}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     value: formaPagamento,
+                    style: const TextStyle(fontSize: 13, color: Colors.black),
                     decoration: const InputDecoration(
                       labelText: 'Forma de Pagamento',
+                      labelStyle: TextStyle(fontSize: 12),
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.payment),
+                      prefixIcon: Icon(Icons.payment, size: 18),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      isDense: true,
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'DINHEIRO', child: Text('💵 Dinheiro')),
-                      DropdownMenuItem(value: 'PIX', child: Text('📱 PIX')),
-                      DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Cartão de Crédito')),
-                      DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Cartão de Débito')),
+                      DropdownMenuItem(value: 'DINHEIRO', child: Text('💵 Dinheiro', style: TextStyle(fontSize: 12))),
+                      DropdownMenuItem(value: 'PIX', child: Text('📱 PIX', style: TextStyle(fontSize: 12))),
+                      DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Crédito', style: TextStyle(fontSize: 12))),
+                      DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Débito', style: TextStyle(fontSize: 12))),
                     ],
                     onChanged: (value) {
                       if (value != null) {
@@ -256,25 +261,29 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                     },
                   ),
                   if (formaPagamento == 'DINHEIRO') ...[
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     TextField(
                       controller: valorPagoController,
+                      style: const TextStyle(fontSize: 13),
                       decoration: const InputDecoration(
                         labelText: 'Valor Pago',
+                        labelStyle: TextStyle(fontSize: 12),
                         border: OutlineInputBorder(),
                         prefixText: 'R\$ ',
-                        prefixIcon: Icon(Icons.attach_money),
+                        prefixIcon: Icon(Icons.attach_money, size: 18),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        isDense: true,
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (_) => setDialogState(() {}),
                     ),
                     if (valorPago > 0) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: troco >= 0 ? Colors.blue.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                           border: Border.all(
                             color: troco >= 0 ? Colors.blue : Colors.red,
                             width: 2,
@@ -286,7 +295,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                             Text(
                               'Troco:',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
                               ),
@@ -294,7 +303,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                             Text(
                               'R\$ ${_formatarNumero(troco.abs())}',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
                               ),
@@ -304,23 +313,24 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
                       ),
                     ],
                   ],
-                  const SizedBox(height: 16),
-                  const Text('Confirma a venda?'),
+                  const SizedBox(height: 12),
+                  const Text('Confirma a venda?', style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
+                child: const Text('Cancelar', style: TextStyle(fontSize: 12)),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF10B981),
                   foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
-                child: const Text('Confirmar Venda'),
+                child: const Text('Confirmar', style: TextStyle(fontSize: 12)),
               ),
             ],
           );

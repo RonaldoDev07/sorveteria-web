@@ -211,29 +211,30 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          contentPadding: const EdgeInsets.all(16),
           title: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF8C00).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.tune_rounded, color: Color(0xFFFF8C00), size: 24),
+                child: const Icon(Icons.tune_rounded, color: Color(0xFFFF8C00), size: 18),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Ajustar Estoque',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       produto['nome'],
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600], fontWeight: FontWeight.normal),
+                      style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.normal),
                     ),
                   ],
                 ),
@@ -246,75 +247,88 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: Colors.blue, size: 20),
-                      const SizedBox(width: 8),
+                      const Icon(Icons.info_outline, color: Colors.blue, size: 16),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           'Estoque atual: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Text('Tipo de ajuste:', style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                const Text('Tipo de ajuste:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Expanded(
                       child: RadioListTile<String>(
-                        title: const Text('Adicionar', style: TextStyle(fontSize: 14)),
+                        title: const Text('Adicionar', style: TextStyle(fontSize: 11)),
                         value: 'adicionar',
                         groupValue: tipoAjuste,
                         onChanged: (value) => setDialogState(() => tipoAjuste = value!),
                         contentPadding: EdgeInsets.zero,
+                        dense: true,
                       ),
                     ),
                     Expanded(
                       child: RadioListTile<String>(
-                        title: const Text('Remover', style: TextStyle(fontSize: 14)),
+                        title: const Text('Remover', style: TextStyle(fontSize: 11)),
                         value: 'remover',
                         groupValue: tipoAjuste,
                         onChanged: (value) => setDialogState(() => tipoAjuste = value!),
                         contentPadding: EdgeInsets.zero,
+                        dense: true,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
                 TextField(
                   controller: quantidadeController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: const TextStyle(fontSize: 13),
                   decoration: InputDecoration(
                     labelText: 'Quantidade',
+                    labelStyle: const TextStyle(fontSize: 12),
                     hintText: 'Ex: 5 ou 3,5',
+                    hintStyle: const TextStyle(fontSize: 11),
                     prefixIcon: Icon(
                       tipoAjuste == 'adicionar' ? Icons.add_rounded : Icons.remove_rounded,
                       color: tipoAjuste == 'adicionar' ? Colors.green : Colors.red,
+                      size: 18,
                     ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     filled: true,
                     fillColor: Colors.grey[50],
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    isDense: true,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
                 TextField(
                   controller: motivoController,
+                  style: const TextStyle(fontSize: 13),
                   decoration: InputDecoration(
                     labelText: 'Motivo do ajuste',
-                    hintText: 'Ex: Conversão balde para bolas, Perda, Inventário...',
-                    prefixIcon: const Icon(Icons.description_rounded, color: Colors.grey),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    labelStyle: const TextStyle(fontSize: 12),
+                    hintText: 'Ex: Conversão, Perda, Inventário...',
+                    hintStyle: const TextStyle(fontSize: 11),
+                    prefixIcon: const Icon(Icons.description_rounded, color: Colors.grey, size: 18),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     filled: true,
                     fillColor: Colors.grey[50],
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    isDense: true,
                   ),
                   maxLines: 2,
                 ),
@@ -324,16 +338,17 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
+              child: const Text('Cancelar', style: TextStyle(fontSize: 12)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF8C00),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
-              child: const Text('Ajustar Estoque'),
+              child: const Text('Ajustar', style: TextStyle(fontSize: 12)),
             ),
           ],
         ),
