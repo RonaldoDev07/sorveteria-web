@@ -43,17 +43,17 @@ class VendasMenuScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             Text(
               'Escolha o tipo de venda',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[800],
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             _TipoVendaCard(
               emoji: '💵',
               title: 'Venda à Vista',
@@ -68,7 +68,7 @@ class VendasMenuScreen extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             _TipoVendaCard(
               emoji: '📅',
               title: 'Venda a Prazo',
@@ -127,7 +127,7 @@ class _TipoVendaCardState extends State<_TipoVendaCard> {
         curve: Curves.easeInOut,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(18),
             gradient: LinearGradient(
               colors: [
                 widget.color,
@@ -138,9 +138,9 @@ class _TipoVendaCardState extends State<_TipoVendaCard> {
             ),
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
+                color: widget.color.withOpacity(0.25),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -148,25 +148,25 @@ class _TipoVendaCardState extends State<_TipoVendaCard> {
             color: Colors.transparent,
             child: InkWell(
               onTap: widget.onTap,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(18),
               splashColor: Colors.white.withOpacity(0.1),
               highlightColor: Colors.white.withOpacity(0.05),
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(18),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         widget.emoji,
-                        style: const TextStyle(fontSize: 40),
+                        style: const TextStyle(fontSize: 32),
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,17 +174,16 @@ class _TipoVendaCardState extends State<_TipoVendaCard> {
                           Text(
                             widget.title,
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 17,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
-                              letterSpacing: 0.3,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 3),
                           Text(
                             widget.subtitle,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 13,
                               color: Colors.white.withOpacity(0.9),
                               fontWeight: FontWeight.w500,
                             ),
@@ -195,7 +194,7 @@ class _TipoVendaCardState extends State<_TipoVendaCard> {
                     Icon(
                       Icons.arrow_forward_ios_rounded,
                       color: Colors.white.withOpacity(0.8),
-                      size: 24,
+                      size: 20,
                     ),
                   ],
                 ),

@@ -82,9 +82,20 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrar Venda'),
-        backgroundColor: const Color(0xFF10B981),
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Registrar Venda',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF10B981), Color(0xFF34D399)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       backgroundColor: const Color(0xFFF5F7FA),
       body: SingleChildScrollView(
@@ -95,104 +106,234 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Card do Produto
-              Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF10B981).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.produto['nome'],
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF10B981),
+                child: Card(
+                  elevation: 0,
+                  color: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.shopping_bag_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.produto['nome'],
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      'Estoque: ${_formatarNumero(widget.produto['estoque_atual'])} ${widget.produto['unidade']}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Estoque atual: ${_formatarNumero(widget.produto['estoque_atual'])} ${widget.produto['unidade']}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
               // Quantidade
-              TextFormField(
-                controller: _quantidadeController,
-                decoration: InputDecoration(
-                  labelText: 'Quantidade (Ex: 10)',
-                  hintText: 'Digite a quantidade',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  helperText: 'Quantas unidades foram vendidas',
-                  prefixIcon: const Icon(Icons.shopping_cart, color: Color(0xFF10B981)),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                onChanged: (_) => setState(() {}),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                  final valorLimpo = value!.replaceAll(',', '.');
-                  final quantidade = double.tryParse(valorLimpo);
-                  if (quantidade == null || quantidade <= 0) {
-                    return 'Quantidade inválida';
-                  }
-                  return null;
-                },
+                child: TextFormField(
+                  controller: _quantidadeController,
+                  decoration: InputDecoration(
+                    labelText: 'Quantidade (Ex: 10)',
+                    hintText: 'Digite a quantidade',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFF10B981),
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    helperText: 'Quantas unidades foram vendidas',
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.shopping_cart_rounded,
+                        color: Color(0xFF10B981),
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (_) => setState(() {}),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                    final valorLimpo = value!.replaceAll(',', '.');
+                    final quantidade = double.tryParse(valorLimpo);
+                    if (quantidade == null || quantidade <= 0) {
+                      return 'Quantidade inválida';
+                    }
+                    return null;
+                  },
+                ),
               ),
               const SizedBox(height: 16),
               // Forma de Pagamento
-              DropdownButtonFormField<String>(
-                value: _formaPagamento,
-                decoration: InputDecoration(
-                  labelText: 'Forma de Pagamento',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon: Icon(
-                    _formaPagamento == 'DINHEIRO' ? Icons.money_rounded :
-                    _formaPagamento == 'PIX' ? Icons.pix_rounded :
-                    _formaPagamento == 'DEBITO' ? Icons.credit_card_rounded :
-                    Icons.credit_score_rounded,
-                    color: const Color(0xFF10B981),
-                  ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'DINHEIRO',
-                    child: Text('💵 Dinheiro'),
+                child: DropdownButtonFormField<String>(
+                  value: _formaPagamento,
+                  decoration: InputDecoration(
+                    labelText: 'Forma de Pagamento',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFF10B981),
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        _formaPagamento == 'DINHEIRO' ? Icons.money_rounded :
+                        _formaPagamento == 'PIX' ? Icons.pix_rounded :
+                        _formaPagamento == 'DEBITO' ? Icons.credit_card_rounded :
+                        Icons.credit_score_rounded,
+                        color: const Color(0xFF10B981),
+                        size: 20,
+                      ),
+                    ),
                   ),
-                  DropdownMenuItem(
-                    value: 'PIX',
-                    child: Text('📱 PIX'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'DEBITO',
-                    child: Text('💳 Cartão Débito'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'CREDITO',
-                    child: Text('💳 Cartão Crédito'),
-                  ),
-                ],
-                onChanged: (value) => setState(() {
-                  _formaPagamento = value!;
-                  _valorPagoController.clear();
-                }),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'DINHEIRO',
+                      child: Text('💵 Dinheiro'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'PIX',
+                      child: Text('📱 PIX'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'DEBITO',
+                      child: Text('💳 Cartão Débito'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'CREDITO',
+                      child: Text('💳 Cartão Crédito'),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() {
+                    _formaPagamento = value!;
+                    _valorPagoController.clear();
+                  }),
+                ),
               ),
               // Valor Total
               if (_quantidadeController.text.isNotEmpty) ...[
@@ -205,30 +346,61 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     final valorTotal = quantidade * precoUnitario;
                     
                     return Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF10B981).withOpacity(0.1),
+                            const Color(0xFF34D399).withOpacity(0.1),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: const Color(0xFF10B981),
                           width: 2,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF10B981).withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Valor Total:',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF10B981),
-                            ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10B981),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.attach_money_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Valor Total:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF10B981),
+                                ),
+                              ),
+                            ],
                           ),
                           Text(
                             'R\$ ${_formatarNumero(valorTotal)}',
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF10B981),
                             ),
@@ -242,21 +414,61 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
               // Campo de valor pago (apenas para dinheiro)
               if (_formaPagamento == 'DINHEIRO') ...[
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _valorPagoController,
-                  decoration: InputDecoration(
-                    labelText: 'Valor Pago',
-                    hintText: 'Quanto o cliente pagou',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    prefixText: 'R\$ ',
-                    prefixIcon: const Icon(Icons.attach_money, color: Color(0xFF10B981)),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (_) => setState(() {}),
+                  child: TextFormField(
+                    controller: _valorPagoController,
+                    decoration: InputDecoration(
+                      labelText: 'Valor Pago',
+                      hintText: 'Quanto o cliente pagou',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.grey.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF10B981),
+                          width: 2,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      prefixText: 'R\$ ',
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.payments_rounded,
+                          color: Color(0xFF10B981),
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (_) => setState(() {}),
+                  ),
                 ),
                 // Troco
                 if (_valorPagoController.text.isNotEmpty) ...[
@@ -273,34 +485,78 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                       final troco = valorPago - valorTotal;
                       
                       return Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: troco >= 0 
-                              ? const Color(0xFF10B981).withOpacity(0.1) 
-                              : Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          gradient: LinearGradient(
+                            colors: troco >= 0 
+                                ? [
+                                    const Color(0xFF10B981).withOpacity(0.1),
+                                    const Color(0xFF34D399).withOpacity(0.1),
+                                  ]
+                                : [
+                                    Colors.red.withOpacity(0.1),
+                                    Colors.orange.withOpacity(0.1),
+                                  ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: troco >= 0 ? const Color(0xFF10B981) : Colors.red,
                             width: 2,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (troco >= 0 
+                                  ? const Color(0xFF10B981) 
+                                  : Colors.red).withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              troco >= 0 ? 'Troco:' : 'Falta:',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: troco >= 0 ? const Color(0xFF10B981) : Colors.red,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: troco >= 0 
+                                        ? const Color(0xFF10B981) 
+                                        : Colors.red,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    troco >= 0 
+                                        ? Icons.check_circle_rounded 
+                                        : Icons.warning_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  troco >= 0 ? 'Troco:' : 'Falta:',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: troco >= 0 
+                                        ? const Color(0xFF10B981) 
+                                        : Colors.red,
+                                  ),
+                                ),
+                              ],
                             ),
                             Text(
                               'R\$ ${_formatarNumero(troco.abs())}',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: troco >= 0 ? const Color(0xFF10B981) : Colors.red,
+                                color: troco >= 0 
+                                    ? const Color(0xFF10B981) 
+                                    : Colors.red,
                               ),
                             ),
                           ],
@@ -312,34 +568,58 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
               ],
               const SizedBox(height: 24),
               // Botão
-              SizedBox(
+              Container(
                 width: double.infinity,
-                height: 50,
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF10B981).withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleBaixa,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF10B981),
+                    backgroundColor: Colors.transparent,
                     foregroundColor: Colors.white,
+                    shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 2,
+                    elevation: 0,
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                          height: 20,
-                          width: 20,
+                          height: 24,
+                          width: 24,
                           child: CircularProgressIndicator(
                             color: Colors.white,
-                            strokeWidth: 2,
+                            strokeWidth: 3,
                           ),
                         )
-                      : const Text(
-                          'Registrar Venda',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.check_circle_rounded, size: 24),
+                            SizedBox(width: 12),
+                            Text(
+                              'Registrar Venda',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
                 ),
               ),

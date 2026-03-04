@@ -120,27 +120,15 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
       appBar: AppBar(
         title: const Text(
           'Cadastrar Produto',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
-          ),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
         elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(24),
-          ),
-        ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFF6366F1), Color(0xFF818CF8)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(24),
             ),
           ),
         ),
@@ -151,191 +139,444 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                controller: _nomeController,
-                decoration: InputDecoration(
-                  labelText: 'Nome do Produto',
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
+              // Card com ícone de destaque
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF6366F1).withOpacity(0.1),
+                      const Color(0xFF818CF8).withOpacity(0.05),
+                    ],
                   ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                ),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Campo obrigatório' : null,
-              ),
-              const SizedBox(height: 20),
-              // Campo de código de barras com botão de scanner
-              TextFormField(
-                controller: _codigoBarrasController,
-                decoration: InputDecoration(
-                  labelText: 'Código de Barras (opcional)',
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                  hintText: 'Escanear ou digitar',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.qr_code_scanner, color: Color(0xFF6366F1)),
-                    onPressed: _abrirScanner,
-                    tooltip: 'Escanear código de barras',
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF6366F1).withOpacity(0.2),
+                    width: 2,
                   ),
                 ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                value: _unidade,
-                decoration: InputDecoration(
-                  labelText: 'Unidade',
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF6366F1), Color(0xFF818CF8)],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(Icons.add_shopping_cart_rounded, color: Colors.white, size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Novo Produto',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF6366F1),
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Preencha os dados abaixo',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'UN', child: Text('Unidade (UN)')),
-                  DropdownMenuItem(value: 'KG', child: Text('Quilograma (KG)')),
-                ],
-                onChanged: (value) => setState(() => _unidade = value!),
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _custoController,
-                decoration: InputDecoration(
-                  labelText: 'Custo de Compra',
-                  hintText: 'Ex: 4,00',
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                  prefixText: 'R\$ ',
-                  prefixStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  helperText: 'Quanto você pagou pela mercadoria',
-                  helperStyle: TextStyle(color: Colors.grey[600]),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              
+              // Nome do Produto
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                  final valorLimpo = value!.replaceAll(',', '.');
-                  final custo = double.tryParse(valorLimpo);
-                  if (custo == null || custo <= 0) {
-                    return 'Custo inválido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _precoController,
-                decoration: InputDecoration(
-                  labelText: 'Preço de Venda',
-                  hintText: 'Ex: 6,00',
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                  prefixText: 'R\$ ',
-                  prefixStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                child: TextFormField(
+                  controller: _nomeController,
+                  decoration: InputDecoration(
+                    labelText: 'Nome do Produto',
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.inventory_2_rounded, color: Color(0xFF6366F1), size: 20),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  helperText: 'Quanto você vai vender',
-                  helperStyle: TextStyle(color: Colors.grey[600]),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Campo obrigatório' : null,
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                  final valorLimpo = value!.replaceAll(',', '.');
-                  final preco = double.tryParse(valorLimpo);
-                  if (preco == null || preco <= 0) {
-                    return 'Preço inválido';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 20),
-              TextFormField(
-                controller: _estoqueController,
-                decoration: InputDecoration(
-                  labelText: 'Estoque Inicial',
-                  hintText: 'Ex: 50',
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              // Código de Barras
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Campo obrigatório';
-                  final valorLimpo = value!.replaceAll(',', '.');
-                  final estoque = double.tryParse(valorLimpo);
-                  if (estoque == null || estoque < 0) {
-                    return 'Estoque inválido';
-                  }
-                  return null;
-                },
+                child: TextFormField(
+                  controller: _codigoBarrasController,
+                  decoration: InputDecoration(
+                    labelText: 'Código de Barras (opcional)',
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                    hintText: 'Escanear ou digitar',
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.qr_code_rounded, color: Color(0xFF6366F1), size: 20),
+                    ),
+                    suffixIcon: Container(
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF6366F1), Color(0xFF818CF8)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white),
+                        onPressed: _abrirScanner,
+                        tooltip: 'Escanear código de barras',
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
               ),
               const SizedBox(height: 20),
-              // Campo de validade (opcional)
+              // Unidade
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: DropdownButtonFormField<String>(
+                  value: _unidade,
+                  decoration: InputDecoration(
+                    labelText: 'Unidade',
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.straighten_rounded, color: Color(0xFF6366F1), size: 20),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'UN', child: Text('Unidade (UN)')),
+                    DropdownMenuItem(value: 'KG', child: Text('Quilograma (KG)')),
+                  ],
+                  onChanged: (value) => setState(() => _unidade = value!),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Custo
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _custoController,
+                  decoration: InputDecoration(
+                    labelText: 'Custo de Compra',
+                    hintText: 'Ex: 4,00',
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                    helperText: 'Quanto você pagou pela mercadoria',
+                    prefixText: 'R\$ ',
+                    prefixStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.shopping_cart_rounded, color: Colors.orange, size: 20),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                    final valorLimpo = value!.replaceAll(',', '.');
+                    final custo = double.tryParse(valorLimpo);
+                    if (custo == null || custo <= 0) {
+                      return 'Custo inválido';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Preço
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _precoController,
+                  decoration: InputDecoration(
+                    labelText: 'Preço de Venda',
+                    hintText: 'Ex: 6,00',
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                    helperText: 'Quanto você vai vender',
+                    prefixText: 'R\$ ',
+                    prefixStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.attach_money_rounded, color: Color(0xFF10B981), size: 20),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                    final valorLimpo = value!.replaceAll(',', '.');
+                    final preco = double.tryParse(valorLimpo);
+                    if (preco == null || preco <= 0) {
+                      return 'Preço inválido';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Estoque
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _estoqueController,
+                  decoration: InputDecoration(
+                    labelText: 'Estoque Inicial',
+                    hintText: 'Ex: 50',
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.inventory_rounded, color: Colors.blue, size: 20),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Campo obrigatório';
+                    final valorLimpo = value!.replaceAll(',', '.');
+                    final estoque = double.tryParse(valorLimpo);
+                    if (estoque == null || estoque < 0) {
+                      return 'Estoque inválido';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Data de Validade
               InkWell(
                 onTap: () async {
                   final data = await showDatePicker(
                     context: context,
                     initialDate: _dataValidade ?? DateTime.now().add(const Duration(days: 30)),
                     firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 anos
+                    lastDate: DateTime.now().add(const Duration(days: 3650)),
                     locale: const Locale('pt', 'BR'),
-                    helpText: 'Selecionar data de validade',
-                    cancelText: 'Cancelar',
-                    confirmText: 'OK',
                   );
                   if (data != null) {
                     setState(() => _dataValidade = data);
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade300),
+                    border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.calendar_today_rounded,
-                        color: _dataValidade != null ? Colors.blue : Colors.grey,
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: (_dataValidade != null ? Colors.blue : Colors.grey).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.calendar_today_rounded,
+                          color: _dataValidade != null ? Colors.blue : Colors.grey,
+                          size: 20,
+                        ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,6 +596,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                                   : 'Nenhuma data selecionada',
                               style: TextStyle(
                                 fontSize: 16,
+                                fontWeight: FontWeight.w600,
                                 color: _dataValidade != null ? Colors.black87 : Colors.grey,
                               ),
                             ),
@@ -362,28 +604,48 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                         ),
                       ),
                       if (_dataValidade != null)
-                        IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.red),
-                          onPressed: () => setState(() => _dataValidade = null),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.clear_rounded, color: Colors.red, size: 20),
+                            onPressed: () => setState(() => _dataValidade = null),
+                          ),
                         ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 32),
-              SizedBox(
+              // Botão de Cadastrar
+              Container(
                 width: double.infinity,
                 height: 56,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF818CF8)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF6366F1).withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleCadastro,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: Colors.transparent,
                     foregroundColor: Colors.white,
+                    shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
-                    shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
                   ),
                   child: _isLoading
                       ? const SizedBox(
@@ -391,15 +653,23 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                           width: 24,
                           child: CircularProgressIndicator(
                             color: Colors.white,
-                            strokeWidth: 2,
+                            strokeWidth: 3,
                           ),
                         )
-                      : const Text(
-                          'Cadastrar Produto',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.check_circle_rounded, size: 24),
+                            SizedBox(width: 12),
+                            Text(
+                              'Cadastrar Produto',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
                 ),
               ),
