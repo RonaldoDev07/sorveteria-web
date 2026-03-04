@@ -258,37 +258,38 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       ],
                     ),
                   )
-                : Column(
-                    children: [
-                      // Campo de pesquisa
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: _filtrarPorVendedor,
-                          decoration: InputDecoration(
-                            hintText: 'Pesquisar por pessoa...',
-                            hintStyle: TextStyle(color: Colors.grey[400]),
-                            prefixIcon: const Icon(Icons.search_rounded, color: Colors.orange, size: 20),
-                            suffixIcon: _searchController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear_rounded, size: 20),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      _filtrarPorVendedor('');
-                                    },
-                                  )
-                                : null,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                : SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Campo de pesquisa
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: _filtrarPorVendedor,
+                            decoration: InputDecoration(
+                              hintText: 'Pesquisar por pessoa...',
+                              hintStyle: TextStyle(color: Colors.grey[400]),
+                              prefixIcon: const Icon(Icons.search_rounded, color: Colors.orange, size: 20),
+                              suffixIcon: _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear_rounded, size: 20),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        _filtrarPorVendedor('');
+                                      },
+                                    )
+                                  : null,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                         ),
-                      ),
                       // Chips de período
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -502,10 +503,11 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                         ),
                       ],
                       // Lista de movimentações
-                      Expanded(
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(12),
-                          itemCount: _movimentacoesFiltradas.length,
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(12),
+                        itemCount: _movimentacoesFiltradas.length,
                     itemBuilder: (context, index) {
                       final mov = _movimentacoesFiltradas[index];
                       final isEntrada = mov['tipo'] == 'ENTRADA';
@@ -684,9 +686,9 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       );
                     },
                   ),
-                        ),
                       ],
                     ),
+                  ),
       ),
     );
   }
