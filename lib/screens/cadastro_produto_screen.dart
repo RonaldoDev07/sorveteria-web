@@ -134,15 +134,15 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(14),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               // Card com ícone de destaque
               Container(
-                margin: const EdgeInsets.only(bottom: 24),
-                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -237,7 +237,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   validator: (value) =>
                       value?.isEmpty ?? true ? 'Campo obrigatório' : null,
@@ -300,7 +300,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -347,7 +347,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   items: const [
                     DropdownMenuItem(value: 'UN', child: Text('Unidade (UN)')),
@@ -402,7 +402,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
@@ -462,7 +462,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
@@ -519,7 +519,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
@@ -549,7 +549,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),

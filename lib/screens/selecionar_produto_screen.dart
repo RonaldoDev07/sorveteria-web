@@ -190,7 +190,7 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
         title: Text(
           titulo,
           style: const TextStyle(
-            fontSize: 22,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
           ),
@@ -234,7 +234,7 @@ _isLoading
             : Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(16),
                     child: TextField(
                       controller: _searchController,
                       onChanged: _filtrarProdutos,

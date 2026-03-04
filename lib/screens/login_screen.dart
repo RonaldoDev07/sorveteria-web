@@ -122,14 +122,14 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             child: Card(
               elevation: 12,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Container(
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.all(24),
                 constraints: const BoxConstraints(maxWidth: 400),
                 child: Form(
                   key: _formKey,
@@ -180,42 +180,42 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: const Icon(
                               Icons.icecream_rounded,
-                              size: 60,
+                              size: 48,
                               color: Colors.white,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 36),
+                      const SizedBox(height: 24),
                       // Nome da sorveteria com fonte elegante
                       const Text(
                         'Sorveteria',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.w300,
                           color: Color(0xFF9C27B0),
-                          letterSpacing: 3,
+                          letterSpacing: 2.5,
                           fontFamily: 'serif',
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       const Text(
                         'Camila',
                         style: TextStyle(
-                          fontSize: 42,
+                          fontSize: 34,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF9C27B0),
-                          letterSpacing: 1.5,
+                          letterSpacing: 1.2,
                           fontFamily: 'serif',
                           height: 1,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         decoration: BoxDecoration(
                           color: const Color(0xFFE1BEE7),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: const Color(0xFF9C27B0).withOpacity(0.2),
                             width: 1,
@@ -226,23 +226,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             const Icon(
                               Icons.store_rounded,
-                              size: 14,
+                              size: 12,
                               color: Color(0xFF9C27B0),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Text(
                               'Sistema de Controle de Estoque',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 11,
                                 color: Colors.grey[700],
                                 fontWeight: FontWeight.w500,
-                                letterSpacing: 0.3,
+                                letterSpacing: 0.2,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 36),
+                      const SizedBox(height: 24),
                       TextFormField(
                         controller: _loginController,
                         focusNode: _loginFocusNode,

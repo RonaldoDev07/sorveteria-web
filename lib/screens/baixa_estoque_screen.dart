@@ -99,7 +99,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
       ),
       backgroundColor: const Color(0xFFF5F7FA),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Form(
           key: _formKey,
           child: Column(
@@ -129,7 +129,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -346,7 +346,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     final valorTotal = quantidade * precoUnitario;
                     
                     return Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -485,7 +485,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                       final troco = valorPago - valorTotal;
                       
                       return Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: troco >= 0 

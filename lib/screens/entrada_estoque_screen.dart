@@ -107,7 +107,7 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(14),
           child: Form(
             key: _formKey,
             child: Column(
@@ -130,7 +130,7 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
                       Container(
@@ -193,7 +193,7 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

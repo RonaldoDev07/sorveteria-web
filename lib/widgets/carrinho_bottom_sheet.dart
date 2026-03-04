@@ -62,7 +62,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                     const Text(
                       'Carrinho',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -301,7 +301,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
           // Footer com total
           if (!carrinho.isEmpty)
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -358,7 +358,7 @@ class CarrinhoBottomSheet extends StatelessWidget {
                           Text(
                             formatoMoeda.format(carrinho.valorTotal),
                             style: const TextStyle(
-                              fontSize: 28,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF10B981),
                             ),
