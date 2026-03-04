@@ -273,14 +273,25 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                                    'N/A';
                   
                   // Tentar pegar o nome do produto de várias formas possíveis
-                  final produtoNome = produtoMap['produto_nome']?.toString() ?? 
-                                     produtoMap['produtoNome']?.toString() ?? 
-                                     produtoMap['nome']?.toString() ??
-                                     produtoMap['produto']?.toString() ??
-                                     produtoMap['name']?.toString() ??
-                                     (produtoMap['produto_info'] != null ? 
-                                       (produtoMap['produto_info'] as Map<String, dynamic>)['nome']?.toString() : null) ??
-                                     'Produto ID: $produtoId';
+                  String produtoNome = produtoMap['produto_nome']?.toString() ?? 
+                                      produtoMap['produtoNome']?.toString() ?? 
+                                      produtoMap['nome']?.toString() ??
+                                      produtoMap['produto']?.toString() ??
+                                      produtoMap['name']?.toString() ?? '';
+                  
+                  // Se ainda não tem nome, tentar buscar em objetos aninhados
+                  if (produtoNome.isEmpty && produtoMap['produto_info'] != null) {
+                    final produtoInfo = produtoMap['produto_info'] as Map<String, dynamic>;
+                    produtoNome = produtoInfo['nome']?.toString() ?? '';
+                  }
+                  
+                  // Se ainda não tem nome, usar um padrão mais descritivo
+                  if (produtoNome.isEmpty) {
+                    produtoNome = 'Produto (ID: $produtoId)';
+                    print('⚠️ Nome do produto não encontrado, usando fallback: $produtoNome');
+                  } else {
+                    print('✅ Nome do produto encontrado: $produtoNome');
+                  }
                   
                   final quantidade = produtoMap['quantidade'] ?? 0;
                   

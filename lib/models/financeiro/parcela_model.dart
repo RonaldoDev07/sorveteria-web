@@ -74,5 +74,25 @@ class Parcela {
   bool get estaAtrasada => status == 'atrasada';
   bool get estaPendente => status == 'pendente';
   
-  String get nomeRelacionado => clienteNome ?? fornecedorNome ?? 'N/A';
+  String get nomeRelacionado {
+    // Tentar várias formas de obter o nome
+    String? nome;
+    
+    if (tipo == 'venda' || tipo == 'VENDA') {
+      nome = clienteNome;
+      if (nome == null || nome.isEmpty || nome == 'null') {
+        print('⚠️ Nome do cliente não encontrado para parcela $id');
+        return 'Cliente não identificado';
+      }
+    } else if (tipo == 'compra' || tipo == 'COMPRA') {
+      nome = fornecedorNome;
+      if (nome == null || nome.isEmpty || nome == 'null') {
+        print('⚠️ Nome do fornecedor não encontrado para parcela $id');
+        return 'Fornecedor não identificado';
+      }
+    }
+    
+    print('✅ Nome encontrado para parcela $id: $nome');
+    return nome ?? 'N/A';
+  }
 }
