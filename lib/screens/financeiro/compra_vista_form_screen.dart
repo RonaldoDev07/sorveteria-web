@@ -517,11 +517,11 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
         .toList();
     
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(16),
-      title: const Text('Adicionar Produto', style: TextStyle(fontSize: 18)),
+      contentPadding: const EdgeInsets.all(12),
+      title: const Text('Adicionar Produto', style: TextStyle(fontSize: 15)),
       content: SizedBox(
         width: double.maxFinite,
-        height: 380,
+        height: 320,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -532,49 +532,50 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Pesquisar produto...',
-                      prefixIcon: const Icon(Icons.search, size: 20),
+                      prefixIcon: const Icon(Icons.search, size: 16),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       filled: true,
                       fillColor: Colors.grey[100],
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                       isDense: true,
                     ),
+                    style: const TextStyle(fontSize: 13),
                     onChanged: (value) {
                       setState(() => _filtroProduto = value.toLowerCase());
                     },
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 4),
                 Tooltip(
                   message: 'Cadastrar novo produto',
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.purple,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: IconButton(
                       onPressed: () => _cadastrarProdutoRapido(context),
-                      icon: const Icon(Icons.add_circle, color: Colors.white, size: 24),
-                      padding: const EdgeInsets.all(8),
+                      icon: const Icon(Icons.add_circle, color: Colors.white, size: 18),
+                      padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             
             // CAMPO DE CÓDIGO DE BARRAS
             TextField(
               controller: _codigoBarrasController,
               decoration: InputDecoration(
                 hintText: 'Código de barras...',
-                prefixIcon: const Icon(Icons.qr_code_scanner, size: 20),
+                prefixIcon: const Icon(Icons.qr_code_scanner, size: 16),
                 suffixIcon: _codigoBarrasController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
+                        icon: const Icon(Icons.clear, size: 14),
                         onPressed: () {
                           _codigoBarrasController.clear();
                           setState(() {});
@@ -582,13 +583,14 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                       )
                     : null,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 filled: true,
                 fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 isDense: true,
               ),
+              style: const TextStyle(fontSize: 13),
               onChanged: (value) {
                 if (value.isNotEmpty) {
                   final produtoEncontrado = widget.produtos.firstWhere(
@@ -606,12 +608,12 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                 }
               },
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             
             // LISTA DE PRODUTOS
             Expanded(
               child: produtosFiltrados.isEmpty
-                  ? const Center(child: Text('Nenhum produto encontrado'))
+                  ? const Center(child: Text('Nenhum produto encontrado', style: TextStyle(fontSize: 12)))
                   : ListView.builder(
                       itemCount: produtosFiltrados.length,
                       itemBuilder: (context, index) {
@@ -619,52 +621,52 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                         final isSelected = _produtoSelecionado?.id == produto.id;
                         
                         return Card(
-                          margin: const EdgeInsets.only(bottom: 6),
+                          margin: const EdgeInsets.only(bottom: 4),
                           color: isSelected ? Colors.purple.shade50 : null,
                           child: ListTile(
                             dense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             leading: Container(
-                              padding: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 color: Colors.purple,
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Icon(Icons.inventory_2, color: Colors.white, size: 18),
+                              child: const Icon(Icons.inventory_2, color: Colors.white, size: 14),
                             ),
                             title: Text(
                               produto.nome,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                             ),
                             subtitle: Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                   decoration: BoxDecoration(
                                     color: Colors.orange.shade100,
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: Text(
                                     '${produto.quantidade} UN',
                                     style: TextStyle(
                                       color: Colors.orange.shade900,
-                                      fontSize: 11,
+                                      fontSize: 9,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 4),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                   decoration: BoxDecoration(
                                     color: Colors.purple.shade100,
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: Text(
                                     'R\$ ${produto.preco.toStringAsFixed(2)}',
                                     style: TextStyle(
                                       color: Colors.purple.shade900,
-                                      fontSize: 11,
+                                      fontSize: 9,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -672,8 +674,8 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                               ],
                             ),
                             trailing: isSelected 
-                                ? const Icon(Icons.check_circle, color: Colors.purple)
-                                : const Icon(Icons.arrow_forward_ios, size: 16),
+                                ? const Icon(Icons.check_circle, color: Colors.purple, size: 18)
+                                : const Icon(Icons.arrow_forward_ios, size: 12),
                             onTap: () {
                               setState(() {
                                 _produtoSelecionado = produto;
@@ -686,15 +688,15 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                     ),
             ),
             
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             
             // PRODUTO SELECIONADO
             if (_produtoSelecionado != null) ...[
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.purple.shade50,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: Colors.purple),
                 ),
                 child: Column(
