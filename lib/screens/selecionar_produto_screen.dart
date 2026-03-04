@@ -295,9 +295,9 @@ _isLoading
                           ],
                         ),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(14),
+                          contentPadding: const EdgeInsets.all(10),
                           leading: Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: widget.tipo == 'ENTRADA'
@@ -306,31 +306,31 @@ _isLoading
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.inventory_2_rounded,
                               color: Colors.white,
-                              size: 28,
+                              size: 22,
                             ),
                           ),
                           title: Text(
                             produto['nome'],
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.2,
                             ),
                           ),
                           subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 12),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                       decoration: BoxDecoration(
                                         color: Colors.orange.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(6),
@@ -338,13 +338,13 @@ _isLoading
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.inventory_rounded, size: 14, color: Colors.orange[700]),
-                                          const SizedBox(width: 4),
+                                          Icon(Icons.inventory_rounded, size: 12, color: Colors.orange[700]),
+                                          const SizedBox(width: 3),
                                           Text(
                                             '${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
                                             style: TextStyle(
                                               color: Colors.orange[900],
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),

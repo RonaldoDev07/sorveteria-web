@@ -173,7 +173,7 @@ class _CompraVistaFormScreenState extends State<CompraVistaFormScreen> {
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 children: [
                   // Fornecedor
                   DropdownButtonFormField<Fornecedor>(

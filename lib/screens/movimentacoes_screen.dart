@@ -355,8 +355,8 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       // Card de resumo por vendedor
                       if (_calcularResumoVendedores().isNotEmpty) ...[
                         Container(
-                          margin: const EdgeInsets.all(8),
-                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],

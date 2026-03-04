@@ -620,9 +620,9 @@ _isLoading
                           ],
                         ),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(14),
+                          contentPadding: const EdgeInsets.all(10),
                           leading: Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
@@ -640,13 +640,13 @@ _isLoading
                           title: Text(
                             produto['nome'],
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.2,
                             ),
                           ),
                           subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 12),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

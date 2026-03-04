@@ -480,7 +480,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           : Form(
               key: _formKey,
               child: ListView(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 children: [
                   // Card Fornecedor e Forma de Pagamento
                   Container(
@@ -520,7 +520,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
                             Expanded(
@@ -674,7 +674,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -687,15 +687,15 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF9333EA).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: const Icon(Icons.shopping_bag, color: Color(0xFF9333EA), size: 20),
+                                  child: const Icon(Icons.shopping_bag, color: Color(0xFF9333EA), size: 18),
                                 ),
                                 const SizedBox(width: 8),
                                 const Text(
                                   'Produtos',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF1F2937),
                                   ),
@@ -851,7 +851,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -864,15 +864,15 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: Colors.blue.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: const Icon(Icons.calendar_month, color: Colors.blue, size: 20),
+                                  child: const Icon(Icons.calendar_month, color: Colors.blue, size: 18),
                                 ),
                                 const SizedBox(width: 8),
                                 const Text(
                                   'Parcelas',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF1F2937),
                                   ),
@@ -1004,7 +1004,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1014,15 +1014,15 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: Colors.orange.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(Icons.note, color: Colors.orange, size: 20),
+                              child: const Icon(Icons.note, color: Colors.orange, size: 18),
                             ),
                             const SizedBox(width: 8),
                             const Text(
                               'Observações',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1F2937),
                               ),
@@ -1108,8 +1108,8 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _abrirScanner,
         backgroundColor: const Color(0xFF9333EA),
-        icon: const Icon(Icons.qr_code_scanner),
-        label: const Text('Escanear'),
+        icon: const Icon(Icons.qr_code_scanner, size: 18),
+        label: const Text('Escanear', style: TextStyle(fontSize: 13)),
         elevation: 4,
       ),
     );
