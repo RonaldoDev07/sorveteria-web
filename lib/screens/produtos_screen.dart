@@ -452,6 +452,18 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
               tooltip: 'Cadastrar Produto',
             ),
           IconButton(
+            icon: const Icon(Icons.shopping_cart_rounded),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ComprasMenuScreen(),
+                ),
+              );
+            },
+            tooltip: 'Registrar Compra',
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: _loadProdutos,
             tooltip: 'Atualizar',
