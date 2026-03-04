@@ -620,9 +620,10 @@ _isLoading
                           ],
                         ),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(10),
+                          dense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           leading: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],

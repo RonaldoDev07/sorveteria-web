@@ -521,7 +521,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
       title: const Text('Adicionar Produto', style: TextStyle(fontSize: 18)),
       content: SizedBox(
         width: double.maxFinite,
-        height: 420,
+        height: 380,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
