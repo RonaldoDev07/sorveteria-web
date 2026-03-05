@@ -513,46 +513,6 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
           ),
         ),
         actions: [
-          // Badge de estoque baixo
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                icon: Icon(
-                  _mostrarApenasEstoqueBaixo ? Icons.filter_alt : Icons.filter_alt_outlined,
-                  color: _mostrarApenasEstoqueBaixo ? Colors.amber : Colors.white,
-                ),
-                onPressed: _toggleFiltroEstoqueBaixo,
-                tooltip: _mostrarApenasEstoqueBaixo ? 'Mostrar todos' : 'Estoque baixo',
-              ),
-              if (_contarProdutosEstoqueBaixo() > 0)
-                Positioned(
-                  left: 4,
-                  top: 4,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    child: Text(
-                      '${_contarProdutosEstoqueBaixo()}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
           if (auth.isAdmin)
             IconButton(
               icon: const Icon(Icons.add_circle_rounded),
@@ -1105,7 +1065,45 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                   ),
                 ],
               ),
-      floatingActionButton: null,
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: _toggleFiltroEstoqueBaixo,
+        backgroundColor: _mostrarApenasEstoqueBaixo ? Colors.orange : const Color(0xFF3B82F6),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(
+              _mostrarApenasEstoqueBaixo ? Icons.filter_alt : Icons.filter_alt_outlined,
+              color: Colors.white,
+            ),
+            if (_contarProdutosEstoqueBaixo() > 0 && !_mostrarApenasEstoqueBaixo)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    '${_contarProdutosEstoqueBaixo()}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
