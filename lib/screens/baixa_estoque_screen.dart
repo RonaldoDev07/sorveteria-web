@@ -429,71 +429,105 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
               // Campo de valor pago (apenas para dinheiro)
               if (_formaPagamento == 'DINHEIRO') ...[
                 const SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: TextFormField(
-                    controller: _valorPagoController,
-                    decoration: InputDecoration(
-                      labelText: 'Valor Pago',
-                      hintText: 'Quanto o cliente pagou',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.grey.withOpacity(0.2),
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF10B981),
-                          width: 2,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      prefixText: 'R\$ ',
-                      prefixIcon: Container(
-                        margin: const EdgeInsets.all(12),
-                        padding: const EdgeInsets.all(8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        child: const Icon(
-                          Icons.payments_rounded,
-                          color: Color(0xFF10B981),
-                          size: 20,
+                        child: TextFormField(
+                          controller: _valorPagoController,
+                          decoration: InputDecoration(
+                            labelText: 'Valor Pago',
+                            hintText: 'Quanto o cliente pagou',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.grey.withOpacity(0.2),
+                                width: 1,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF10B981),
+                                width: 2,
+                              ),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            prefixText: 'R\$ ',
+                            prefixIcon: Container(
+                              margin: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.payments_rounded,
+                                color: Color(0xFF10B981),
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          textInputAction: TextInputAction.done,
+                          onChanged: (_) => setState(() {}),
+                          onTap: () {
+                            // Garantir que o campo receba foco ao clicar
+                            if (_valorPagoController.text.isNotEmpty) {
+                              _valorPagoController.selection = TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _valorPagoController.text.length,
+                              );
+                            }
+                          },
                         ),
                       ),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    textInputAction: TextInputAction.done,
-                    onChanged: (_) => setState(() {}),
-                    onTap: () {
-                      // Garantir que o campo receba foco ao clicar
-                      if (_valorPagoController.text.isNotEmpty) {
-                        _valorPagoController.selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset: _valorPagoController.text.length,
+                    const SizedBox(width: 8),
+                    Builder(
+                      builder: (context) {
+                        final quantidadeStr = _quantidadeController.text.replaceAll(',', '.');
+                        final quantidade = double.tryParse(quantidadeStr) ?? 0;
+                        final precoUnitario = double.parse(widget.produto['preco_venda'].toString());
+                        final valorTotal = quantidade * precoUnitario;
+                        
+                        return ElevatedButton(
+                          onPressed: () {
+                            _valorPagoController.text = valorTotal.toStringAsFixed(2).replaceAll('.', ',');
+                            setState(() {});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Exato',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
                         );
-                      }
-                    },
-                  ),
+                      },
+                    ),
+                  ],
                 ),
                 // Troco
                 if (_valorPagoController.text.isNotEmpty) ...[

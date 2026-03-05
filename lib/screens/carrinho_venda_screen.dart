@@ -331,29 +331,54 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                   ),
                   if (formaPagamento == 'DINHEIRO') ...[
                     const SizedBox(height: 12),
-                    TextField(
-                      controller: valorPagoController,
-                      style: const TextStyle(fontSize: 13),
-                      decoration: const InputDecoration(
-                        labelText: 'Valor Pago',
-                        labelStyle: TextStyle(fontSize: 12),
-                        border: OutlineInputBorder(),
-                        prefixText: 'R\$ ',
-                        prefixIcon: Icon(Icons.attach_money, size: 18),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        isDense: true,
-                      ),
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      onTap: () {
-                        if (valorPagoController.text.isNotEmpty) {
-                          valorPagoController.selection = TextSelection(
-                            baseOffset: 0,
-                            extentOffset: valorPagoController.text.length,
-                          );
-                        }
-                      },
-                      onChanged: (_) => setDialogState(() {}),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: valorPagoController,
+                            style: const TextStyle(fontSize: 13),
+                            decoration: const InputDecoration(
+                              labelText: 'Valor Pago',
+                              labelStyle: TextStyle(fontSize: 12),
+                              border: OutlineInputBorder(),
+                              prefixText: 'R\$ ',
+                              prefixIcon: Icon(Icons.attach_money, size: 18),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                              isDense: true,
+                            ),
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            onTap: () {
+                              if (valorPagoController.text.isNotEmpty) {
+                                valorPagoController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: valorPagoController.text.length,
+                                );
+                              }
+                            },
+                            onChanged: (_) => setDialogState(() {}),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            valorPagoController.text = valorTotal.toStringAsFixed(2).replaceAll('.', ',');
+                            setDialogState(() {});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Exato',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
                     if (valorPago > 0) ...[
                       const SizedBox(height: 10),
@@ -402,7 +427,22 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                 child: const Text('Cancelar', style: TextStyle(fontSize: 12)),
               ),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () {
+                  // Validar se valor foi preenchido quando for DINHEIRO
+                  if (formaPagamento == 'DINHEIRO') {
+                    final valorPago = double.tryParse(valorPagoController.text.replaceAll(',', '.')) ?? 0;
+                    if (valorPago <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Informe o valor pago pelo cliente'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                      return;
+                    }
+                  }
+                  Navigator.pop(context, true);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF10B981),
                   foregroundColor: Colors.white,

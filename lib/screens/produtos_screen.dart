@@ -54,6 +54,16 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
     return numero.toStringAsFixed(2).replaceAll('.', ',');
   }
 
+  String _formatarData(dynamic data) {
+    if (data == null) return '';
+    try {
+      final DateTime dataObj = DateTime.parse(data.toString());
+      return '${dataObj.day.toString().padLeft(2, '0')}/${dataObj.month.toString().padLeft(2, '0')}/${dataObj.year}';
+    } catch (e) {
+      return '';
+    }
+  }
+
   double _calcularValorTotalEstoque() {
     double total = 0;
     for (var produto in _produtosFiltrados) {
@@ -994,6 +1004,24 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                                         ],
                                       );
                                     },
+                                  ),
+                                ],
+                                // Data de cadastro
+                                if (produto['created_at'] != null) ...[
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Cadastrado em ${_formatarData(produto['created_at'])}',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ],
