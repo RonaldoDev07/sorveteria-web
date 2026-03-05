@@ -52389,7 +52389,7 @@ s=m.ganH()
 r=t.p
 h=A.a([A.cb(l,l,l,h,l,s,l,l,l,i?"Mostrar todos":"Estoque baixo")],r)
 if(m.Qx()>0){i=A.di(B.i,2)
-h.push(A.wO(l,A.C(l,A.n(""+m.Qx(),l,l,l,B.r0,B.bO,l),B.f,l,B.Ps,new A.F(B.t,l,i,l,l,l,B.eh),l,l,l,B.hh,l,l,l),l,l,l,4,4,l))}i=A.a([A.iY(B.cP,h,B.f,B.cE,l)],r)
+h.push(A.wO(l,A.C(l,A.n(""+m.Qx(),l,l,l,B.r0,B.bO,l),B.f,l,B.Ps,new A.F(B.t,l,i,l,l,l,B.eh),l,l,l,B.hh,l,l,l),l,l,4,l,4,l))}i=A.a([A.iY(B.cP,h,B.f,B.cE,l)],r)
 if(k.b==="ADMIN")i.push(A.cb(l,l,l,B.Zh,l,new A.aHg(m,a),l,l,l,"Cadastrar Produto"))
 i.push(A.cb(l,l,l,B.ZD,l,new A.aHh(a),l,l,l,"Registrar Compra"))
 i.push(A.cb(l,l,l,B.iO,l,m.gaii(),l,l,l,"Atualizar"))

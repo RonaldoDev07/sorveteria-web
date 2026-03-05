@@ -527,7 +527,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
               ),
               if (_contarProdutosEstoqueBaixo() > 0)
                 Positioned(
-                  right: 4,
+                  left: 4,
                   top: 4,
                   child: Container(
                     padding: const EdgeInsets.all(4),
