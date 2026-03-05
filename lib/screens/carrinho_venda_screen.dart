@@ -11,17 +11,29 @@ class CarrinhoVendaScreen extends StatefulWidget {
   State<CarrinhoVendaScreen> createState() => _CarrinhoVendaScreenState();
 }
 
-class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
+class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTickerProviderStateMixin {
   List<dynamic> _produtos = [];
   List<dynamic> _produtosFiltrados = [];
   List<Map<String, dynamic>> _carrinho = [];
   bool _isLoading = true;
   final _searchController = TextEditingController();
   final _codigoBarrasController = TextEditingController();
+  late AnimationController _badgeAnimationController;
+  late Animation<double> _badgeAnimation;
 
   @override
   void initState() {
     super.initState();
+    _badgeAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    _badgeAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(
+        parent: _badgeAnimationController,
+        curve: Curves.elasticOut,
+      ),
+    );
     _carregarProdutos();
   }
 
@@ -29,7 +41,14 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
   void dispose() {
     _searchController.dispose();
     _codigoBarrasController.dispose();
+    _badgeAnimationController.dispose();
     super.dispose();
+  }
+
+  void _animarBadge() {
+    _badgeAnimationController.forward().then((_) {
+      _badgeAnimationController.reverse();
+    });
   }
 
   String _formatarNumero(dynamic valor) {
@@ -146,20 +165,10 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
         setState(() {
           _carrinho[index]['quantidade']++;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${produto['nome']} - quantidade aumentada'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 1),
-          ),
-        );
+        _animarBadge();
+        _mostrarFeedbackSucesso('${produto['nome']} - quantidade aumentada', Icons.add_circle);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Estoque insuficiente de ${produto['nome']}'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        _mostrarFeedbackErro('Estoque insuficiente de ${produto['nome']}');
       }
     } else {
       // Adicionar novo item
@@ -169,14 +178,68 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
           'quantidade': 1.0,
         });
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${produto['nome']} adicionado ao carrinho'),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 1),
-        ),
-      );
+      _animarBadge();
+      _mostrarFeedbackSucesso('${produto['nome']} adicionado ao carrinho', Icons.shopping_cart);
     }
+  }
+
+  void _mostrarFeedbackSucesso(String mensagem, IconData icone) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 400),
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: value,
+                  child: Icon(icone, color: Colors.white, size: 24),
+                );
+              },
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                mensagem,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF10B981),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(milliseconds: 1500),
+        elevation: 6,
+      ),
+    );
+  }
+
+  void _mostrarFeedbackErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                mensagem,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.orange,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(milliseconds: 2000),
+        elevation: 6,
+      ),
+    );
   }
 
   void _removerDoCarrinho(int index) {
@@ -455,20 +518,30 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> {
             tooltip: 'Escanear código de barras',
           ),
           if (_carrinho.isNotEmpty)
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '${_carrinho.length}',
-                  style: const TextStyle(
-                    color: Color(0xFF10B981),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+            ScaleTransition(
+              scale: _badgeAnimation,
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.only(right: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    '${_carrinho.length}',
+                    style: const TextStyle(
+                      color: Color(0xFF10B981),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
