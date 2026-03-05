@@ -21,11 +21,20 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
   List<dynamic> _produtosFiltrados = [];
   bool _isLoading = true;
   final _searchController = TextEditingController();
+  bool _mostrarApenasEstoqueBaixo = false;
 
   @override
   void initState() {
     super.initState();
     _loadProdutos();
+  }
+
+  int _contarProdutosEstoqueBaixo() {
+    return _produtos.where((produto) {
+      final estoque = produto['estoque_atual'];
+      final estoqueNum = estoque is num ? estoque.toDouble() : (double.tryParse(estoque.toString().replaceAll(',', '.')) ?? 0);
+      return estoqueNum > 0 && estoqueNum <= 10;
+    }).length;
   }
 
   String _formatarNumero(dynamic valor) {
@@ -103,14 +112,33 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
 
   void _filtrarProdutos(String query) {
     setState(() {
+      var produtosFiltrados = _produtos;
+      
+      // Filtrar por estoque baixo se ativado
+      if (_mostrarApenasEstoqueBaixo) {
+        produtosFiltrados = produtosFiltrados.where((produto) {
+          final estoque = produto['estoque_atual'];
+          final estoqueNum = estoque is num ? estoque.toDouble() : (double.tryParse(estoque.toString().replaceAll(',', '.')) ?? 0);
+          return estoqueNum > 0 && estoqueNum <= 10;
+        }).toList();
+      }
+      
+      // Filtrar por nome
       if (query.isEmpty) {
-        _produtosFiltrados = _produtos;
+        _produtosFiltrados = produtosFiltrados;
       } else {
-        _produtosFiltrados = _produtos
+        _produtosFiltrados = produtosFiltrados
             .where((produto) =>
                 produto['nome'].toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
+    });
+  }
+
+  void _toggleFiltroEstoqueBaixo() {
+    setState(() {
+      _mostrarApenasEstoqueBaixo = !_mostrarApenasEstoqueBaixo;
+      _filtrarProdutos(_searchController.text);
     });
   }
 
@@ -485,6 +513,45 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
           ),
         ),
         actions: [
+          // Badge de estoque baixo
+          Stack(
+            children: [
+              IconButton(
+                icon: Icon(
+                  _mostrarApenasEstoqueBaixo ? Icons.filter_alt : Icons.filter_alt_outlined,
+                  color: _mostrarApenasEstoqueBaixo ? Colors.amber : Colors.white,
+                ),
+                onPressed: _toggleFiltroEstoqueBaixo,
+                tooltip: _mostrarApenasEstoqueBaixo ? 'Mostrar todos' : 'Estoque baixo',
+              ),
+              if (_contarProdutosEstoqueBaixo() > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    child: Text(
+                      '${_contarProdutosEstoqueBaixo()}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
           if (auth.isAdmin)
             IconButton(
               icon: const Icon(Icons.add_circle_rounded),
@@ -520,11 +587,51 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
           ),
         ],
       ),
-      body:
-_isLoading
+      body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(
                 children: [
+                  // Banner de filtro ativo
+                  if (_mostrarApenasEstoqueBaixo)
+                    Container(
+                      margin: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.orange.shade400, Colors.orange.shade600],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 24),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Mostrando apenas produtos com estoque baixo (≤10 unidades)',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                            onPressed: _toggleFiltroEstoqueBaixo,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.all(8),
                     child: TextField(
