@@ -515,6 +515,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
         actions: [
           // Badge de estoque baixo
           Stack(
+            clipBehavior: Clip.none,
             children: [
               IconButton(
                 icon: Icon(
@@ -526,8 +527,8 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
               ),
               if (_contarProdutosEstoqueBaixo() > 0)
                 Positioned(
-                  right: 8,
-                  top: 8,
+                  right: 4,
+                  top: 4,
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(

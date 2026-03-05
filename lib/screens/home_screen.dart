@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/offline_service.dart';
 import '../widgets/auth_wrapper.dart';
 import '../widgets/connectivity_banner.dart';
 import 'produtos_screen.dart';
@@ -241,6 +242,43 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
         ),
         actions: [
+          Consumer<OfflineService>(
+            builder: (context, offlineService, child) {
+              return Container(
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: offlineService.isOnline 
+                      ? Colors.green.withOpacity(0.2)
+                      : Colors.red.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: offlineService.isOnline ? Colors.green : Colors.red,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      offlineService.isOnline ? Icons.wifi : Icons.wifi_off,
+                      size: 16,
+                      color: offlineService.isOnline ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      offlineService.isOnline ? 'Online' : 'Offline',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: offlineService.isOnline ? Colors.green : Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout_rounded),
             onPressed: () => _confirmarLogout(context, auth),
