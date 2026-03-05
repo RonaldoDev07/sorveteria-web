@@ -52234,7 +52234,7 @@ else{i=A.a([],r)
 if(m.w){h=A.a([B.tY,B.tW],t.O)
 q=A.k(12)
 p=A.a([new A.aC(0,B.w,A.m(B.c.O(76.5),255,152,0),B.bg,8)],t.V)
-i.push(A.D(l,A.a2(A.a([B.vM,B.V,A.aZ(A.n("Mostrando apenas produtos com estoque baixo (\u226410 unidades)",l,l,l,B.Ns,l,l),1),A.cb(l,B.dj,l,B.Zj,l,s,B.b8,l,l,l)],r),B.j,B.h,B.e),B.f,l,l,new A.E(l,l,l,q,p,new A.bv(B.aW,B.aY,B.S,h,l,l),B.k),l,l,B.Y,B.ao,l,l,l))}h=m.r
+i.push(A.D(l,A.a2(A.a([B.vM,B.V,A.aZ(A.n("Mostrando apenas produtos com estoque baixo (\u22645 unidades)",l,l,l,B.Ns,l,l),1),A.cb(l,B.dj,l,B.Zj,l,s,B.b8,l,l,l)],r),B.j,B.h,B.e),B.f,l,l,new A.E(l,l,l,q,p,new A.bv(B.aW,B.aY,B.S,h,l,l),B.k),l,l,B.Y,B.ao,l,l,l))}h=m.r
 s=A.a7(l,l,B.cV,l,l,l,l,l,l,l,l,l,l,l,l,l,l,!0,l,l,l,l,l,l,l,l)
 q=h.a.a.length!==0?A.cb(l,l,l,B.wb,l,new A.aGS(m),l,l,l,l):l
 i.push(new A.aE(B.Y,A.c1(!0,B.a3,!1,l,!0,B.l,l,A.c3(),h,l,l,l,l,l,2,A.bb(l,new A.aa(4,A.k(16),B.p),l,B.f7,l,l,l,l,!0,l,l,l,l,l,l,B.i,!0,l,l,l,l,l,l,l,l,l,l,l,l,s,"Pesquisar produto...",l,l,l,l,l,l,l,l,l,l,B.Zq,l,l,l,l,l,l,q,l,l,l,l),B.G,!0,l,!0,l,!1,l,B.a5,l,l,l,l,l,l,l,1,l,l,!1,"\u2022",l,m.gacl(),l,l,l,!1,l,!1,l,!0,l,B.F,l,l,B.a2,B.a_,l,l,l,l,l,l,l,B.O,l,B.L,l,l,l,l),l))
@@ -52255,7 +52255,7 @@ $1(a){var s,r,q=J.J(a,"estoque_atual")
 if(typeof q=="number")s=q
 else{r=J.at(q)
 r=A.c7(A.b3(r,",","."))
-s=r==null?0:r}return s>0&&s<=10},
+s=r==null?0:r}return s>0&&s<=5},
 $S:20}
 A.aGs.prototype={
 $0(){var s,r=this.a,q=r.d
@@ -52270,7 +52270,7 @@ $1(a){var s,r,q=J.J(a,"estoque_atual")
 if(typeof q=="number")s=q
 else{r=J.at(q)
 r=A.c7(A.b3(r,",","."))
-s=r==null?0:r}return s>0&&s<=10},
+s=r==null?0:r}return s>0&&s<=5},
 $S:20}
 A.aGr.prototype={
 $1(a){return J.jR(J.a95(J.J(a,"nome")),this.a.toLowerCase())},

@@ -33,7 +33,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
     return _produtos.where((produto) {
       final estoque = produto['estoque_atual'];
       final estoqueNum = estoque is num ? estoque.toDouble() : (double.tryParse(estoque.toString().replaceAll(',', '.')) ?? 0);
-      return estoqueNum > 0 && estoqueNum <= 10;
+      return estoqueNum > 0 && estoqueNum <= 5;
     }).length;
   }
 
@@ -119,7 +119,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
         produtosFiltrados = produtosFiltrados.where((produto) {
           final estoque = produto['estoque_atual'];
           final estoqueNum = estoque is num ? estoque.toDouble() : (double.tryParse(estoque.toString().replaceAll(',', '.')) ?? 0);
-          return estoqueNum > 0 && estoqueNum <= 10;
+          return estoqueNum > 0 && estoqueNum <= 5;
         }).toList();
       }
       
@@ -615,7 +615,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Mostrando apenas produtos com estoque baixo (≤10 unidades)',
+                              'Mostrando apenas produtos com estoque baixo (≤5 unidades)',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13,
