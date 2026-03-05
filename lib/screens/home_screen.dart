@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/auth_wrapper.dart';
+import '../widgets/connectivity_banner.dart';
 import 'produtos_screen.dart';
 import 'vendas_menu_screen.dart';
 import 'movimentacoes_screen.dart';
@@ -253,6 +254,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             position: _slideAnimation,
             child: Column(
               children: [
+                // Banner de conectividade
+                const ConnectivityBanner(),
                 // Header com informações do usuário
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
+import 'services/offline_service.dart';
 import 'widgets/auth_wrapper.dart';
 
 void main() {
@@ -20,8 +21,11 @@ void main() {
   runZonedGuarded(
     () {
       runApp(
-        ChangeNotifierProvider(
-          create: (_) => AuthService(),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => AuthService()),
+            ChangeNotifierProvider(create: (_) => OfflineService()),
+          ],
           child: const MyApp(),
         ),
       );
