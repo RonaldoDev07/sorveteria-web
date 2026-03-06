@@ -15,9 +15,11 @@ class ContasReceberScreen extends StatefulWidget {
 
 class _ContasReceberScreenState extends State<ContasReceberScreen> {
   List<VendaPrazo> _vendas = [];
+  List<VendaPrazo> _vendasFiltradas = [];
   bool _isLoading = true;
   String? _errorMessage;
   RelatorioService? _relatorioService;
+  final _searchController = TextEditingController();
   
   double _totalAReceber = 0;
   double _totalRecebido = 0;
@@ -58,6 +60,7 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
       
       setState(() {
         _vendas = resultado['vendas'] as List<VendaPrazo>;
+        _vendasFiltradas = _vendas;
         _totalAReceber = resultado['total_a_receber'] ?? 0.0;
         _totalRecebido = resultado['total_recebido'] ?? 0.0;
         _totalEmAberto = resultado['total_em_aberto'] ?? 0.0;
@@ -105,6 +108,25 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
     }
   }
 
+  void _filtrarVendas(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _vendasFiltradas = _vendas;
+      } else {
+        _vendasFiltradas = _vendas.where((venda) {
+          final nomeCliente = venda.cliente?.nome?.toLowerCase() ?? '';
+          return nomeCliente.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,6 +172,33 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                 )
               : Column(
                   children: [
+                    // Campo de pesquisa
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Pesquisar por cliente...',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    _filtrarVendas('');
+                                  },
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
+                        onChanged: _filtrarVendas,
+                      ),
+                    ),
+                    // Cards de resumo
                     Container(
                       padding: const EdgeInsets.all(16),
                       color: Colors.teal.shade50,
@@ -190,16 +239,16 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                       ),
                     ),
                     Expanded(
-                      child: _vendas.isEmpty
+                      child: _vendasFiltradas.isEmpty
                           ? const Center(
                               child: Text('Nenhuma conta a receber'),
                             )
                           : RefreshIndicator(
                               onRefresh: _carregarContas,
                               child: ListView.builder(
-                                itemCount: _vendas.length,
+                                itemCount: _vendasFiltradas.length,
                                 itemBuilder: (context, index) {
-                                  final venda = _vendas[index];
+                                  final venda = _vendasFiltradas[index];
                                   return Card(
                                     margin: const EdgeInsets.symmetric(
                                       horizontal: 16,

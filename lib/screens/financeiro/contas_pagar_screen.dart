@@ -15,6 +15,7 @@ class ContasPagarScreen extends StatefulWidget {
 
 class _ContasPagarScreenState extends State<ContasPagarScreen> {
   List<CompraPrazo> _compras = [];
+  List<CompraPrazo> _comprasFiltradas = [];
   bool _isLoading = true;
   String? _errorMessage;
   RelatorioService? _relatorioService;
@@ -25,9 +26,22 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
   int _contasAtrasadas = 0;
   
   String? _filtroStatus;
+  final _searchController = TextEditingController();
 
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
   final _formatoData = DateFormat('dd/MM/yyyy');
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_filtrarCompras);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -37,6 +51,20 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
       _relatorioService = RelatorioService(authService);
       _carregarContas();
     }
+  }
+
+  void _filtrarCompras() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _comprasFiltradas = _compras;
+      } else {
+        _comprasFiltradas = _compras.where((compra) {
+          final nomeFornecedor = compra.fornecedor?.nome?.toLowerCase() ?? '';
+          return nomeFornecedor.contains(query);
+        }).toList();
+      }
+    });
   }
 
   Future<void> _carregarContas() async {
@@ -58,6 +86,7 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
       
       setState(() {
         _compras = resultado['compras'] as List<CompraPrazo>;
+        _comprasFiltradas = _compras;
         _totalAPagar = resultado['total_a_pagar'] ?? 0.0;
         _totalPago = resultado['total_pago'] ?? 0.0;
         _totalEmAberto = resultado['total_em_aberto'] ?? 0.0;
@@ -150,6 +179,30 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                 )
               : Column(
                   children: [
+                    // Campo de pesquisa
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Pesquisar por fornecedor...',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                  },
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
+                      ),
+                    ),
                     Container(
                       padding: const EdgeInsets.all(16),
                       color: Colors.red.shade50,
@@ -190,16 +243,16 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                       ),
                     ),
                     Expanded(
-                      child: _compras.isEmpty
+                      child: _comprasFiltradas.isEmpty
                           ? const Center(
                               child: Text('Nenhuma conta a pagar'),
                             )
                           : RefreshIndicator(
                               onRefresh: _carregarContas,
                               child: ListView.builder(
-                                itemCount: _compras.length,
+                                itemCount: _comprasFiltradas.length,
                                 itemBuilder: (context, index) {
-                                  final compra = _compras[index];
+                                  final compra = _comprasFiltradas[index];
                                   return Card(
                                     margin: const EdgeInsets.symmetric(
                                       horizontal: 16,
