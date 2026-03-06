@@ -209,28 +209,8 @@ class _MenuCard extends StatefulWidget {
   State<_MenuCard> createState() => _MenuCardState();
 }
 
-class _MenuCardState extends State<_MenuCard> with SingleTickerProviderStateMixin {
+class _MenuCardState extends State<_MenuCard> {
   bool _isPressed = false;
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -279,27 +259,6 @@ class _MenuCardState extends State<_MenuCard> with SingleTickerProviderStateMixi
                 highlightColor: Colors.white.withOpacity(0.1),
                 child: Stack(
                   children: [
-                    // Padrão decorativo no fundo
-                    Positioned(
-                      right: -20,
-                      bottom: -20,
-                      child: AnimatedBuilder(
-                        animation: _pulseAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: _pulseAnimation.value,
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.05),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
                     // Conteúdo
                     Padding(
                       padding: const EdgeInsets.all(12),

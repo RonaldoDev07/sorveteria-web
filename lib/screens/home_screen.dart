@@ -457,28 +457,8 @@ class _MenuCard extends StatefulWidget {
   State<_MenuCard> createState() => _MenuCardState();
 }
 
-class _MenuCardState extends State<_MenuCard> with SingleTickerProviderStateMixin {
+class _MenuCardState extends State<_MenuCard> {
   bool _isPressed = false;
-  late AnimationController _shimmerController;
-  late Animation<double> _shimmerAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _shimmerController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-    _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
-      CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _shimmerController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -527,32 +507,6 @@ class _MenuCardState extends State<_MenuCard> with SingleTickerProviderStateMixi
               highlightColor: Colors.white.withOpacity(0.1),
               child: Stack(
                 children: [
-                  // Shimmer effect sutil
-                  AnimatedBuilder(
-                    animation: _shimmerAnimation,
-                    builder: (context, child) {
-                      return Positioned.fill(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Transform.translate(
-                            offset: Offset(_shimmerAnimation.value * 200, 0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.white.withOpacity(0.1),
-                                    Colors.transparent,
-                                  ],
-                                  stops: const [0.0, 0.5, 1.0],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
                   // Conteúdo do card
                   Padding(
                     padding: const EdgeInsets.all(12),
