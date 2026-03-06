@@ -176,41 +176,15 @@ class FinanceiroMenuScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFEC4899),
         foregroundColor: Colors.white,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Se tiver 2 ou menos cards, centraliza
-          if (cards.length <= 2) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  alignment: WrapAlignment.center,
-                  children: cards.map((card) {
-                    return SizedBox(
-                      width: (constraints.maxWidth - 48) / 2,
-                      height: (constraints.maxWidth - 48) / 2,
-                      child: card,
-                    );
-                  }).toList(),
-                ),
-              ),
-            );
-          }
-          
-          // Se tiver mais de 2, usa grid normal
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 1.0,
-              children: cards,
-            ),
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 1.0,
+          children: cards,
+        ),
       ),
     );
   }
