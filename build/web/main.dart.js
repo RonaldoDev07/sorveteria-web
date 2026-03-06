@@ -49547,7 +49547,7 @@ if(p==="ADMIN"||p==="VENDEDOR")B.b.L(q,A.a([new A.jK("\ud83d\udc64","Clientes","
 p=n.b
 if(p==="ADMIN"||p==="VENDEDOR")B.b.L(q,A.a([new A.jK("\ud83c\udfe2","Fornecedores","Cadastro de fornecedores",B.U3,new A.afs(a),o)],r))
 q.push(new A.jK("\ud83d\udcb0","Contas a Receber","Recebimentos pendentes",B.dT,new A.aft(a),o))
-q.push(new A.jK("\ud83d\udcb8","Contas a Pagar","Pagamentos pendentes",B.dV,new A.afu(a),o))
+if(n.b==="ADMIN")q.push(new A.jK("\ud83d\udcb8","Contas a Pagar","Pagamentos pendentes",B.dV,new A.afu(a),o))
 p=n.b
 if(p==="ADMIN"||p==="VENDEDOR")B.b.L(q,A.a([new A.jK("\ud83d\udccb","Vendas a Prazo","Hist\xf3rico de vendas",B.O,new A.afv(a),o)],r))
 p=n.b

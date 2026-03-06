@@ -86,20 +86,21 @@ class FinanceiroMenuScreen extends StatelessWidget {
                 );
               },
             ),
-            _MenuCard(
-              emoji: '💸',
-              title: 'Contas a Pagar',
-              subtitle: 'Pagamentos pendentes',
-              color: const Color(0xFFEF4444), // Vermelho
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ContasPagarScreen(),
-                  ),
-                );
-              },
-            ),
+            if (auth.isAdmin)
+              _MenuCard(
+                emoji: '💸',
+                title: 'Contas a Pagar',
+                subtitle: 'Pagamentos pendentes',
+                color: const Color(0xFFEF4444), // Vermelho
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ContasPagarScreen(),
+                    ),
+                  );
+                },
+              ),
             // Vendas e Compras a Prazo - apenas ADMIN e VENDEDOR
             if (auth.canVenderPrazo) ...[
               _MenuCard(
