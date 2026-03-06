@@ -15,15 +15,29 @@ class ParcelasScreen extends StatefulWidget {
 
 class _ParcelasScreenState extends State<ParcelasScreen> {
   List<Parcela> _parcelas = [];
+  List<Parcela> _parcelasFiltradas = [];
   bool _isLoading = true;
   String? _errorMessage;
   ParcelaService? _parcelaService;
   
   String? _filtroTipo;
   String? _filtroStatus;
+  final _searchController = TextEditingController();
 
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final _formatoData = DateFormat('dd/MM/yyyy');
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_filtrarParcelas);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -33,6 +47,21 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       _parcelaService = ParcelaService(authService);
       _carregarParcelas();
     }
+  }
+
+  void _filtrarParcelas() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _parcelasFiltradas = _parcelas;
+      } else {
+        _parcelasFiltradas = _parcelas.where((parcela) {
+          final nomeCliente = parcela.clienteNome?.toLowerCase() ?? '';
+          final nomeFornecedor = parcela.fornecedorNome?.toLowerCase() ?? '';
+          return nomeCliente.contains(query) || nomeFornecedor.contains(query);
+        }).toList();
+      }
+    });
   }
 
   Future<void> _carregarParcelas() async {
@@ -58,6 +87,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       
       setState(() {
         _parcelas = parcelas;
+        _parcelasFiltradas = parcelas;
         _isLoading = false;
       });
     } catch (e, stackTrace) {
@@ -299,7 +329,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                     ],
                   ),
                 )
-              : _parcelas.isEmpty
+              : _parcelasFiltradas.isEmpty
                   ? const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -310,13 +340,40 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                         ],
                       ),
                     )
-                  : RefreshIndicator(
-                      onRefresh: _carregarParcelas,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _parcelas.length,
-                        itemBuilder: (context, index) {
-                          final parcela = _parcelas[index];
+                  : Column(
+                      children: [
+                        // Campo de pesquisa
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Pesquisar por cliente ou fornecedor...',
+                              prefixIcon: const Icon(Icons.search),
+                              suffixIcon: _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                      },
+                                    )
+                                  : null,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: _carregarParcelas,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: _parcelasFiltradas.length,
+                              itemBuilder: (context, index) {
+                                final parcela = _parcelasFiltradas[index];
                           final cor = parcela.tipo == 'venda' ? const Color(0xFF10B981) : const Color(0xFF9333EA);
                           final formatoHora = DateFormat('HH:mm');
                           
@@ -538,6 +595,9 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                         },
                       ),
                     ),
+                  ),
+                ],
+              ),
     );
   }
 }

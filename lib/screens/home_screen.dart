@@ -558,6 +558,7 @@ class _MenuCardState extends State<_MenuCard> with SingleTickerProviderStateMixi
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
@@ -576,9 +577,11 @@ class _MenuCardState extends State<_MenuCard> with SingleTickerProviderStateMixi
                               ),
                             ],
                           ),
-                          child: Text(
-                            widget.emoji,
-                            style: const TextStyle(fontSize: 32),
+                          child: Center(
+                            child: Text(
+                              widget.emoji,
+                              style: const TextStyle(fontSize: 32),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 10),

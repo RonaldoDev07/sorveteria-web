@@ -291,164 +291,381 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
           final troco = valorPago - valorTotal;
           
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            contentPadding: const EdgeInsets.all(16),
-            title: const Text('Finalizar Venda', style: TextStyle(fontSize: 16)),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            contentPadding: EdgeInsets.zero,
+            title: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Row(
                 children: [
-                  Text('Total de itens: ${_carrinho.length}', style: const TextStyle(fontSize: 12)),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Valor total: R\$ ${_formatarPreco(valorTotal)}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    value: formaPagamento,
-                    style: const TextStyle(fontSize: 13, color: Colors.black),
-                    decoration: const InputDecoration(
-                      labelText: 'Forma de Pagamento',
-                      labelStyle: TextStyle(fontSize: 12),
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.payment, size: 18),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      isDense: true,
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'DINHEIRO', child: Text('💵 Dinheiro', style: TextStyle(fontSize: 12))),
-                      DropdownMenuItem(value: 'PIX', child: Text('📱 PIX', style: TextStyle(fontSize: 12))),
-                      DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Crédito', style: TextStyle(fontSize: 12))),
-                      DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Débito', style: TextStyle(fontSize: 12))),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setDialogState(() => formaPagamento = value);
-                      }
-                    },
-                  ),
-                  if (formaPagamento == 'DINHEIRO') ...[
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: valorPagoController,
-                            style: const TextStyle(fontSize: 13),
-                            decoration: const InputDecoration(
-                              labelText: 'Valor Pago',
-                              labelStyle: TextStyle(fontSize: 12),
-                              border: OutlineInputBorder(),
-                              prefixText: 'R\$ ',
-                              prefixIcon: Icon(Icons.attach_money, size: 18),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                              isDense: true,
-                            ),
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.done,
-                            onTap: () {
-                              if (valorPagoController.text.isNotEmpty) {
-                                valorPagoController.selection = TextSelection(
-                                  baseOffset: 0,
-                                  extentOffset: valorPagoController.text.length,
-                                );
-                              }
-                            },
-                            onChanged: (_) => setDialogState(() {}),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            valorPagoController.text = valorTotal.toStringAsFixed(2).replaceAll('.', ',');
-                            setDialogState(() {});
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF10B981),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            'Exato',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
+                    child: const Icon(
+                      Icons.shopping_cart_checkout,
+                      color: Colors.white,
+                      size: 28,
                     ),
-                    if (valorPago > 0) ...[
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: troco >= 0 ? Colors.blue.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: troco >= 0 ? Colors.blue : Colors.red,
-                            width: 2,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Troco:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
-                              ),
-                            ),
-                            Text(
-                              'R\$ ${_formatarPreco(troco.abs())}',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
-                              ),
-                            ),
-                          ],
-                        ),
+                  ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Text(
+                      'Finalizar Venda',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
-                    ],
-                  ],
-                  const SizedBox(height: 12),
-                  const Text('Confirma a venda?', style: TextStyle(fontSize: 12)),
+                    ),
+                  ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar', style: TextStyle(fontSize: 12)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Validar se valor foi preenchido quando for DINHEIRO
-                  if (formaPagamento == 'DINHEIRO') {
-                    final valorPago = double.tryParse(valorPagoController.text.replaceAll(',', '.')) ?? 0;
-                    if (valorPago <= 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Informe o valor pago pelo cliente'),
-                          backgroundColor: Colors.orange,
+            content: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFF10B981).withOpacity(0.3),
                         ),
-                      );
-                      return;
-                    }
-                  }
-                  Navigator.pop(context, true);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Total de itens:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              Text(
+                                '${_carrinho.length}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Divider(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Valor total:',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF10B981),
+                                ),
+                              ),
+                              Text(
+                                'R\$ ${_formatarPreco(valorTotal)}',
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF10B981),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: DropdownButtonFormField<String>(
+                        value: formaPagamento,
+                        style: const TextStyle(fontSize: 15, color: Colors.black),
+                        decoration: InputDecoration(
+                          labelText: 'Forma de Pagamento',
+                          labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: Container(
+                            margin: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.payment, color: Color(0xFF10B981), size: 20),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'DINHEIRO', child: Text('💵 Dinheiro')),
+                          DropdownMenuItem(value: 'PIX', child: Text('📱 PIX')),
+                          DropdownMenuItem(value: 'CARTAO_CREDITO', child: Text('💳 Crédito')),
+                          DropdownMenuItem(value: 'CARTAO_DEBITO', child: Text('💳 Débito')),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() => formaPagamento = value);
+                          }
+                        },
+                      ),
+                    ),
+                    if (formaPagamento == 'DINHEIRO') ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: TextField(
+                                controller: valorPagoController,
+                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                                decoration: InputDecoration(
+                                  labelText: 'Valor Pago',
+                                  labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  prefixText: 'R\$ ',
+                                  prefixStyle: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF10B981),
+                                  ),
+                                  prefixIcon: Container(
+                                    margin: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF10B981).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.attach_money, color: Color(0xFF10B981), size: 20),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                ),
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.done,
+                                onTap: () {
+                                  if (valorPagoController.text.isNotEmpty) {
+                                    valorPagoController.selection = TextSelection(
+                                      baseOffset: 0,
+                                      extentOffset: valorPagoController.text.length,
+                                    );
+                                  }
+                                },
+                                onChanged: (_) => setDialogState(() {}),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF10B981).withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                valorPagoController.text = valorTotal.toStringAsFixed(2).replaceAll('.', ',');
+                                setDialogState(() {});
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: const Text(
+                                'Exato',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (valorPago > 0) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: troco >= 0 
+                                  ? [Colors.blue.withOpacity(0.1), Colors.blue.withOpacity(0.05)]
+                                  : [Colors.red.withOpacity(0.1), Colors.red.withOpacity(0.05)],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: troco >= 0 ? Colors.blue : Colors.red,
+                              width: 2,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: troco >= 0 ? Colors.blue : Colors.red,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      troco >= 0 ? Icons.check_circle : Icons.warning,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    troco >= 0 ? 'Troco:' : 'Falta:',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'R\$ ${_formatarPreco(troco.abs())}',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ],
                 ),
-                child: const Text('Confirmar', style: TextStyle(fontSize: 12)),
+              ),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF10B981).withOpacity(0.4),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Validar se valor foi preenchido quando for DINHEIRO
+                            if (formaPagamento == 'DINHEIRO') {
+                              final valorPago = double.tryParse(valorPagoController.text.replaceAll(',', '.')) ?? 0;
+                              if (valorPago <= 0) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('⚠️ Informe o valor pago pelo cliente'),
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                );
+                                return;
+                              }
+                            }
+                            Navigator.pop(context, true);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'Confirmar',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           );

@@ -45,27 +45,252 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
   Future<void> _handleBaixa() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Validar valor pago para dinheiro
+    if (_formaPagamento == 'DINHEIRO' && _valorPagoController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('⚠️ Informe o valor pago pelo cliente'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Calcular valores
+    final quantidadeStr = _quantidadeController.text.replaceAll(',', '.');
+    final quantidade = double.parse(quantidadeStr);
+    final precoUnitario = double.parse(widget.produto['preco_venda'].toString());
+    final valorTotal = quantidade * precoUnitario;
+    
+    double? valorPago;
+    double? troco;
+    if (_formaPagamento == 'DINHEIRO' && _valorPagoController.text.isNotEmpty) {
+      final valorPagoStr = _valorPagoController.text.replaceAll(',', '.');
+      valorPago = double.parse(valorPagoStr);
+      troco = valorPago - valorTotal;
+    }
+
+    // Mostrar diálogo de confirmação
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Text(
+                'Confirmar Venda',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFF10B981).withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.inventory_2, color: Color(0xFF10B981), size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.produto['nome'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 20),
+                  _buildInfoRow('Quantidade', '${_formatarNumero(quantidade)} ${widget.produto['unidade']}'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Preço Unitário', 'R\$ ${_formatarMoeda(precoUnitario)}'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Forma de Pagamento', _getFormaPagamentoLabel(_formaPagamento)),
+                  const Divider(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF10B981),
+                        ),
+                      ),
+                      Text(
+                        'R\$ ${_formatarMoeda(valorTotal)}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF10B981),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (troco != null && troco >= 0) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.blue.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            '💵 Troco:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          Text(
+                            'R\$ ${_formatarMoeda(troco)}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Deseja confirmar esta venda?',
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF10B981), Color(0xFF34D399)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF10B981).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Confirmar',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
     setState(() => _isLoading = true);
 
     try {
       final auth = Provider.of<AuthService>(context, listen: false);
       
-      // Converter vírgula para ponto
-      final quantidadeStr = _quantidadeController.text.replaceAll(',', '.');
-      
       await ApiService.registrarMovimentacao(
         auth.token!,
         widget.produto['id'],
         'SAIDA',
-        double.parse(quantidadeStr),
+        quantidade,
         formaPagamento: _formaPagamento,
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Venda registrada com sucesso!'),
+            content: Text('✅ Venda registrada com sucesso!'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
           ),
         );
         Navigator.pop(context, true); // Retorna true para indicar sucesso
@@ -75,11 +300,49 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao registrar venda: $e'),
+            content: Text('❌ Erro ao registrar venda: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
+    }
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[700],
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getFormaPagamentoLabel(String forma) {
+    switch (forma) {
+      case 'DINHEIRO':
+        return '💵 Dinheiro';
+      case 'PIX':
+        return '📱 PIX';
+      case 'DEBITO':
+        return '💳 Débito';
+      case 'CREDITO':
+        return '💳 Crédito';
+      default:
+        return forma;
     }
   }
 

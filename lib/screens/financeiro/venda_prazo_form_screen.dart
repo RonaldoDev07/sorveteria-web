@@ -1185,13 +1185,6 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _abrirScanner,
-        backgroundColor: const Color(0xFF10B981),
-        icon: const Icon(Icons.qr_code_scanner),
-        label: const Text('Escanear'),
-        elevation: 4,
-      ),
     );
   }
 }
