@@ -34,10 +34,11 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   Future<void> _tentarAbrirCamera() async {
     try {
       _cameraController = MobileScannerController(
-        detectionSpeed: DetectionSpeed.normal,
+        detectionSpeed: DetectionSpeed.noDuplicates,
         facing: CameraFacing.back,
         torchEnabled: false,
         returnImage: false,
+        autoStart: true,
         formats: [
           BarcodeFormat.ean13,
           BarcodeFormat.ean8,
@@ -76,6 +77,12 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
       final String? code = barcode.rawValue;
       
       if (code != null && code.isNotEmpty && code.length >= 8) {
+        // Vibrar ao detectar (se disponível)
+        try {
+          // HapticFeedback.mediumImpact();
+        } catch (e) {
+          // Ignorar se não disponível
+        }
         Navigator.pop(context, code);
       }
     }
@@ -210,27 +217,50 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
           child: Container(),
         ),
         
-        // Instruções
+        // Instruções MAIORES
         Positioned(
           bottom: 40,
           left: 20,
           right: 20,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.75),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Text(
-              'Posicione o código de barras\ndentro da área marcada',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                height: 1.5,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.75),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Posicione o código de barras\ndentro da área marcada',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.lightbulb_outline, color: Colors.yellow[300], size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Dica: Mantenha distância de 15-20cm',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ],
@@ -348,37 +378,26 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   }
 }
 
-// Overlay personalizado MAIOR para guiar o escaneamento
+// Overlay minimalista - só bordas nos cantos, SEM área escura
 class ScannerOverlay extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withOpacity(0.6)
-      ..style = PaintingStyle.fill;
+    // NÃO desenhar overlay escuro - deixar câmera livre
 
-    // Área de scan MAIOR - 90% da largura e 50% da altura
+    // Área de referência (invisível, só para posicionar as bordas)
     final scanArea = Rect.fromCenter(
       center: Offset(size.width / 2, size.height / 2),
-      width: size.width * 0.90,
-      height: size.height * 0.50,
+      width: size.width * 0.85,
+      height: size.height * 0.40,
     );
 
-    // Desenhar overlay escuro ao redor da área de scan
-    canvas.drawPath(
-      Path()
-        ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-        ..addRRect(RRect.fromRectAndRadius(scanArea, const Radius.circular(20)))
-        ..fillType = PathFillType.evenOdd,
-      paint,
-    );
-
-    // Desenhar bordas da área de scan - MAIS GROSSAS
+    // Desenhar APENAS bordas nos cantos - MAIS GROSSAS e MAIORES
     final borderPaint = Paint()
       ..color = const Color(0xFF9C27B0)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6;
+      ..strokeWidth = 8;
 
-    final cornerLength = 50.0;
+    final cornerLength = 60.0;
 
     // Cantos superiores
     canvas.drawLine(
