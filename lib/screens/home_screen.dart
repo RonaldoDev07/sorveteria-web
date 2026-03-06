@@ -560,15 +560,17 @@ class _MenuCardState extends State<_MenuCard> with SingleTickerProviderStateMixi
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            widget.emoji,
-                            style: const TextStyle(fontSize: 36),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              widget.emoji,
+                              style: const TextStyle(fontSize: 36),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 10),
