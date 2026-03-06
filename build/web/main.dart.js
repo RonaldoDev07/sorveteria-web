@@ -52504,7 +52504,7 @@ h=A.a([A.ca(l,l,l,h,l,s,l,l,l,i?"Mostrar todos":"Estoque baixo")],r)
 if(m.QC()>0){i=A.dj(B.i,2)
 h.push(A.wP(l,A.C(l,A.n(""+m.QC(),l,l,l,B.r2,B.bO,l),B.f,l,B.Pu,new A.G(B.t,l,i,l,l,l,B.ei),l,l,l,B.hj,l,l,l),l,l,4,l,4,l))}i=A.a([A.iY(B.cO,h,B.f,B.cE,l)],r)
 if(k.b==="ADMIN")i.push(A.ca(l,l,l,B.Zk,l,new A.aHB(m,a),l,l,l,"Cadastrar Produto"))
-i.push(A.ca(l,l,l,B.ZE,l,new A.aHC(a),l,l,l,"Registrar Compra"))
+if(k.b==="ADMIN")i.push(A.ca(l,l,l,B.ZE,l,new A.aHC(a),l,l,l,"Registrar Compra"))
 i.push(A.ca(l,l,l,B.iQ,l,m.gail(),l,l,l,"Atualizar"))
 j=A.dq(i,l,0,j,l,B.dH,B.arc,l)
 if(m.f)i=B.bR
