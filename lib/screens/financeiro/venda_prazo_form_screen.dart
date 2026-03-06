@@ -1404,19 +1404,56 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 10),
-              TextField(
-                controller: codigoBarrasController,
-                decoration: InputDecoration(
-                  labelText: 'Código de Barras',
-                  labelStyle: const TextStyle(fontSize: 14),
-                  prefixIcon: const Icon(Icons.qr_code_2, color: Color(0xFF9333EA), size: 20),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  isDense: true,
-                ),
-                style: const TextStyle(fontSize: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: codigoBarrasController,
+                      decoration: InputDecoration(
+                        labelText: 'Código de Barras',
+                        labelStyle: const TextStyle(fontSize: 14),
+                        prefixIcon: const Icon(Icons.qr_code_2, color: Color(0xFF9333EA), size: 20),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        filled: true,
+                        fillColor: Colors.grey[50],
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                        isDense: true,
+                      ),
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () async {
+                      try {
+                        final codigo = await Navigator.push<String>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const BarcodeScannerUniversal(),
+                            fullscreenDialog: true,
+                          ),
+                        );
+                        
+                        if (codigo != null) {
+                          codigoBarrasController.text = codigo;
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Erro ao abrir scanner: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.qr_code_scanner, color: Color(0xFF9333EA)),
+                    tooltip: 'Escanear código',
+                    style: IconButton.styleFrom(
+                      backgroundColor: const Color(0xFF9333EA).withOpacity(0.1),
+                      padding: const EdgeInsets.all(12),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
