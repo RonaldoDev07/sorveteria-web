@@ -535,9 +535,12 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: () async {
               try {
-                final codigo = await showDialog<String>(
-                  context: context,
-                  builder: (_) => const BarcodeScannerUniversal(),
+                final codigo = await Navigator.push<String>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const BarcodeScannerUniversal(),
+                    fullscreenDialog: true,
+                  ),
                 );
                 
                 if (codigo != null && mounted) {

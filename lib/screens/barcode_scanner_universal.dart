@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// Scanner universal que funciona em qualquer plataforma
-/// - No navegador: mostra campo para digitar + botão para tentar câmera
-/// - No app: abre câmera diretamente
+/// Scanner universal em TELA CHEIA para melhor visualização
 class BarcodeScannerUniversal extends StatefulWidget {
   const BarcodeScannerUniversal({super.key});
 
@@ -99,65 +97,67 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: 500,
-        constraints: const BoxConstraints(maxHeight: 650),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
                 color: Color(0xFF9C27B0),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.qr_code_scanner, color: Colors.white),
+                  const Icon(Icons.qr_code_scanner, color: Colors.white, size: 28),
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
                       'Código de Barras',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
+                  if (_mostrarCamera && _cameraController != null)
+                    IconButton(
+                      icon: Icon(
+                        _cameraController!.torchEnabled ? Icons.flash_on : Icons.flash_off,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                      onPressed: () {
+                        _cameraController!.toggleTorch();
+                        setState(() {});
+                      },
+                      tooltip: 'Lanterna',
+                    ),
                   if (_cameraDisponivel && !_mostrarCamera)
                     IconButton(
-                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                      icon: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
                       onPressed: _tentarAbrirCamera,
                       tooltip: 'Abrir câmera',
                     ),
                   if (_mostrarCamera)
                     IconButton(
-                      icon: const Icon(Icons.keyboard, color: Colors.white),
+                      icon: const Icon(Icons.keyboard, color: Colors.white, size: 28),
                       onPressed: () {
                         setState(() => _mostrarCamera = false);
                       },
                       tooltip: 'Digitar manualmente',
                     ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
             ),
             
-            // Content
+            // Content - TELA CHEIA
             Expanded(
               child: _mostrarCamera && _cameraController != null
                   ? _buildCamera()
@@ -172,40 +172,39 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   Widget _buildCamera() {
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-          child: MobileScanner(
-            controller: _cameraController!,
-            onDetect: _onBarcodeDetect,
-            errorBuilder: (context, error, child) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Erro ao acessar câmera',
-                      style: TextStyle(color: Colors.grey[700]),
+        // Câmera em tela cheia
+        MobileScanner(
+          controller: _cameraController!,
+          onDetect: _onBarcodeDetect,
+          errorBuilder: (context, error, child) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 80, color: Colors.red),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Erro ao acessar câmera',
+                    style: TextStyle(color: Colors.grey[700], fontSize: 18),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() => _mostrarCamera = false);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF9C27B0),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     ),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() => _mostrarCamera = false);
-                      },
-                      child: const Text('Digitar manualmente'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+                    child: const Text('Digitar manualmente', style: TextStyle(fontSize: 16)),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
         
-        // Overlay com guia
+        // Overlay com guia MAIOR
         CustomPaint(
           painter: ScannerOverlay(),
           child: Container(),
@@ -213,23 +212,23 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
         
         // Instruções
         Positioned(
-          bottom: 20,
+          bottom: 40,
           left: 20,
           right: 20,
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.black.withOpacity(0.75),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: const Text(
               'Posicione o código de barras\ndentro da área marcada',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                height: 1.4,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                height: 1.5,
               ),
             ),
           ),
@@ -239,143 +238,147 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   }
 
   Widget _buildManualInput() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (!_cameraDisponivel) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline, color: Colors.orange),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Câmera não disponível neste dispositivo',
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 13,
+    return Container(
+      color: Colors.white,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!_cameraDisponivel) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: Colors.orange),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Câmera não disponível neste dispositivo',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 14,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+            
+            const Icon(
+              Icons.keyboard,
+              color: Color(0xFF9C27B0),
+              size: 80,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Digite o Código de Barras',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 24),
-          ],
-          
-          const Icon(
-            Icons.keyboard,
-            color: Color(0xFF9C27B0),
-            size: 64,
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Digite o Código de Barras',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: _codigoController,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            style: const TextStyle(
-              fontSize: 18,
-              letterSpacing: 2,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Ex: 7891234567890',
-              hintStyle: TextStyle(
-                color: Colors.grey[400],
+            TextField(
+              controller: _codigoController,
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                fontSize: 20,
+                letterSpacing: 2,
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 18,
-              ),
-            ),
-            onSubmitted: (_) => _confirmarCodigo(),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _confirmarCodigo,
-              icon: const Icon(Icons.check_circle, size: 24),
-              label: const Text(
-                'Confirmar',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF9C27B0),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              decoration: InputDecoration(
+                hintText: 'Ex: 7891234567890',
+                hintStyle: TextStyle(
+                  color: Colors.grey[400],
                 ),
-                elevation: 0,
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
+              ),
+              onSubmitted: (_) => _confirmarCodigo(),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _confirmarCodigo,
+                icon: const Icon(Icons.check_circle, size: 28),
+                label: const Text(
+                  'Confirmar',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF9C27B0),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Dica: O código geralmente tem 13 dígitos',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
+            const SizedBox(height: 16),
+            Text(
+              'Dica: O código geralmente tem 13 dígitos',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// Overlay personalizado para guiar o escaneamento
+// Overlay personalizado MAIOR para guiar o escaneamento
 class ScannerOverlay extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
+      ..color = Colors.black.withOpacity(0.6)
       ..style = PaintingStyle.fill;
 
+    // Área de scan MAIOR - 90% da largura e 50% da altura
     final scanArea = Rect.fromCenter(
       center: Offset(size.width / 2, size.height / 2),
-      width: size.width * 0.75,
-      height: size.height * 0.35,
+      width: size.width * 0.90,
+      height: size.height * 0.50,
     );
 
     // Desenhar overlay escuro ao redor da área de scan
     canvas.drawPath(
       Path()
         ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-        ..addRRect(RRect.fromRectAndRadius(scanArea, const Radius.circular(16)))
+        ..addRRect(RRect.fromRectAndRadius(scanArea, const Radius.circular(20)))
         ..fillType = PathFillType.evenOdd,
       paint,
     );
 
-    // Desenhar bordas da área de scan
+    // Desenhar bordas da área de scan - MAIS GROSSAS
     final borderPaint = Paint()
       ..color = const Color(0xFF9C27B0)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
+      ..strokeWidth = 6;
 
-    final cornerLength = 30.0;
+    final cornerLength = 50.0;
 
     // Cantos superiores
     canvas.drawLine(

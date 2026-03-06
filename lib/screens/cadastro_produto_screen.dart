@@ -34,9 +34,12 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
 
   Future<void> _abrirScanner() async {
     try {
-      final codigo = await showDialog<String>(
-        context: context,
-        builder: (_) => const BarcodeScannerUniversal(),
+      final codigo = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const BarcodeScannerUniversal(),
+          fullscreenDialog: true,
+        ),
       );
       
       if (codigo != null && mounted) {

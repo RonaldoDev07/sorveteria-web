@@ -460,9 +460,12 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
 
   Future<void> _abrirScanner() async {
     try {
-      final codigo = await showDialog<String>(
-        context: context,
-        builder: (_) => const BarcodeScannerUniversal(),
+      final codigo = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const BarcodeScannerUniversal(),
+          fullscreenDialog: true,
+        ),
       );
       
       if (codigo != null && mounted) {
@@ -1602,9 +1605,12 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                         
                         // Abrir scanner da tela principal
                         final parentContext = context;
-                        final codigo = await showDialog<String>(
-                          context: parentContext,
-                          builder: (_) => const BarcodeScannerUniversal(),
+                        final codigo = await Navigator.push<String>(
+                          parentContext,
+                          MaterialPageRoute(
+                            builder: (_) => const BarcodeScannerUniversal(),
+                            fullscreenDialog: true,
+                          ),
                         );
                         
                         if (codigo != null) {
