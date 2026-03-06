@@ -129,10 +129,12 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
   }
 
   void _adicionarProduto() {
+    final auth = Provider.of<AuthService>(context, listen: false);
     showDialog(
       context: context,
       builder: (context) => _DialogAdicionarProduto(
         produtos: _produtos,
+        auth: auth,
         onAdicionar: (produto, quantidade, valorUnitario) {
           setState(() {
             _itensVenda.add(_ItemVenda(
@@ -502,10 +504,12 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
 
     if (produto.codigoBarras == codigo) {
       // Produto encontrado, abrir dialog de adicionar com produto pré-selecionado
+      final auth = Provider.of<AuthService>(context, listen: false);
       showDialog(
         context: context,
         builder: (context) => _DialogAdicionarProduto(
           produtos: _produtos,
+          auth: auth,
           produtoInicial: produto,
           onAdicionar: (produto, quantidade, valorUnitario) {
             setState(() {
@@ -1223,12 +1227,14 @@ class _DialogAdicionarProduto extends StatefulWidget {
   final Function(Produto, int, double) onAdicionar;
   final Future<void> Function()? onProdutoCadastrado;
   final Produto? produtoInicial;
+  final AuthService auth;
 
   const _DialogAdicionarProduto({
     required this.produtos,
     required this.onAdicionar,
     this.onProdutoCadastrado,
     this.produtoInicial,
+    required this.auth,
   });
 
   @override
@@ -1585,19 +1591,20 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Tooltip(
-                    message: 'Cadastrar novo produto',
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        onPressed: () => _cadastrarProdutoRapido(context),
-                        icon: const Icon(Icons.add_circle, color: Colors.white, size: 28),
+                  if (widget.auth.canCadastrarProduto)
+                    Tooltip(
+                      message: 'Cadastrar novo produto',
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: IconButton(
+                          onPressed: () => _cadastrarProdutoRapido(context),
+                          icon: const Icon(Icons.add_circle, color: Colors.white, size: 28),
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -1707,6 +1714,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                             context: parentContext,
                             builder: (context) => _DialogAdicionarProduto(
                               produtos: widget.produtos,
+                              auth: widget.auth,
                               onAdicionar: widget.onAdicionar,
                               onProdutoCadastrado: widget.onProdutoCadastrado,
                             ),
