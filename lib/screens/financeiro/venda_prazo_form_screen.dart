@@ -11,7 +11,7 @@ import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
 import '../../utils/input_formatters.dart';
-import '../barcode_scanner_universal.dart';
+import '../barcode_scanner_screen.dart';
 
 class VendaPrazoFormScreen extends StatefulWidget {
   const VendaPrazoFormScreen({super.key});
@@ -476,7 +476,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
       final codigo = await Navigator.push<String>(
         context,
         MaterialPageRoute(
-          builder: (_) => const BarcodeScannerUniversal(),
+          builder: (_) => const BarcodeScannerScreen(),
           fullscreenDialog: true,
         ),
       );
@@ -1428,7 +1428,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                         final codigo = await Navigator.push<String>(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const BarcodeScannerUniversal(),
+                            builder: (_) => const BarcodeScannerScreen(),
                             fullscreenDialog: true,
                           ),
                         );
@@ -1669,7 +1669,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                           final codigo = await Navigator.push<String>(
                             parentContext,
                             MaterialPageRoute(
-                              builder: (_) => const BarcodeScannerUniversal(),
+                              builder: (_) => const BarcodeScannerScreen(),
                               fullscreenDialog: true,
                             ),
                           );

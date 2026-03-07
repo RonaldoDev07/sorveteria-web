@@ -9,58 +9,40 @@ class BarcodeScannerScreen extends StatefulWidget {
 }
 
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
-  MobileScannerController cameraController = MobileScannerController(
-    detectionSpeed: DetectionSpeed.normal,
+  final MobileScannerController _controller = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
     facing: CameraFacing.back,
-    torchEnabled: false,
-    returnImage: false,
-    formats: [
-      BarcodeFormat.ean13,
-      BarcodeFormat.ean8,
-      BarcodeFormat.code128,
-      BarcodeFormat.code39,
-      BarcodeFormat.code93,
-      BarcodeFormat.upcA,
-      BarcodeFormat.upcE,
-    ],
   );
-  bool _isScanning = true;
+
+  bool _isProcessing = false;
+  bool _torchEnabled = false;
 
   @override
   void dispose() {
-    cameraController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   void _onDetect(BarcodeCapture capture) {
-    if (!_isScanning) return;
+    if (_isProcessing) return;
 
     final List<Barcode> barcodes = capture.barcodes;
-    
-    if (barcodes.isNotEmpty) {
-      final barcode = barcodes.first;
-      final String? code = barcode.rawValue;
-      
-      if (code != null && code.isNotEmpty && code.length >= 8) {
-        setState(() => _isScanning = false);
-        
-        // Mostrar feedback visual
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Código detectado: $code'),
-            duration: const Duration(milliseconds: 500),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
-        // Aguardar um pouco antes de retornar para dar feedback
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted) {
-            Navigator.pop(context, code);
-          }
-        });
-      }
+    if (barcodes.isEmpty) return;
+
+    final barcode = barcodes.first;
+    final String? code = barcode.rawValue;
+
+    if (code != null && code.isNotEmpty) {
+      setState(() => _isProcessing = true);
+      Navigator.of(context).pop(code);
     }
+  }
+
+  void _toggleTorch() {
+    setState(() {
+      _torchEnabled = !_torchEnabled;
+    });
+    _controller.toggleTorch();
   }
 
   @override
@@ -68,25 +50,20 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          'Escanear Código de Barras',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        backgroundColor: const Color(0xFF9C27B0),
-        elevation: 0,
+        title: const Text('Escanear Código de Barras'),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.flash_on),
-            onPressed: () => cameraController.toggleTorch(),
-            tooltip: 'Ligar/Desligar Flash',
+            icon: Icon(
+              _torchEnabled ? Icons.flash_on : Icons.flash_off,
+              color: _torchEnabled ? Colors.yellow : Colors.grey,
+            ),
+            onPressed: _toggleTorch,
           ),
           IconButton(
             icon: const Icon(Icons.cameraswitch),
-            onPressed: () => cameraController.switchCamera(),
-            tooltip: 'Trocar Câmera',
+            onPressed: () => _controller.switchCamera(),
           ),
         ],
       ),
@@ -94,7 +71,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         children: [
           // Scanner
           MobileScanner(
-            controller: cameraController,
+            controller: _controller,
             onDetect: _onDetect,
           ),
           
@@ -117,7 +94,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
                       'Posicione o código de barras\ndentro da área marcada',
@@ -126,21 +103,6 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.keyboard),
-                    label: const Text('Digitar Manualmente'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF9C27B0),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
@@ -154,80 +116,73 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   }
 }
 
-// Overlay personalizado para guiar o escaneamento
 class ScannerOverlay extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
-      ..style = PaintingStyle.fill;
+    final double scanAreaWidth = size.width * 0.8;
+    final double scanAreaHeight = size.height * 0.3;
+    final double left = (size.width - scanAreaWidth) / 2;
+    final double top = (size.height - scanAreaHeight) / 2;
 
-    final scanArea = Rect.fromCenter(
-      center: Offset(size.width / 2, size.height / 2),
-      width: size.width * 0.8,
-      height: size.height * 0.3,
+    // Escurecer área fora do scanner
+    final backgroundPath = Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    
+    final scanAreaPath = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(left, top, scanAreaWidth, scanAreaHeight),
+        const Radius.circular(12),
+      ));
+
+    final overlayPath = Path.combine(
+      PathOperation.difference,
+      backgroundPath,
+      scanAreaPath,
     );
 
-    // Desenhar overlay escuro ao redor da área de scan
     canvas.drawPath(
-      Path()
-        ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-        ..addRRect(RRect.fromRectAndRadius(scanArea, const Radius.circular(16)))
-        ..fillType = PathFillType.evenOdd,
-      paint,
+      overlayPath,
+      Paint()..color = Colors.black.withOpacity(0.6),
     );
 
-    // Desenhar bordas da área de scan
+    // Desenhar borda do scanner
     final borderPaint = Paint()
-      ..color = const Color(0xFF9C27B0)
+      ..color = Colors.green
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
+      ..strokeWidth = 3;
 
-    final cornerLength = 30.0;
-
-    // Cantos superiores
-    canvas.drawLine(
-      Offset(scanArea.left, scanArea.top),
-      Offset(scanArea.left + cornerLength, scanArea.top),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(scanArea.left, scanArea.top),
-      Offset(scanArea.left, scanArea.top + cornerLength),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(scanArea.right, scanArea.top),
-      Offset(scanArea.right - cornerLength, scanArea.top),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(scanArea.right, scanArea.top),
-      Offset(scanArea.right, scanArea.top + cornerLength),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(left, top, scanAreaWidth, scanAreaHeight),
+        const Radius.circular(12),
+      ),
       borderPaint,
     );
 
-    // Cantos inferiores
-    canvas.drawLine(
-      Offset(scanArea.left, scanArea.bottom),
-      Offset(scanArea.left + cornerLength, scanArea.bottom),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(scanArea.left, scanArea.bottom),
-      Offset(scanArea.left, scanArea.bottom - cornerLength),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(scanArea.right, scanArea.bottom),
-      Offset(scanArea.right - cornerLength, scanArea.bottom),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(scanArea.right, scanArea.bottom),
-      Offset(scanArea.right, scanArea.bottom - cornerLength),
-      borderPaint,
-    );
+    // Desenhar cantos
+    final cornerPaint = Paint()
+      ..color = Colors.green
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round;
+
+    const cornerLength = 30.0;
+
+    // Canto superior esquerdo
+    canvas.drawLine(Offset(left, top), Offset(left + cornerLength, top), cornerPaint);
+    canvas.drawLine(Offset(left, top), Offset(left, top + cornerLength), cornerPaint);
+
+    // Canto superior direito
+    canvas.drawLine(Offset(left + scanAreaWidth, top), Offset(left + scanAreaWidth - cornerLength, top), cornerPaint);
+    canvas.drawLine(Offset(left + scanAreaWidth, top), Offset(left + scanAreaWidth, top + cornerLength), cornerPaint);
+
+    // Canto inferior esquerdo
+    canvas.drawLine(Offset(left, top + scanAreaHeight), Offset(left + cornerLength, top + scanAreaHeight), cornerPaint);
+    canvas.drawLine(Offset(left, top + scanAreaHeight), Offset(left, top + scanAreaHeight - cornerLength), cornerPaint);
+
+    // Canto inferior direito
+    canvas.drawLine(Offset(left + scanAreaWidth, top + scanAreaHeight), Offset(left + scanAreaWidth - cornerLength, top + scanAreaHeight), cornerPaint);
+    canvas.drawLine(Offset(left + scanAreaWidth, top + scanAreaHeight), Offset(left + scanAreaWidth, top + scanAreaHeight - cornerLength), cornerPaint);
   }
 
   @override

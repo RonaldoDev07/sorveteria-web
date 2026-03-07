@@ -92,13 +92,13 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
               
               if (dataMovStr == dataInicio) {
                 vendasEncontradas++;
-                final lucroUnitario = mov['lucro_unitario'];
+                final valorUnitario = mov['valor_unitario'];
                 final quantidade = mov['quantidade'];
                 
-                if (lucroUnitario != null && quantidade != null) {
-                  final lucro = (lucroUnitario is num ? lucroUnitario.toDouble() : double.tryParse(lucroUnitario.toString()) ?? 0.0);
+                if (valorUnitario != null && quantidade != null) {
+                  final valor = (valorUnitario is num ? valorUnitario.toDouble() : double.tryParse(valorUnitario.toString()) ?? 0.0);
                   final qtd = (quantidade is num ? quantidade.toDouble() : double.tryParse(quantidade.toString()) ?? 0.0);
-                  final valorVenda = lucro * qtd;
+                  final valorVenda = valor * qtd;
                   totalVendas += valorVenda;
                 }
               }
@@ -133,13 +133,13 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
             try {
               final dataParsed = DateTime.parse(dataHora);
               if (dataParsed.isAfter(seteDiasAtras) && dataParsed.isBefore(hoje.add(const Duration(days: 1)))) {
-                final lucroUnitario = mov['lucro_unitario'];
+                final valorUnitario = mov['valor_unitario'];
                 final quantidade = mov['quantidade'];
                 
-                if (lucroUnitario != null && quantidade != null) {
-                  final lucro = (lucroUnitario is num ? lucroUnitario.toDouble() : double.tryParse(lucroUnitario.toString()) ?? 0.0);
+                if (valorUnitario != null && quantidade != null) {
+                  final valor = (valorUnitario is num ? valorUnitario.toDouble() : double.tryParse(valorUnitario.toString()) ?? 0.0);
                   final qtd = (quantidade is num ? quantidade.toDouble() : double.tryParse(quantidade.toString()) ?? 0.0);
-                  final valorVenda = lucro * qtd;
+                  final valorVenda = valor * qtd;
                   totalVendas += valorVenda;
                 }
               }
@@ -292,13 +292,10 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
                   color: const Color(0xFF10B981).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  'R\$',
-                  style: TextStyle(
-                    color: Color(0xFF10B981),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: const Icon(
+                  Icons.trending_up,
+                  color: Color(0xFF10B981),
+                  size: 16,
                 ),
               ),
               const SizedBox(width: 8),
