@@ -10,7 +10,7 @@ import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
 import '../../utils/input_formatters.dart';
-import '../barcode_scanner_screen.dart';
+import '../barcode_scanner_universal.dart';
 
 /// Tela de compra à vista - similar à compra a prazo mas sem parcelas
 class CompraVistaFormScreen extends StatefulWidget {

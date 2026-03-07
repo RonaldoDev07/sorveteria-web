@@ -4,7 +4,7 @@ import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import 'entrada_estoque_screen.dart';
 import 'baixa_estoque_screen.dart';
-import 'barcode_scanner_screen.dart';
+import 'barcode_scanner_universal.dart';
 
 class SelecionarProdutoScreen extends StatefulWidget {
   final String tipo; // 'ENTRADA' ou 'SAIDA'
@@ -110,7 +110,7 @@ class _SelecionarProdutoScreenState extends State<SelecionarProdutoScreen> {
       final codigo = await Navigator.push<String>(
         context,
         MaterialPageRoute(
-          builder: (_) => const BarcodeScannerScreen(),
+          builder: (_) => const BarcodeScannerUniversal(),
           fullscreenDialog: true,
         ),
       );

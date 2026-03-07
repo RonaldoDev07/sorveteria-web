@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import '../utils/text_formatters.dart';
-import 'barcode_scanner_screen.dart';
+import 'barcode_scanner_universal.dart';
 
 class EditarProdutoScreen extends StatefulWidget {
   final Map<String, dynamic> produto;
@@ -64,7 +64,7 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
       final codigo = await Navigator.push<String>(
         context,
         MaterialPageRoute(
-          builder: (_) => const BarcodeScannerScreen(),
+          builder: (_) => const BarcodeScannerUniversal(),
           fullscreenDialog: true,
         ),
       );

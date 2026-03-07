@@ -23,8 +23,10 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   @override
   void initState() {
     super.initState();
-    // Sempre tentar abrir câmera primeiro (web e app)
-    _tentarAbrirCamera();
+    // Apenas abrir câmera se NÃO for web
+    if (!kIsWeb) {
+      _tentarAbrirCamera();
+    }
   }
 
   @override
@@ -146,7 +148,7 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
                       ),
                     ),
                   ),
-                  if (_mostrarCamera && _cameraController != null) ...[
+                  if (!kIsWeb && _mostrarCamera && _cameraController != null) ...[
                     IconButton(
                       icon: const Icon(Icons.flip_camera_ios, color: Colors.white, size: 28),
                       onPressed: _alternarCamera,
@@ -180,13 +182,13 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
                       tooltip: 'Lanterna',
                     ),
                   ],
-                  if (_cameraDisponivel && !_mostrarCamera)
+                  if (!kIsWeb && _cameraDisponivel && !_mostrarCamera)
                     IconButton(
                       icon: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
                       onPressed: _tentarAbrirCamera,
                       tooltip: 'Abrir câmera',
                     ),
-                  if (_mostrarCamera)
+                  if (!kIsWeb && _mostrarCamera)
                     IconButton(
                       icon: const Icon(Icons.keyboard, color: Colors.white, size: 28),
                       onPressed: () {
@@ -204,7 +206,7 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
             
             // Content - TELA CHEIA
             Expanded(
-              child: _mostrarCamera && _cameraController != null
+              child: !kIsWeb && _mostrarCamera && _cameraController != null
                   ? _buildCamera()
                   : _buildManualInput(),
             ),
@@ -313,7 +315,33 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!_cameraDisponivel) ...[
+            if (kIsWeb) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: Colors.blue),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Scanner de câmera disponível apenas no aplicativo instalado',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+            if (!kIsWeb && !_cameraDisponivel) ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-import 'barcode_scanner_screen.dart';
+import 'barcode_scanner_universal.dart';
 
 class CadastroProdutoScreen extends StatefulWidget {
   const CadastroProdutoScreen({super.key});
@@ -37,7 +37,7 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
       final codigo = await Navigator.push<String>(
         context,
         MaterialPageRoute(
-          builder: (_) => const BarcodeScannerScreen(),
+          builder: (_) => const BarcodeScannerUniversal(),
           fullscreenDialog: true,
         ),
       );

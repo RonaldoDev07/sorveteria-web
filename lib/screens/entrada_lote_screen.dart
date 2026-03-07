@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import '../utils/text_formatters.dart';
-import 'barcode_scanner_screen.dart';
+import 'barcode_scanner_universal.dart';
 
 class EntradaLoteScreen extends StatefulWidget {
   const EntradaLoteScreen({super.key});
@@ -72,7 +72,7 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
       final codigo = await Navigator.push<String>(
         context,
         MaterialPageRoute(
-          builder: (_) => const BarcodeScannerScreen(),
+          builder: (_) => const BarcodeScannerUniversal(),
           fullscreenDialog: true,
         ),
       );
