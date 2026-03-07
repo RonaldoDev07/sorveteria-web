@@ -176,6 +176,7 @@ class ApiService {
     String unidade,
     double preco, {
     String? dataValidade,
+    String? codigoBarras,
   }) async {
     final body = {
       'nome': nome,
@@ -185,6 +186,10 @@ class ApiService {
     
     if (dataValidade != null) {
       body['data_validade'] = dataValidade;
+    }
+    
+    if (codigoBarras != null && codigoBarras.isNotEmpty) {
+      body['codigo_barras'] = codigoBarras;
     }
     
     final response = await http.put(

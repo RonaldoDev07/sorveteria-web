@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'financeiro/compra_vista_form_screen.dart';
 import 'financeiro/compra_prazo_form_screen.dart';
+import 'entrada_lote_screen.dart';
 
 /// Tela de menu para escolher tipo de compra (à vista ou a prazo)
 class ComprasMenuScreen extends StatelessWidget {
@@ -54,6 +55,21 @@ class ComprasMenuScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
+            _TipoCompraCard(
+              emoji: '📦',
+              title: 'Entrada em Lote',
+              subtitle: 'Adicionar vários produtos',
+              color: const Color(0xFF0891B2),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const EntradaLoteScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
             _TipoCompraCard(
               emoji: '💵',
               title: 'Compra à Vista',

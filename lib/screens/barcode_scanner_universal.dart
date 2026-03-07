@@ -34,11 +34,11 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   Future<void> _tentarAbrirCamera() async {
     try {
       _cameraController = MobileScannerController(
-        detectionSpeed: DetectionSpeed.noDuplicates,
+        detectionSpeed: DetectionSpeed.normal,
         facing: CameraFacing.back,
         torchEnabled: false,
         returnImage: false,
-        autoStart: true,
+        autoStart: false,
         formats: [
           BarcodeFormat.ean13,
           BarcodeFormat.ean8,
@@ -51,6 +51,16 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
       );
       
       await _cameraController!.start();
+      
+      // Aguardar um pouco para câmera inicializar
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      // Aplicar zoom para melhor foco de perto (1.5x a 2x)
+      try {
+        await _cameraController!.setZoomScale(1.8);
+      } catch (e) {
+        print('⚠️ Zoom não suportado: $e');
+      }
       
       if (mounted) {
         setState(() {
@@ -249,7 +259,7 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
                         Icon(Icons.lightbulb_outline, color: Colors.yellow[300], size: 20),
                         const SizedBox(width: 8),
                         const Text(
-                          'Dica: Mantenha distância de 15-20cm',
+                          'Dica: Mantenha distância de 10-15cm',
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 13,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import '../utils/text_formatters.dart';
+import 'barcode_scanner_universal.dart';
 
 class EditarProdutoScreen extends StatefulWidget {
   final Map<String, dynamic> produto;
@@ -16,6 +17,7 @@ class EditarProdutoScreen extends StatefulWidget {
 class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nomeController;
+  late TextEditingController _codigoBarrasController;
   late TextEditingController _precoController;
   late String _unidade;
   bool _isLoading = false;
@@ -25,6 +27,9 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
   void initState() {
     super.initState();
     _nomeController = TextEditingController(text: widget.produto['nome']);
+    _codigoBarrasController = TextEditingController(
+      text: widget.produto['codigo_barras']?.toString() ?? '',
+    );
     // Formatar preço removendo zeros desnecessários
     final preco = double.parse(widget.produto['preco_venda'].toString());
     _precoController = TextEditingController(
@@ -54,9 +59,37 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
     return numero.toStringAsFixed(3).replaceAll(RegExp(r'\.?0+$'), '');
   }
 
+  Future<void> _abrirScanner() async {
+    try {
+      final codigo = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const BarcodeScannerUniversal(),
+          fullscreenDialog: true,
+        ),
+      );
+      
+      if (codigo != null && mounted) {
+        setState(() {
+          _codigoBarrasController.text = codigo;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir scanner: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _nomeController.dispose();
+    _codigoBarrasController.dispose();
     _precoController.dispose();
     super.dispose();
   }
@@ -90,6 +123,7 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
         _unidade,
         preco,
         dataValidade: dataValidadeStr,
+        codigoBarras: _codigoBarrasController.text.isEmpty ? null : _codigoBarrasController.text,
       );
 
       if (mounted) {
@@ -229,6 +263,44 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
                   ),
                   validator: (value) =>
                       value?.isEmpty ?? true ? 'Campo obrigatório' : null,
+                ),
+                const SizedBox(height: 16),
+                // Código de Barras
+                TextFormField(
+                  controller: _codigoBarrasController,
+                  decoration: InputDecoration(
+                    labelText: 'Código de Barras (opcional)',
+                    hintText: 'Escanear ou digitar',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    prefixIcon: const Icon(Icons.qr_code_rounded),
+                    suffixIcon: Container(
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Colors.indigo, Colors.indigoAccent],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white),
+                        onPressed: _abrirScanner,
+                        tooltip: 'Escanear código de barras',
+                      ),
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  onTap: () {
+                    if (_codigoBarrasController.text.isNotEmpty) {
+                      _codigoBarrasController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _codigoBarrasController.text.length,
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
