@@ -72,27 +72,51 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
       final hoje = DateTime.now();
       final dataInicio = '${hoje.year}-${hoje.month.toString().padLeft(2, '0')}-${hoje.day.toString().padLeft(2, '0')}';
       
+      print('🔍 DEBUG: Buscando vendas de hoje: $dataInicio');
+      
       // Buscar movimentações do dia
       final movimentacoes = await ApiService.getMovimentacoes(token);
       
+      print('🔍 DEBUG: Total de movimentações: ${movimentacoes.length}');
+      
       // Filtrar apenas vendas (SAIDA) de hoje
       double totalVendas = 0.0;
+      int vendasEncontradas = 0;
+      
       for (var mov in movimentacoes) {
         if (mov['tipo'] == 'SAIDA') {
-          // Verificar se é de hoje
+          // Debug: mostrar TODOS os campos da movimentação
+          print('🔍 DEBUG: Movimentação SAIDA completa: $mov');
+          
           final dataMov = mov['data_movimentacao'] ?? '';
-          if (dataMov.startsWith(dataInicio)) {
-            final valorTotal = mov['valor_total'];
-            if (valorTotal != null) {
-              totalVendas += (valorTotal is num ? valorTotal.toDouble() : double.tryParse(valorTotal.toString()) ?? 0.0);
+          print('🔍 DEBUG: Campo data_movimentacao: $dataMov');
+          
+          // Verificar se é de hoje (comparar apenas a data, ignorando hora)
+          if (dataMov.isNotEmpty) {
+            try {
+              final dataParsed = DateTime.parse(dataMov);
+              final dataMovStr = '${dataParsed.year}-${dataParsed.month.toString().padLeft(2, '0')}-${dataParsed.day.toString().padLeft(2, '0')}';
+              
+              if (dataMovStr == dataInicio) {
+                vendasEncontradas++;
+                final valorTotal = mov['valor_total'];
+                if (valorTotal != null) {
+                  final valor = (valorTotal is num ? valorTotal.toDouble() : double.tryParse(valorTotal.toString()) ?? 0.0);
+                  totalVendas += valor;
+                  print('🔍 DEBUG: Venda encontrada! Valor: R\$ $valor - Total acumulado: R\$ $totalVendas');
+                }
+              }
+            } catch (e) {
+              print('⚠️ Erro ao parsear data: $dataMov - $e');
             }
           }
         }
       }
       
+      print('✅ DEBUG: Total de vendas hoje: $vendasEncontradas vendas = R\$ $totalVendas');
       return totalVendas;
     } catch (e) {
-      print('Erro ao buscar vendas de hoje: $e');
+      print('❌ Erro ao buscar vendas de hoje: $e');
       return 0.0;
     }
   }

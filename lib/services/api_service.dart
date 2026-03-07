@@ -89,35 +89,37 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> login(String login, String senha) async {
-    try {
-      print('📡 Enviando requisição de login para: $baseUrl/login/json');
-      
-      final response = await http.post(
-        Uri.parse('$baseUrl/login/json'),
-        headers: _getHeaders(null),
-        body: _encodeBody({'login': login, 'senha': senha}),
-      ).timeout(const Duration(seconds: 30)); // 🔥 Timeout aumentado para 30s
+    return _retryRequest(() async {
+      try {
+        print('📡 Enviando requisição de login para: $baseUrl/login/json');
+        
+        final response = await http.post(
+          Uri.parse('$baseUrl/login/json'),
+          headers: _getHeaders(null),
+          body: _encodeBody({'login': login, 'senha': senha}),
+        ).timeout(const Duration(seconds: 30)); // 🔥 Timeout aumentado para 30s
 
-      print('📥 Resposta recebida - Status: ${response.statusCode}');
+        print('📥 Resposta recebida - Status: ${response.statusCode}');
 
-      if (response.statusCode == 200) {
-        final data = _decodeResponse(response);
-        print('✅ Login bem-sucedido! Token recebido.');
-        return data;
-      } else if (response.statusCode == 401) {
-        print('❌ Credenciais inválidas (401)');
-        throw Exception('Credenciais inválidas');
-      } else {
-        print('❌ Erro no servidor: ${response.statusCode}');
-        throw Exception('Erro no servidor: ${response.statusCode}');
+        if (response.statusCode == 200) {
+          final data = _decodeResponse(response);
+          print('✅ Login bem-sucedido! Token recebido.');
+          return data;
+        } else if (response.statusCode == 401) {
+          print('❌ Credenciais inválidas (401)');
+          throw Exception('Credenciais inválidas');
+        } else {
+          print('❌ Erro no servidor: ${response.statusCode}');
+          throw Exception('Erro no servidor: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('❌ Exceção no login: $e');
+        if (e.toString().contains('TimeoutException')) {
+          throw Exception('Servidor demorando para responder. Aguarde e tente novamente.');
+        }
+        rethrow;
       }
-    } catch (e) {
-      print('❌ Exceção no login: $e');
-      if (e.toString().contains('TimeoutException')) {
-        throw Exception('Servidor demorando para responder. Aguarde e tente novamente.');
-      }
-      rethrow;
-    }
+    });
   }
 
   static Future<List<dynamic>> getProdutos(String token) async {
@@ -151,18 +153,20 @@ class ApiService {
     String token,
     String codigoBarras,
   ) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/produtos/barcode/$codigoBarras'),
-      headers: _getHeaders(token),
-    );
+    return _retryRequest(() async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/produtos/barcode/$codigoBarras'),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else if (response.statusCode == 404) {
-      throw Exception('Produto não encontrado com este código de barras');
-    } else {
-      throw Exception('Erro ao buscar produto');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else if (response.statusCode == 404) {
+        throw Exception('Produto não encontrado com este código de barras');
+      } else {
+        throw Exception('Erro ao buscar produto');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> criarProduto(
@@ -175,33 +179,35 @@ class ApiService {
     String? dataValidade,
     String? codigoBarras,
   }) async {
-    final body = {
-      'nome': nome,
-      'unidade': unidade,
-      'custo_medio': custo,
-      'preco_venda': preco,
-      'estoque_atual': estoqueAtual,
-    };
-    
-    if (dataValidade != null) {
-      body['data_validade'] = dataValidade;
-    }
-    
-    if (codigoBarras != null && codigoBarras.isNotEmpty) {
-      body['codigo_barras'] = codigoBarras;
-    }
-    
-    final response = await http.post(
-      Uri.parse('$baseUrl/produtos'),
-      headers: _getHeaders(token),
-      body: _encodeBody(body),
-    );
+    return _retryRequest(() async {
+      final body = {
+        'nome': nome,
+        'unidade': unidade,
+        'custo_medio': custo,
+        'preco_venda': preco,
+        'estoque_atual': estoqueAtual,
+      };
+      
+      if (dataValidade != null) {
+        body['data_validade'] = dataValidade;
+      }
+      
+      if (codigoBarras != null && codigoBarras.isNotEmpty) {
+        body['codigo_barras'] = codigoBarras;
+      }
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/produtos'),
+        headers: _getHeaders(token),
+        body: _encodeBody(body),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      throw Exception('Erro ao criar produto');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        throw Exception('Erro ao criar produto');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> atualizarProduto(
@@ -213,48 +219,52 @@ class ApiService {
     String? dataValidade,
     String? codigoBarras,
   }) async {
-    final body = {
-      'nome': nome,
-      'unidade': unidade,
-      'preco_venda': preco,
-    };
-    
-    if (dataValidade != null) {
-      body['data_validade'] = dataValidade;
-    }
-    
-    if (codigoBarras != null && codigoBarras.isNotEmpty) {
-      body['codigo_barras'] = codigoBarras;
-    }
-    
-    final response = await http.put(
-      Uri.parse('$baseUrl/produtos/$produtoId'),
-      headers: _getHeaders(token),
-      body: _encodeBody(body),
-    );
+    return _retryRequest(() async {
+      final body = {
+        'nome': nome,
+        'unidade': unidade,
+        'preco_venda': preco,
+      };
+      
+      if (dataValidade != null) {
+        body['data_validade'] = dataValidade;
+      }
+      
+      if (codigoBarras != null && codigoBarras.isNotEmpty) {
+        body['codigo_barras'] = codigoBarras;
+      }
+      
+      final response = await http.put(
+        Uri.parse('$baseUrl/produtos/$produtoId'),
+        headers: _getHeaders(token),
+        body: _encodeBody(body),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      throw Exception('Erro ao atualizar produto');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        throw Exception('Erro ao atualizar produto');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> deletarProduto(
     String token,
     int produtoId,
   ) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/produtos/$produtoId'),
-      headers: _getHeaders(token),
-    );
+    return _retryRequest(() async {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/produtos/$produtoId'),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao deletar produto');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao deletar produto');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> registrarMovimentacao(
@@ -265,32 +275,34 @@ class ApiService {
     double? custoUnitario,
     String? formaPagamento,
   }) async {
-    final body = {
-      'produto_id': produtoId,
-      'tipo': tipo,
-      'quantidade': quantidade,
-    };
-    
-    if (custoUnitario != null) {
-      body['custo_unitario'] = custoUnitario;
-    }
-    
-    if (formaPagamento != null && tipo == 'SAIDA') {
-      body['forma_pagamento'] = formaPagamento;
-    }
+    return _retryRequest(() async {
+      final body = {
+        'produto_id': produtoId,
+        'tipo': tipo,
+        'quantidade': quantidade,
+      };
+      
+      if (custoUnitario != null) {
+        body['custo_unitario'] = custoUnitario;
+      }
+      
+      if (formaPagamento != null && tipo == 'SAIDA') {
+        body['forma_pagamento'] = formaPagamento;
+      }
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/movimentacoes'),
-      headers: _getHeaders(token),
-      body: _encodeBody(body),
-    );
+      final response = await http.post(
+        Uri.parse('$baseUrl/movimentacoes'),
+        headers: _getHeaders(token),
+        body: _encodeBody(body),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao registrar movimentação');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao registrar movimentação');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> criarMovimentacao(
@@ -301,28 +313,30 @@ class ApiService {
     String tipo,
     String? observacao,
   ) async {
-    final body = {
-      'produto_id': produtoId,
-      'tipo': tipo,
-      'quantidade': quantidade,
-    };
-    
-    if (tipo != 'AJUSTE' && valorUnitario > 0) {
-      body['custo_unitario'] = valorUnitario;
-    }
+    return _retryRequest(() async {
+      final body = {
+        'produto_id': produtoId,
+        'tipo': tipo,
+        'quantidade': quantidade,
+      };
+      
+      if (tipo != 'AJUSTE' && valorUnitario > 0) {
+        body['custo_unitario'] = valorUnitario;
+      }
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/movimentacoes'),
-      headers: _getHeaders(token),
-      body: _encodeBody(body),
-    );
+      final response = await http.post(
+        Uri.parse('$baseUrl/movimentacoes'),
+        headers: _getHeaders(token),
+        body: _encodeBody(body),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao criar movimentação');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao criar movimentação');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> getRelatorioLucro(
@@ -330,77 +344,85 @@ class ApiService {
     String? dataInicio,
     String? dataFim,
   ) async {
-    var url = '$baseUrl/relatorios/lucro';
-    final params = <String>[];
+    return _retryRequest(() async {
+      var url = '$baseUrl/relatorios/lucro';
+      final params = <String>[];
 
-    if (dataInicio != null && dataInicio.isNotEmpty) {
-      params.add('data_inicio=$dataInicio');
-    }
-    if (dataFim != null && dataFim.isNotEmpty) {
-      params.add('data_fim=$dataFim');
-    }
+      if (dataInicio != null && dataInicio.isNotEmpty) {
+        params.add('data_inicio=$dataInicio');
+      }
+      if (dataFim != null && dataFim.isNotEmpty) {
+        params.add('data_fim=$dataFim');
+      }
 
-    if (params.isNotEmpty) {
-      url += '?${params.join('&')}';
-    }
+      if (params.isNotEmpty) {
+        url += '?${params.join('&')}';
+      }
 
-    final response = await http.get(
-      Uri.parse(url),
-      headers: _getHeaders(token),
-    );
+      final response = await http.get(
+        Uri.parse(url),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else if (response.statusCode == 401) {
-      throw Exception('401');
-    } else {
-      throw Exception('Erro ao buscar relatório');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else if (response.statusCode == 401) {
+        throw Exception('401');
+      } else {
+        throw Exception('Erro ao buscar relatório');
+      }
+    });
   }
 
   static Future<List<dynamic>> getMovimentacoes(String token) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/movimentacoes'),
-      headers: _getHeaders(token),
-    );
+    return _retryRequest(() async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/movimentacoes'),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      throw Exception('Erro ao buscar movimentações');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        throw Exception('Erro ao buscar movimentações');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> cancelarMovimentacao(
     String token,
     int movimentacaoId,
   ) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/movimentacoes/$movimentacaoId'),
-      headers: _getHeaders(token),
-    );
+    return _retryRequest(() async {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/movimentacoes/$movimentacaoId'),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao cancelar movimentação');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao cancelar movimentação');
+      }
+    });
   }
 
   // ========== USUÁRIOS ==========
 
   static Future<List<dynamic>> getUsuarios(String token) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/usuarios'),
-      headers: _getHeaders(token),
-    );
+    return _retryRequest(() async {
+      final response = await http.get(
+        Uri.parse('$baseUrl/usuarios'),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      throw Exception('Erro ao buscar usuários');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        throw Exception('Erro ao buscar usuários');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> criarUsuario(
@@ -410,23 +432,25 @@ class ApiService {
     String senha,
     String perfil,
   ) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/usuarios'),
-      headers: _getHeaders(token),
-      body: _encodeBody({
-        'nome': nome,
-        'login': login,
-        'senha': senha,
-        'perfil': perfil,
-      }),
-    );
+    return _retryRequest(() async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/usuarios'),
+        headers: _getHeaders(token),
+        body: _encodeBody({
+          'nome': nome,
+          'login': login,
+          'senha': senha,
+          'perfil': perfil,
+        }),
+      );
 
-    if (response.statusCode == 201) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao criar usuário');
-    }
+      if (response.statusCode == 201) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao criar usuário');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> atualizarUsuario(
@@ -438,60 +462,66 @@ class ApiService {
     String? perfil,
     bool? ativo,
   ) async {
-    final body = <String, dynamic>{};
-    
-    if (nome != null) body['nome'] = nome;
-    if (login != null) body['login'] = login;
-    if (senha != null) body['senha'] = senha;
-    if (perfil != null) body['perfil'] = perfil;
-    if (ativo != null) body['ativo'] = ativo;
+    return _retryRequest(() async {
+      final body = <String, dynamic>{};
+      
+      if (nome != null) body['nome'] = nome;
+      if (login != null) body['login'] = login;
+      if (senha != null) body['senha'] = senha;
+      if (perfil != null) body['perfil'] = perfil;
+      if (ativo != null) body['ativo'] = ativo;
 
-    final response = await http.put(
-      Uri.parse('$baseUrl/usuarios/$usuarioId'),
-      headers: _getHeaders(token),
-      body: _encodeBody(body),
-    );
+      final response = await http.put(
+        Uri.parse('$baseUrl/usuarios/$usuarioId'),
+        headers: _getHeaders(token),
+        body: _encodeBody(body),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao atualizar usuário');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao atualizar usuário');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> deletarUsuario(
     String token,
     int usuarioId,
   ) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/usuarios/$usuarioId'),
-      headers: _getHeaders(token),
-    );
+    return _retryRequest(() async {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/usuarios/$usuarioId'),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao deletar usuário');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao deletar usuário');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> toggleAtivoUsuario(
     String token,
     int usuarioId,
   ) async {
-    final response = await http.patch(
-      Uri.parse('$baseUrl/usuarios/$usuarioId/toggle-ativo'),
-      headers: _getHeaders(token),
-    );
+    return _retryRequest(() async {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/usuarios/$usuarioId/toggle-ativo'),
+        headers: _getHeaders(token),
+      );
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else {
-      final error = _decodeResponse(response);
-      throw Exception(error['detail'] ?? 'Erro ao alterar status do usuário');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else {
+        final error = _decodeResponse(response);
+        throw Exception(error['detail'] ?? 'Erro ao alterar status do usuário');
+      }
+    });
   }
 
   // ========== FOTO DE PERFIL ==========
