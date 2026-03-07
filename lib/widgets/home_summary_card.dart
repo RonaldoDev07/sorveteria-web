@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
@@ -17,11 +18,24 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
   double _vendasSemana = 0.0;
   int _produtosEstoqueBaixo = 0;
   int _parcelasVencidas = 0;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _carregarResumo();
+    // Atualizar a cada 1 minuto
+    _refreshTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted) {
+        _carregarResumo();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _carregarResumo() async {
@@ -214,10 +228,13 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
                   color: const Color(0xFF10B981).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
-                  Icons.attach_money_rounded,
-                  color: Color(0xFF10B981),
-                  size: 16,
+                child: const Text(
+                  'R\$',
+                  style: TextStyle(
+                    color: Color(0xFF10B981),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),

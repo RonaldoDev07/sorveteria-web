@@ -22,7 +22,6 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
   List<dynamic> _produtosFiltrados = [];
   bool _isLoading = true;
   final _searchController = TextEditingController();
-  final _searchFocusNode = FocusNode();
   bool _mostrarApenasEstoqueBaixo = false;
 
   @override
@@ -120,7 +119,6 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
   @override
   void dispose() {
     _searchController.dispose();
-    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -658,7 +656,6 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
                     padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _searchController,
-                      focusNode: _searchFocusNode,
                       onChanged: _filtrarProdutos,
                       decoration: InputDecoration(
                         hintText: 'Pesquisar produto...',
