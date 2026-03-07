@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../services/offline_service.dart';
 import '../widgets/auth_wrapper.dart';
 import '../widgets/connectivity_banner.dart';
+import '../widgets/home_summary_card.dart';
 import 'produtos_screen.dart';
 import 'vendas_menu_screen.dart';
 import 'movimentacoes_screen.dart';
@@ -342,6 +343,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ],
                 ),
               ),
+              // Card de Resumo
+              const HomeSummaryCard(),
               // Grid de cards
               Expanded(
                 child: LayoutBuilder(
