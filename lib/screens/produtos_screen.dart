@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import '../utils/text_formatters.dart';
+import '../mixins/auto_refresh_mixin.dart';
 import 'baixa_estoque_screen.dart';
 import 'entrada_estoque_screen.dart';
 import 'editar_produto_screen.dart';
@@ -16,17 +17,19 @@ class ProdutosScreen extends StatefulWidget {
   State<ProdutosScreen> createState() => _ProdutosScreenState();
 }
 
-class _ProdutosScreenState extends State<ProdutosScreen> {
+class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
   List<dynamic> _produtos = [];
   List<dynamic> _produtosFiltrados = [];
   bool _isLoading = true;
   final _searchController = TextEditingController();
+  final _searchFocusNode = FocusNode();
   bool _mostrarApenasEstoqueBaixo = false;
 
   @override
   void initState() {
     super.initState();
     _loadProdutos();
+    startAutoRefresh(); // Inicia refresh automático a cada 30 segundos
   }
 
   int _contarProdutosEstoqueBaixo() {
@@ -117,8 +120,12 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
+
+  @override
+  Future<void> loadData() => _loadProdutos();
 
   void _filtrarProdutos(String query) {
     setState(() {
@@ -153,16 +160,19 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
   }
 
   Future<void> _loadProdutos() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final auth = Provider.of<AuthService>(context, listen: false);
       final produtos = await ApiService.getProdutos(auth.token!);
+      if (!mounted) return;
       setState(() {
         _produtos = produtos;
-        _produtosFiltrados = produtos;
+        _filtrarProdutos(_searchController.text);
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -648,6 +658,8 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                     padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _searchController,
+                      focusNode: _searchFocusNode,
+                      autofocus: true,
                       onChanged: _filtrarProdutos,
                       decoration: InputDecoration(
                         hintText: 'Pesquisar produto...',
@@ -659,6 +671,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                                 onPressed: () {
                                   _searchController.clear();
                                   _filtrarProdutos('');
+                                  _searchFocusNode.requestFocus();
                                 },
                               )
                             : null,
@@ -783,25 +796,32 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                     ),
                   ),
                   Expanded(
-                    child: _produtosFiltrados.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                    child: RefreshIndicator(
+                      onRefresh: _loadProdutos,
+                      child: _produtosFiltrados.isEmpty
+                          ? ListView( // Precisa ser scrollable para o RefreshIndicator funcionar
                               children: [
-                                Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey[300]),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Nenhum produto encontrado',
-                                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                                SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                                Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey[300]),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        'Nenhum produto encontrado',
+                                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
-                            ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            itemCount: _produtosFiltrados.length,
-                            itemBuilder: (context, index) {
-                              final produto = _produtosFiltrados[index];
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              itemCount: _produtosFiltrados.length,
+                              itemBuilder: (context, index) {
+                                final produto = _produtosFiltrados[index];
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
@@ -1131,6 +1151,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                       );
                             },
                           ),
+                    ),
                   ),
                 ],
               ),
