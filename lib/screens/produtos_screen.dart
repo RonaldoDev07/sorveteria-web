@@ -659,7 +659,6 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
                     child: TextField(
                       controller: _searchController,
                       focusNode: _searchFocusNode,
-                      autofocus: true,
                       onChanged: _filtrarProdutos,
                       decoration: InputDecoration(
                         hintText: 'Pesquisar produto...',
@@ -671,7 +670,6 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
                                 onPressed: () {
                                   _searchController.clear();
                                   _filtrarProdutos('');
-                                  _searchFocusNode.requestFocus();
                                 },
                               )
                             : null,

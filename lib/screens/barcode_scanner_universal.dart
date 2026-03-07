@@ -14,6 +14,9 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   final _codigoController = TextEditingController();
   bool _mostrarCamera = false;
   bool _cameraDisponivel = true;
+  CameraFacing _cameraFacing = CameraFacing.back;
+  double _zoomLevel = 1.0;
+  bool _torchEnabled = false;
   
   MobileScannerController? _cameraController;
 
@@ -35,7 +38,7 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
     try {
       _cameraController = MobileScannerController(
         detectionSpeed: DetectionSpeed.normal,
-        facing: CameraFacing.back,
+        facing: _cameraFacing,
         torchEnabled: false,
         returnImage: false,
         autoStart: false,
@@ -52,16 +55,6 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
       
       await _cameraController!.start();
       
-      // Aguardar um pouco para câmera inicializar
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Aplicar zoom para melhor foco de perto (1.5x a 2x)
-      try {
-        await _cameraController!.setZoomScale(1.8);
-      } catch (e) {
-        print('⚠️ Zoom não suportado: $e');
-      }
-      
       if (mounted) {
         setState(() {
           _mostrarCamera = true;
@@ -77,6 +70,20 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
         });
       }
     }
+  }
+
+  Future<void> _alternarCamera() async {
+    await _cameraController?.stop();
+    await _cameraController?.dispose();
+    
+    setState(() {
+      _cameraFacing = _cameraFacing == CameraFacing.back 
+          ? CameraFacing.front 
+          : CameraFacing.back;
+      _torchEnabled = false; // Resetar flash ao trocar câmera
+    });
+    
+    await _tentarAbrirCamera();
   }
 
   void _onBarcodeDetect(BarcodeCapture capture) {
@@ -139,19 +146,40 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
                       ),
                     ),
                   ),
-                  if (_mostrarCamera && _cameraController != null)
+                  if (_mostrarCamera && _cameraController != null) ...[
+                    IconButton(
+                      icon: const Icon(Icons.flip_camera_ios, color: Colors.white, size: 28),
+                      onPressed: _alternarCamera,
+                      tooltip: 'Alternar câmera',
+                    ),
                     IconButton(
                       icon: Icon(
-                        _cameraController!.torchEnabled ? Icons.flash_on : Icons.flash_off,
+                        _torchEnabled ? Icons.flash_on : Icons.flash_off,
                         color: Colors.white,
                         size: 28,
                       ),
-                      onPressed: () {
-                        _cameraController!.toggleTorch();
-                        setState(() {});
+                      onPressed: () async {
+                        try {
+                          await _cameraController!.toggleTorch();
+                          setState(() {
+                            _torchEnabled = !_torchEnabled;
+                          });
+                        } catch (e) {
+                          print('⚠️ Erro ao alternar flash: $e');
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Flash não disponível neste dispositivo'),
+                                backgroundColor: Colors.orange,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        }
                       },
                       tooltip: 'Lanterna',
                     ),
+                  ],
                   if (_cameraDisponivel && !_mostrarCamera)
                     IconButton(
                       icon: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
@@ -259,7 +287,7 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
                         Icon(Icons.lightbulb_outline, color: Colors.yellow[300], size: 20),
                         const SizedBox(width: 8),
                         const Text(
-                          'Dica: Mantenha distância de 10-15cm',
+                          'Dica: Mantenha distância de 15-20cm',
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 13,

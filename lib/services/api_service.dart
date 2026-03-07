@@ -22,6 +22,39 @@ class ApiService {
     }
   }
 
+  // 🔄 RETRY - Tentar novamente em caso de erro de conexão
+  static Future<T> _retryRequest<T>(
+    Future<T> Function() request, {
+    int maxRetries = 2,
+    Duration retryDelay = const Duration(seconds: 3),
+  }) async {
+    int attempts = 0;
+    
+    while (attempts < maxRetries) {
+      try {
+        return await request();
+      } catch (e) {
+        attempts++;
+        
+        // Se for erro de conexão e ainda tem tentativas, aguarda e tenta novamente
+        if (attempts < maxRetries && 
+            (e.toString().contains('XMLHttpRequest') || 
+             e.toString().contains('ClientException') ||
+             e.toString().contains('SocketException'))) {
+          print('⚠️ Tentativa $attempts falhou. Tentando novamente em ${retryDelay.inSeconds}s...');
+          await Future.delayed(retryDelay);
+          continue;
+        }
+        
+        // Se não for erro de conexão ou acabaram as tentativas, lança o erro
+        rethrow;
+      }
+    }
+    
+    // Nunca deve chegar aqui, mas por segurança
+    throw Exception('Falha após $maxRetries tentativas');
+  }
+
   // Headers padrão com UTF-8 explícito e Authorization Bearer
   static Map<String, String> _getHeaders(String? token) {
     final headers = {
@@ -88,28 +121,30 @@ class ApiService {
   }
 
   static Future<List<dynamic>> getProdutos(String token) async {
-    if (kDebugMode) {
-      print('📡 Buscando produtos...');
-      print('🔑 Token: ${token.substring(0, min(20, token.length))}...');
-    }
-    
-    final response = await http.get(
-      Uri.parse('$baseUrl/produtos'),
-      headers: _getHeaders(token),
-    ).timeout(ApiConfig.timeout);
+    return _retryRequest(() async {
+      if (kDebugMode) {
+        print('📡 Buscando produtos...');
+        print('🔑 Token: ${token.substring(0, min(20, token.length))}...');
+      }
+      
+      final response = await http.get(
+        Uri.parse('$baseUrl/produtos'),
+        headers: _getHeaders(token),
+      ).timeout(ApiConfig.timeout);
 
-    if (kDebugMode) {
-      print('📥 Resposta produtos - Status: ${response.statusCode}');
-    }
+      if (kDebugMode) {
+        print('📥 Resposta produtos - Status: ${response.statusCode}');
+      }
 
-    if (response.statusCode == 200) {
-      return _decodeResponse(response);
-    } else if (response.statusCode == 401) {
-      print('❌ Token inválido ou expirado (401)');
-      throw Exception('401');
-    } else {
-      throw Exception('Erro ao buscar produtos');
-    }
+      if (response.statusCode == 200) {
+        return _decodeResponse(response);
+      } else if (response.statusCode == 401) {
+        print('❌ Token inválido ou expirado (401)');
+        throw Exception('401');
+      } else {
+        throw Exception('Erro ao buscar produtos');
+      }
+    });
   }
 
   static Future<Map<String, dynamic>> getProdutoPorCodigoBarras(
