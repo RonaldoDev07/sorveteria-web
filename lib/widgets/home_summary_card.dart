@@ -72,9 +72,27 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
       final hoje = DateTime.now();
       final dataInicio = '${hoje.year}-${hoje.month.toString().padLeft(2, '0')}-${hoje.day.toString().padLeft(2, '0')}';
       
-      final relatorio = await ApiService.getRelatorioLucro(token, dataInicio, dataInicio);
-      return (relatorio['receita_total'] ?? 0.0).toDouble();
+      // Buscar movimentações do dia
+      final movimentacoes = await ApiService.getMovimentacoes(token);
+      
+      // Filtrar apenas vendas (SAIDA) de hoje
+      double totalVendas = 0.0;
+      for (var mov in movimentacoes) {
+        if (mov['tipo'] == 'SAIDA') {
+          // Verificar se é de hoje
+          final dataMov = mov['data_movimentacao'] ?? '';
+          if (dataMov.startsWith(dataInicio)) {
+            final valorTotal = mov['valor_total'];
+            if (valorTotal != null) {
+              totalVendas += (valorTotal is num ? valorTotal.toDouble() : double.tryParse(valorTotal.toString()) ?? 0.0);
+            }
+          }
+        }
+      }
+      
+      return totalVendas;
     } catch (e) {
+      print('Erro ao buscar vendas de hoje: $e');
       return 0.0;
     }
   }
@@ -83,12 +101,34 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
     try {
       final hoje = DateTime.now();
       final seteDiasAtras = hoje.subtract(const Duration(days: 7));
-      final dataInicio = '${seteDiasAtras.year}-${seteDiasAtras.month.toString().padLeft(2, '0')}-${seteDiasAtras.day.toString().padLeft(2, '0')}';
-      final dataFim = '${hoje.year}-${hoje.month.toString().padLeft(2, '0')}-${hoje.day.toString().padLeft(2, '0')}';
       
-      final relatorio = await ApiService.getRelatorioLucro(token, dataInicio, dataFim);
-      return (relatorio['receita_total'] ?? 0.0).toDouble();
+      // Buscar movimentações
+      final movimentacoes = await ApiService.getMovimentacoes(token);
+      
+      // Filtrar apenas vendas (SAIDA) dos últimos 7 dias
+      double totalVendas = 0.0;
+      for (var mov in movimentacoes) {
+        if (mov['tipo'] == 'SAIDA') {
+          final dataMov = mov['data_movimentacao'] ?? '';
+          if (dataMov.isNotEmpty) {
+            try {
+              final dataParsed = DateTime.parse(dataMov);
+              if (dataParsed.isAfter(seteDiasAtras) && dataParsed.isBefore(hoje.add(const Duration(days: 1)))) {
+                final valorTotal = mov['valor_total'];
+                if (valorTotal != null) {
+                  totalVendas += (valorTotal is num ? valorTotal.toDouble() : double.tryParse(valorTotal.toString()) ?? 0.0);
+                }
+              }
+            } catch (e) {
+              // Ignorar erro de parse de data
+            }
+          }
+        }
+      }
+      
+      return totalVendas;
     } catch (e) {
+      print('Erro ao buscar vendas da semana: $e');
       return 0.0;
     }
   }
