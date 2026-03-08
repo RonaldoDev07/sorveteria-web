@@ -59,6 +59,9 @@ class ApiService {
     final headers = {
       'Content-Type': 'application/json; charset=utf-8',
       'Accept': 'application/json; charset=utf-8',
+      'Accept-Encoding': 'gzip, deflate',
+      'Connection': 'keep-alive',
+      'User-Agent': 'SorveteriaCamila/1.0.7 (Android)',
     };
     
     // CRÍTICO: Adicionar token JWT no header Authorization
