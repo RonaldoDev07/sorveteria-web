@@ -14,5 +14,5 @@ class ApiConfig {
   
   // Timeout das requisições (aumentado para cold start do Render)
   // Render free tier pode demorar até 180s para acordar
-  static const Duration timeout = Duration(seconds: 180);
+  static const Duration timeout = Duration(seconds: 300); // 5 minutos para Android
 }
