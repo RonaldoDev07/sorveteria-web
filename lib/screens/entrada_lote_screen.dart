@@ -117,8 +117,10 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
     final custoController = TextEditingController();
     final loteController = TextEditingController();
     final validadeController = TextEditingController();
+    final searchController = TextEditingController();
     Map<String, dynamic>? produtoAtual = produtoSelecionado;
     DateTime? dataValidade;
+    List<Map<String, dynamic>> produtosFiltrados = List.from(_produtos);
 
     showDialog(
       context: context,
@@ -136,33 +138,111 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                 child: const Icon(Icons.add_shopping_cart, color: Color(0xFF14B8A6)),
               ),
               const SizedBox(width: 12),
-              const Text('Adicionar Produto'),
+              const Expanded(
+                child: Text(
+                  'Adicionar Produto',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
             ],
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Seletor de produto
-                if (produtoAtual == null)
-                  DropdownButtonFormField<Map<String, dynamic>>(
-                    decoration: InputDecoration(
-                      labelText: 'Produto',
-                      border: OutlineInputBorder(
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Seletor de produto com pesquisa
+                  if (produtoAtual == null) ...[
+                    // Campo de pesquisa
+                    TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        labelText: 'Pesquisar produto',
+                        hintText: 'Digite o nome do produto',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 20),
+                                onPressed: () {
+                                  setDialogState(() {
+                                    searchController.clear();
+                                    produtosFiltrados = List.from(_produtos);
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (value) {
+                        setDialogState(() {
+                          if (value.isEmpty) {
+                            produtosFiltrados = List.from(_produtos);
+                          } else {
+                            produtosFiltrados = _produtos
+                                .where((p) => p['nome']
+                                    .toString()
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()))
+                                .toList();
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    // Lista de produtos
+                    Container(
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      prefixIcon: const Icon(Icons.inventory_2),
+                      child: produtosFiltrados.isEmpty
+                          ? const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(
+                                child: Text(
+                                  'Nenhum produto encontrado',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: produtosFiltrados.length,
+                              itemBuilder: (context, index) {
+                                final produto = produtosFiltrados[index];
+                                return ListTile(
+                                  leading: const Icon(
+                                    Icons.inventory_2,
+                                    color: Color(0xFF14B8A6),
+                                  ),
+                                  title: Text(
+                                    produto['nome'],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    'Estoque: ${_formatarNumero(produto['estoque_atual'])} ${produto['unidade']}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    setDialogState(() {
+                                      produtoAtual = produto;
+                                      searchController.clear();
+                                    });
+                                  },
+                                );
+                              },
+                            ),
                     ),
-                    items: _produtos.map((p) {
-                      return DropdownMenuItem(
-                        value: p,
-                        child: Text(p['nome']),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setDialogState(() => produtoAtual = value);
-                    },
-                  )
+                  ]
                 else
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -215,7 +295,7 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: const Icon(Icons.add_shopping_cart),
+                    prefixIcon: const Icon(Icons.production_quantity_limits),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   autofocus: produtoAtual != null,
@@ -231,7 +311,7 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: const Icon(Icons.attach_money),
+                    prefixIcon: const Icon(Icons.payments),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
@@ -245,7 +325,7 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: const Icon(Icons.qr_code),
+                    prefixIcon: const Icon(Icons.label),
                   ),
                   textCapitalization: TextCapitalization.characters,
                 ),
@@ -290,6 +370,7 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                   },
                 ),
               ],
+            ),
             ),
           ),
           actions: [
