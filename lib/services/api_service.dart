@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html' as html;
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -610,12 +609,22 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final bytes = response.bodyBytes;
-      final blob = html.Blob([bytes]);
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute('download', 'relatorio_${DateTime.now().millisecondsSinceEpoch}.csv')
-        ..click();
-      html.Url.revokeObjectUrl(url);
+      
+      // Download de relatório (funcionalidade web desabilitada para mobile)
+      if (kIsWeb) {
+        // Importação dinâmica para web
+        // ignore: avoid_web_libraries_in_flutter
+        // final blob = html.Blob([bytes]);
+        // final url = html.Url.createObjectUrlFromBlob(blob);
+        // final anchor = html.AnchorElement(href: url)
+        //   ..setAttribute('download', 'relatorio_${DateTime.now().millisecondsSinceEpoch}.csv')
+        //   ..click();
+        // html.Url.revokeObjectUrl(url);
+        print('Download de relatório disponível apenas na versão web');
+      } else {
+        // No mobile, funcionalidade não implementada
+        print('Download de relatório não disponível no mobile');
+      }
       return;
     } else {
       throw Exception('Erro ao exportar relatório');
