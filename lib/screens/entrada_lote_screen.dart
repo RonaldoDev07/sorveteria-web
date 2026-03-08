@@ -115,7 +115,10 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
   void _mostrarDialogAdicionarProduto([Map<String, dynamic>? produtoSelecionado]) {
     final quantidadeController = TextEditingController();
     final custoController = TextEditingController();
+    final loteController = TextEditingController();
+    final validadeController = TextEditingController();
     Map<String, dynamic>? produtoAtual = produtoSelecionado;
+    DateTime? dataValidade;
 
     showDialog(
       context: context,
@@ -232,6 +235,60 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
+                const SizedBox(height: 16),
+                // Número do Lote (opcional)
+                TextFormField(
+                  controller: loteController,
+                  decoration: InputDecoration(
+                    labelText: 'Número do Lote (opcional)',
+                    hintText: 'Ex: L001, LOTE-2024-03',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.qr_code),
+                  ),
+                  textCapitalization: TextCapitalization.characters,
+                ),
+                const SizedBox(height: 16),
+                // Data de Validade (opcional)
+                TextFormField(
+                  controller: validadeController,
+                  decoration: InputDecoration(
+                    labelText: 'Validade (opcional)',
+                    hintText: 'Toque para selecionar',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.calendar_today),
+                    suffixIcon: dataValidade != null
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 20),
+                            onPressed: () {
+                              setDialogState(() {
+                                dataValidade = null;
+                                validadeController.clear();
+                              });
+                            },
+                          )
+                        : null,
+                  ),
+                  readOnly: true,
+                  onTap: () async {
+                    final data = await showDatePicker(
+                      context: context,
+                      initialDate: dataValidade ?? DateTime.now().add(const Duration(days: 30)),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 3650)),
+                      locale: const Locale('pt', 'BR'),
+                    );
+                    if (data != null) {
+                      setDialogState(() {
+                        dataValidade = data;
+                        validadeController.text = DateFormat('dd/MM/yyyy').format(data);
+                      });
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -285,6 +342,8 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                     'unidade': produtoAtual!['unidade'],
                     'quantidade': quantidade,
                     'custo_unitario': custo,
+                    'lote': loteController.text.trim().isNotEmpty ? loteController.text.trim() : null,
+                    'validade': dataValidade != null ? DateFormat('yyyy-MM-dd').format(dataValidade!) : null,
                   });
                 });
 
@@ -331,6 +390,8 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
           'ENTRADA',
           item['quantidade'],
           custoUnitario: item['custo_unitario'],
+          lote: item['lote'],
+          validade: item['validade'],
         );
       }
 
@@ -524,6 +585,38 @@ class _EntradaLoteScreenState extends State<EntradaLoteScreen> {
                                         fontSize: 14,
                                       ),
                                     ),
+                                    if (item['lote'] != null) ...[
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.qr_code, size: 14, color: Colors.grey[600]),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Lote: ${item['lote']}',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                    if (item['validade'] != null) ...[
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Val: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(item['validade']))}',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                     const SizedBox(height: 4),
                                     Text(
                                       'Subtotal: ${formatarMoeda(subtotal)}',

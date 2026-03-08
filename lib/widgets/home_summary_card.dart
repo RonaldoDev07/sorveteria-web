@@ -15,9 +15,7 @@ class HomeSummaryCard extends StatefulWidget {
 class _HomeSummaryCardState extends State<HomeSummaryCard> {
   bool _isLoading = true;
   double _vendasHoje = 0.0;
-  double _vendasSemana = 0.0;
   int _produtosEstoqueBaixo = 0;
-  int _parcelasVencidas = 0;
   Timer? _refreshTimer;
 
   @override
@@ -45,17 +43,13 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
       // Buscar dados em paralelo
       final results = await Future.wait([
         _buscarVendasHoje(auth.token!),
-        _buscarVendasSemana(auth.token!),
         _buscarProdutosEstoqueBaixo(auth.token!),
-        _buscarParcelasVencidas(auth.token!),
       ]);
 
       if (mounted) {
         setState(() {
           _vendasHoje = results[0] as double;
-          _vendasSemana = results[1] as double;
-          _produtosEstoqueBaixo = results[2] as int;
-          _parcelasVencidas = results[3] as int;
+          _produtosEstoqueBaixo = results[1] as int;
           _isLoading = false;
         });
       }
@@ -77,7 +71,6 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
       
       // Filtrar apenas vendas (SAIDA) de hoje
       double totalVendas = 0.0;
-      int vendasEncontradas = 0;
       
       for (var mov in movimentacoes) {
         if (mov['tipo'] == 'SAIDA') {
@@ -91,7 +84,6 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
               final dataMovStr = '${dataParsed.year}-${dataParsed.month.toString().padLeft(2, '0')}-${dataParsed.day.toString().padLeft(2, '0')}';
               
               if (dataMovStr == dataInicio) {
-                vendasEncontradas++;
                 final valorUnitario = mov['valor_unitario'];
                 final quantidade = mov['quantidade'];
                 
@@ -116,66 +108,14 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
     }
   }
 
-  Future<double> _buscarVendasSemana(String token) async {
-    try {
-      final hoje = DateTime.now();
-      final seteDiasAtras = hoje.subtract(const Duration(days: 7));
-      
-      // Buscar movimentações
-      final movimentacoes = await ApiService.getMovimentacoes(token);
-      
-      // Filtrar apenas vendas (SAIDA) dos últimos 7 dias
-      double totalVendas = 0.0;
-      for (var mov in movimentacoes) {
-        if (mov['tipo'] == 'SAIDA') {
-          final dataHora = mov['data_hora'] ?? '';
-          if (dataHora.isNotEmpty) {
-            try {
-              final dataParsed = DateTime.parse(dataHora);
-              if (dataParsed.isAfter(seteDiasAtras) && dataParsed.isBefore(hoje.add(const Duration(days: 1)))) {
-                final valorUnitario = mov['valor_unitario'];
-                final quantidade = mov['quantidade'];
-                
-                if (valorUnitario != null && quantidade != null) {
-                  final valor = (valorUnitario is num ? valorUnitario.toDouble() : double.tryParse(valorUnitario.toString()) ?? 0.0);
-                  final qtd = (quantidade is num ? quantidade.toDouble() : double.tryParse(quantidade.toString()) ?? 0.0);
-                  final valorVenda = valor * qtd;
-                  totalVendas += valorVenda;
-                }
-              }
-            } catch (e) {
-              // Ignorar erro de parse de data
-            }
-          }
-        }
-      }
-      
-      return totalVendas;
-    } catch (e) {
-      print('Erro ao buscar vendas da semana: $e');
-      return 0.0;
-    }
-  }
-
   Future<int> _buscarProdutosEstoqueBaixo(String token) async {
     try {
       final produtos = await ApiService.getProdutos(token);
       return produtos.where((p) {
         final estoque = p['estoque_atual'];
         final estoqueNum = estoque is num ? estoque : (double.tryParse(estoque.toString()) ?? 0);
-        return estoqueNum < 5; // Estoque baixo = menos de 5 unidades
+        return estoqueNum < 5;
       }).length;
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  Future<int> _buscarParcelasVencidas(String token) async {
-    try {
-      // Buscar parcelas vencidas (status PENDENTE e data_vencimento < hoje)
-      final hoje = DateTime.now();
-      // Por enquanto, retornar 0 - implementar quando tiver endpoint específico
-      return 0;
     } catch (e) {
       return 0;
     }

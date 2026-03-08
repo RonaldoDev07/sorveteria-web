@@ -15,7 +15,6 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
   bool _mostrarCamera = false;
   bool _cameraDisponivel = true;
   CameraFacing _cameraFacing = CameraFacing.back;
-  double _zoomLevel = 1.0;
   bool _torchEnabled = false;
   
   MobileScannerController? _cameraController;

@@ -274,6 +274,8 @@ class ApiService {
     double quantidade, {
     double? custoUnitario,
     String? formaPagamento,
+    String? lote,
+    String? validade,
   }) async {
     return _retryRequest(() async {
       final body = {
@@ -288,6 +290,14 @@ class ApiService {
       
       if (formaPagamento != null && tipo == 'SAIDA') {
         body['forma_pagamento'] = formaPagamento;
+      }
+
+      if (lote != null && lote.isNotEmpty) {
+        body['lote'] = lote;
+      }
+
+      if (validade != null && validade.isNotEmpty) {
+        body['validade'] = validade;
       }
 
       final response = await http.post(
