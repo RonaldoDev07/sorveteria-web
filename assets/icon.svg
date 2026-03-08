@@ -1,0 +1,24 @@
+<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo lilás -->
+  <rect width="1024" height="1024" fill="#9C27B0" rx="180"/>
+  
+  <!-- Casquinha (triângulo bege) -->
+  <polygon points="512,550 350,900 674,900" fill="#D2B48C"/>
+  
+  <!-- Linhas da casquinha -->
+  <line x1="400" y1="650" x2="624" y2="650" stroke="#C19A6B" stroke-width="8"/>
+  <line x1="375" y1="750" x2="649" y2="750" stroke="#C19A6B" stroke-width="8"/>
+  <line x1="362" y1="850" x2="662" y2="850" stroke="#C19A6B" stroke-width="8"/>
+  
+  <!-- Bola de sorvete inferior (lilás claro) -->
+  <circle cx="512" cy="480" r="140" fill="#E1BEE7"/>
+  
+  <!-- Bola de sorvete superior (branco) -->
+  <circle cx="512" cy="300" r="140" fill="#FFFFFF"/>
+  
+  <!-- Cereja no topo (lilás escuro) -->
+  <circle cx="512" cy="160" r="60" fill="#7B1FA2"/>
+  
+  <!-- Cabo da cereja -->
+  <path d="M 512 220 Q 512 250 512 280" stroke="#8B4513" stroke-width="8" fill="none"/>
+</svg>

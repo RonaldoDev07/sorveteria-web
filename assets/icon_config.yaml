@@ -1,0 +1,12 @@
+# Configuração para flutter_launcher_icons
+# Para gerar os ícones, execute: flutter pub run flutter_launcher_icons
+
+flutter_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon.png"
+  adaptive_icon_background: "#9C27B0"  # Lilás
+  adaptive_icon_foreground: "assets/icon_foreground.png"
+  
+  # Configurações adicionais
+  min_sdk_android: 21
