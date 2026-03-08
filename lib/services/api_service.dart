@@ -82,7 +82,25 @@ class ApiService {
 
   // Decodificar resposta com UTF-8
   static dynamic _decodeResponse(http.Response response) {
-    return jsonDecode(utf8.decode(response.bodyBytes));
+    try {
+      if (response.body.isEmpty) {
+        return {};
+      }
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ Erro ao decodificar resposta: $e');
+        print('   Body: ${response.body}');
+        print('   Status: ${response.statusCode}');
+      }
+      // Se falhar, tenta decodificar direto
+      try {
+        return jsonDecode(response.body);
+      } catch (e2) {
+        // Se ainda falhar, retorna objeto vazio
+        return {};
+      }
+    }
   }
 
   // Codificar body com UTF-8
@@ -202,12 +220,19 @@ class ApiService {
         Uri.parse('$baseUrl/produtos'),
         headers: _getHeaders(token),
         body: _encodeBody(body),
-      );
+      ).timeout(ApiConfig.timeout);
 
-      if (response.statusCode == 200) {
-        return _decodeResponse(response);
+      if (kDebugMode) {
+        print('📥 Resposta criar produto - Status: ${response.statusCode}');
+        print('   Body: ${response.body}');
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = _decodeResponse(response);
+        return decoded is Map<String, dynamic> ? decoded : {'success': true};
       } else {
-        throw Exception('Erro ao criar produto');
+        final errorBody = response.body.isNotEmpty ? response.body : 'Sem detalhes';
+        throw Exception('Erro ao criar produto: ${response.statusCode} - $errorBody');
       }
     });
   }
@@ -306,13 +331,23 @@ class ApiService {
         Uri.parse('$baseUrl/movimentacoes'),
         headers: _getHeaders(token),
         body: _encodeBody(body),
-      );
+      ).timeout(ApiConfig.timeout);
 
-      if (response.statusCode == 200) {
-        return _decodeResponse(response);
+      if (kDebugMode) {
+        print('📥 Resposta registrar movimentação - Status: ${response.statusCode}');
+        print('   Body: ${response.body}');
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = _decodeResponse(response);
+        return decoded is Map<String, dynamic> ? decoded : {'success': true};
       } else {
-        final error = _decodeResponse(response);
-        throw Exception(error['detail'] ?? 'Erro ao registrar movimentação');
+        try {
+          final error = _decodeResponse(response);
+          throw Exception(error['detail'] ?? 'Erro ao registrar movimentação');
+        } catch (e) {
+          throw Exception('Erro ao registrar movimentação: ${response.statusCode}');
+        }
       }
     });
   }
