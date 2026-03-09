@@ -226,6 +226,25 @@ class ApiService {
       if (kDebugMode) {
         print('📥 Resposta criar produto - Status: ${response.statusCode}');
         print('   Body: ${response.body}');
+        print('   Headers: ${response.headers}');
+      }
+
+      // Status 307 = Temporary Redirect - seguir o redirect manualmente
+      if (response.statusCode == 307 || response.statusCode == 308) {
+        final location = response.headers['location'];
+        if (location != null) {
+          print('🔄 Redirect detectado para: $location');
+          final redirectResponse = await http.post(
+            Uri.parse(location),
+            headers: _getHeaders(token),
+            body: _encodeBody(body),
+          ).timeout(ApiConfig.timeout);
+          
+          if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
+            final decoded = _decodeResponse(redirectResponse);
+            return decoded is Map<String, dynamic> ? decoded : {'success': true};
+          }
+        }
       }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -337,6 +356,25 @@ class ApiService {
       if (kDebugMode) {
         print('📥 Resposta registrar movimentação - Status: ${response.statusCode}');
         print('   Body: ${response.body}');
+        print('   Headers: ${response.headers}');
+      }
+
+      // Status 307 = Temporary Redirect - seguir o redirect manualmente
+      if (response.statusCode == 307 || response.statusCode == 308) {
+        final location = response.headers['location'];
+        if (location != null) {
+          print('🔄 Redirect detectado para: $location');
+          final redirectResponse = await http.post(
+            Uri.parse(location),
+            headers: _getHeaders(token),
+            body: _encodeBody(body),
+          ).timeout(ApiConfig.timeout);
+          
+          if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
+            final decoded = _decodeResponse(redirectResponse);
+            return decoded is Map<String, dynamic> ? decoded : {'success': true};
+          }
+        }
       }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -376,9 +414,32 @@ class ApiService {
         Uri.parse('$baseUrl/movimentacoes'),
         headers: _getHeaders(token),
         body: _encodeBody(body),
-      );
+      ).timeout(ApiConfig.timeout);
 
-      if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print('📥 Resposta criar movimentação - Status: ${response.statusCode}');
+        print('   Headers: ${response.headers}');
+      }
+
+      // Status 307 = Temporary Redirect - seguir o redirect manualmente
+      if (response.statusCode == 307 || response.statusCode == 308) {
+        final location = response.headers['location'];
+        if (location != null) {
+          print('🔄 Redirect detectado para: $location');
+          final redirectResponse = await http.post(
+            Uri.parse(location),
+            headers: _getHeaders(token),
+            body: _encodeBody(body),
+          ).timeout(ApiConfig.timeout);
+          
+          if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
+            final decoded = _decodeResponse(redirectResponse);
+            return decoded is Map<String, dynamic> ? decoded : {'success': true};
+          }
+        }
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return _decodeResponse(response);
       } else {
         final error = _decodeResponse(response);
