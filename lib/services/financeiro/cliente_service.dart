@@ -69,10 +69,28 @@ class ClienteService {
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode(cliente.toJson()),
-      );
+      ).timeout(const Duration(minutes: 5));
 
       print('📥 Status: ${response.statusCode}');
+      print('📥 Headers: ${response.headers}');
       print('📥 Response: ${utf8.decode(response.bodyBytes)}');
+
+      // Status 307 = Temporary Redirect - seguir o redirect manualmente
+      if (response.statusCode == 307 || response.statusCode == 308) {
+        final location = response.headers['location'];
+        if (location != null) {
+          print('🔄 Redirect detectado para: $location');
+          final redirectResponse = await http.post(
+            Uri.parse(location),
+            headers: _headers,
+            body: json.encode(cliente.toJson()),
+          ).timeout(const Duration(minutes: 5));
+          
+          if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
+            return Cliente.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
+          }
+        }
+      }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Cliente.fromJson(json.decode(utf8.decode(response.bodyBytes)));
@@ -94,7 +112,27 @@ class ClienteService {
         Uri.parse('$_baseUrl/$id'),
         headers: _headers,
         body: json.encode(dados),
-      );
+      ).timeout(const Duration(minutes: 5));
+
+      print('📥 Resposta atualizar cliente - Status: ${response.statusCode}');
+      print('   Headers: ${response.headers}');
+
+      // Status 307 = Temporary Redirect - seguir o redirect manualmente
+      if (response.statusCode == 307 || response.statusCode == 308) {
+        final location = response.headers['location'];
+        if (location != null) {
+          print('🔄 Redirect detectado para: $location');
+          final redirectResponse = await http.put(
+            Uri.parse(location),
+            headers: _headers,
+            body: json.encode(dados),
+          ).timeout(const Duration(minutes: 5));
+          
+          if (redirectResponse.statusCode == 200) {
+            return Cliente.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
+          }
+        }
+      }
 
       if (response.statusCode == 200) {
         return Cliente.fromJson(json.decode(utf8.decode(response.bodyBytes)));

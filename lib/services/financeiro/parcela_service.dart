@@ -95,14 +95,36 @@ class ParcelaService {
 
   Future<void> darBaixaParcela(String id, double valorPago, String formaPagamento) async {
     try {
+      final body = {
+        'valorPago': valorPago,
+        'formaPagamento': formaPagamento,
+      };
+
       final response = await http.put(
         Uri.parse('$_baseUrl/$id/baixa'),
         headers: _headers,
-        body: json.encode({
-          'valorPago': valorPago,
-          'formaPagamento': formaPagamento,
-        }),
-      );
+        body: json.encode(body),
+      ).timeout(const Duration(minutes: 5));
+
+      print('📥 Resposta baixa parcela - Status: ${response.statusCode}');
+      print('   Headers: ${response.headers}');
+
+      // Status 307 = Temporary Redirect - seguir o redirect manualmente
+      if (response.statusCode == 307 || response.statusCode == 308) {
+        final location = response.headers['location'];
+        if (location != null) {
+          print('🔄 Redirect detectado para: $location');
+          final redirectResponse = await http.put(
+            Uri.parse(location),
+            headers: _headers,
+            body: json.encode(body),
+          ).timeout(const Duration(minutes: 5));
+          
+          if (redirectResponse.statusCode == 200) {
+            return;
+          }
+        }
+      }
 
       if (response.statusCode != 200) {
         final error = json.decode(utf8.decode(response.bodyBytes));

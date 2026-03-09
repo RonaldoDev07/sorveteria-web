@@ -96,7 +96,27 @@ class CompraPrazoService {
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode(body),
-      );
+      ).timeout(const Duration(minutes: 5));
+
+      print('📥 Resposta criar compra a prazo - Status: ${response.statusCode}');
+      print('   Headers: ${response.headers}');
+
+      // Status 307 = Temporary Redirect - seguir o redirect manualmente
+      if (response.statusCode == 307 || response.statusCode == 308) {
+        final location = response.headers['location'];
+        if (location != null) {
+          print('🔄 Redirect detectado para: $location');
+          final redirectResponse = await http.post(
+            Uri.parse(location),
+            headers: _headers,
+            body: json.encode(body),
+          ).timeout(const Duration(minutes: 5));
+          
+          if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
+            return CompraPrazo.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
+          }
+        }
+      }
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return CompraPrazo.fromJson(json.decode(utf8.decode(response.bodyBytes)));
