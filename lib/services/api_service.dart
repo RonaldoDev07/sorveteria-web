@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
+import '../utils/debug_logger.dart';
 
 class ApiService {
   static const String baseUrl = ApiConfig.baseUrl;
