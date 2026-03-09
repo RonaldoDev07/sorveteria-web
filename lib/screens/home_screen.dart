@@ -341,6 +341,31 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ],
                       ),
                     ),
+                    // Badge de sistema completo
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.white, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            'v1.2.0',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -356,7 +381,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     
                     // Criar lista de cards
                     final cards = <Widget>[
-                      // Ações principais do dia a dia
                       _MenuCard(
                         emoji: '🛒',
                         title: 'Vendas',
