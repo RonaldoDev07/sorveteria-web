@@ -7,6 +7,7 @@ import '../widgets/connectivity_banner.dart';
 import '../widgets/home_summary_card.dart';
 import 'produtos_screen.dart';
 import 'vendas_menu_screen.dart';
+import 'compras_menu_screen.dart';
 import 'movimentacoes_screen.dart';
 import 'usuarios_screen.dart';
 import 'carrinho_venda_screen.dart';
@@ -375,6 +376,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       ),
                       _MenuCard(
+                        emoji: '📦',
+                        title: 'Compras',
+                        color: const Color(0xFF14B8A6), // Teal
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ComprasMenuScreen()),
+                        ),
+                      ),
+                      _MenuCard(
                         emoji: '💰',
                         title: 'Receber Pagamento',
                         color: const Color(0xFF16A34A), // Verde dinheiro
@@ -384,7 +394,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       ),
                       _MenuCard(
-                        emoji: '📦',
+                        emoji: '📋',
                         title: 'Produtos',
                         color: const Color(0xFF2563EB), // Azul royal
                         onTap: () => Navigator.push(
