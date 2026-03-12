@@ -359,7 +359,7 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
               if (_venda.historicoDetalhado != null && _venda.historicoDetalhado!.isNotEmpty) ...[
                 // Mostrar histórico agrupado por data/hora
                 ..._venda.historicoDetalhado!.map((historico) {
-                  final dataAdicao = DateTime.parse(historico['dataAdicao']);
+                  final dataAdicao = DateTime.parse(historico['dataAdicao']).toLocal();
                   final usuarioNome = historico['usuarioNome'] ?? 'Usuário';
                   final valorAdicionado = _toDouble(historico['valorAdicionado']);
                   final produtos = historico['produtos'] as List<dynamic>? ?? [];

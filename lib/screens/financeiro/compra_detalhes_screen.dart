@@ -231,8 +231,8 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
                       ],
                     ),
                     const Divider(height: 24),
-                    _buildInfoRow('Data', formatoData.format(_compra.dataCompra)),
-                    _buildInfoRow('Horário', formatoHora.format(_compra.dataCompra)),
+                    _buildInfoRow('Data', formatoData.format(_compra.dataCompra.toLocal())),
+                    _buildInfoRow('Horário', formatoHora.format(_compra.dataCompra.toLocal())),
                     _buildInfoRow('Status', _getStatusLabel(_compra.status)),
                     const Divider(height: 24),
                     _buildInfoRow('Valor Total', formatoMoeda.format(_compra.valorTotal)),
@@ -311,10 +311,10 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
                   ),
                   title: Text(formatoMoeda.format(pagamento.valorPago)),
                   subtitle: Text(
-                    '${_getFormaPagamentoLabel(pagamento.formaPagamento)} - ${formatoData.format(pagamento.dataPagamento)}',
+                    '${_getFormaPagamentoLabel(pagamento.formaPagamento)} - ${formatoData.format(pagamento.dataPagamento.toLocal())}',
                   ),
                   trailing: Text(
-                    formatoHora.format(pagamento.dataPagamento),
+                    formatoHora.format(pagamento.dataPagamento.toLocal()),
                     style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                 ),
