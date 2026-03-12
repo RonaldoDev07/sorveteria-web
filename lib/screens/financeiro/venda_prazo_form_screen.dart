@@ -8,6 +8,7 @@ import '../../services/financeiro/cliente_service.dart';
 import '../../services/financeiro/venda_prazo_service.dart';
 import '../../services/produto_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/sound_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/financeiro_styles.dart';
 import '../../utils/input_formatters.dart';
@@ -450,18 +451,31 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
       );
 
       if (mounted) {
+        await SoundService.playSuccess();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ Venda criada com sucesso!'),
             backgroundColor: Color(0xFF10B981),
+            duration: Duration(seconds: 2),
           ),
         );
+        
+        await Future.delayed(const Duration(milliseconds: 500));
         Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Erro: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     } finally {

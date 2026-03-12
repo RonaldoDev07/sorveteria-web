@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../services/sound_service.dart';
 import '../utils/text_formatters.dart';
 import '../mixins/auto_refresh_mixin.dart';
 import 'baixa_estoque_screen.dart';
