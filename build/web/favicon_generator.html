@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Gerar Favicon</title>
+</head>
+<body>
+    <h2>Gerando favicon.png...</h2>
+    <canvas id="canvas" width="64" height="64"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const size = 64;
+        const center = size / 2;
+        
+        // Fundo rosa
+        const gradient = ctx.createLinearGradient(0, 0, size, size);
+        gradient.addColorStop(0, '#FF6B9D');
+        gradient.addColorStop(1, '#E91E63');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+        
+        // Casquinha (cone)
+        ctx.fillStyle = '#D4A574';
+        ctx.beginPath();
+        ctx.moveTo(center, size * 0.85);
+        ctx.lineTo(center - size * 0.15, size * 0.5);
+        ctx.lineTo(center + size * 0.15, size * 0.5);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Bola de sorvete principal
+        ctx.fillStyle = '#FFB6D9';
+        ctx.beginPath();
+        ctx.arc(center, size * 0.42, size * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Bola de sorvete topo
+        ctx.fillStyle = '#FF8DC7';
+        ctx.beginPath();
+        ctx.arc(center, size * 0.28, size * 0.15, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Cereja
+        ctx.fillStyle = '#DC143C';
+        ctx.beginPath();
+        ctx.arc(center, size * 0.15, size * 0.08, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Brilho
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.beginPath();
+        ctx.arc(center - 3, size * 0.25, size * 0.05, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Baixar
+        setTimeout(() => {
+            const link = document.createElement('a');
+            link.download = 'favicon.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            document.body.innerHTML = '<h2 style="color: green;">✅ favicon.png baixado!</h2><p>Substitua o arquivo favicon.png na pasta web/</p>';
+        }, 100);
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "buildCommand": "flutter build web --release",
+  "buildCommand": "echo 'Using pre-built files from build/web'",
   "outputDirectory": "build/web",
-  "installCommand": "echo 'Flutter já instalado'"
+  "installCommand": "echo 'No install needed'"
 }
