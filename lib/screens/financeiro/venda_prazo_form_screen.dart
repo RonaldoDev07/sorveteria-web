@@ -362,74 +362,288 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
       );
       return;
     }
+
+    // Verificar se cliente tem conta aberta no mês
+    setState(() => _isLoading = true);
     
+    try {
+      final contaAberta = await _vendaService.buscarContaAberta(_clienteSelecionado!.id!);
+      
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+
+      if (contaAberta != null) {
+        // Cliente tem conta aberta - perguntar o que fazer
+        final opcao = await showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.info_outline, color: Colors.orange, size: 28),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Conta Mensal Aberta',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cliente: ${_clienteSelecionado!.nome}',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text('Saldo devedor atual: ${_formatoMoeda.format(contaAberta['saldoDevedor'])}'),
+                const SizedBox(height: 16),
+                const Text(
+                  'Este cliente já tem uma conta aberta neste mês. O que deseja fazer?',
+                  style: TextStyle(fontSize: 15),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'cancelar'),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, 'adicionar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Adicionar à Conta'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, 'nova'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10B981),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Nova Venda'),
+              ),
+            ],
+          ),
+        );
+
+        if (opcao == 'adicionar') {
+          await _adicionarNaContaMensal();
+        } else if (opcao == 'nova') {
+          await _criarVendaComParcelas();
+        }
+      } else {
+        // Não tem conta aberta - perguntar o que fazer
+        final opcao = await showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.help_outline, color: Color(0xFF10B981), size: 28),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Tipo de Venda',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cliente: ${_clienteSelecionado!.nome}',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text('Produtos: ${_itensVenda.length}'),
+                Text('Valor Total: ${_formatoMoeda.format(_valorTotal)}'),
+                const SizedBox(height: 16),
+                const Text(
+                  'Como deseja registrar esta venda?',
+                  style: TextStyle(fontSize: 15),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_month, color: Colors.orange, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Conta Mensal',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Cliente pode pegar produtos durante o mês. Parcelas geradas no final.',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green.shade200),
+                  ),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.receipt_long, color: Colors.green, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Venda com Parcelas',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Gera parcelas imediatamente para esta venda.',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'cancelar'),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, 'conta_mensal'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Conta Mensal'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, 'com_parcelas'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10B981),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Com Parcelas'),
+              ),
+            ],
+          ),
+        );
+
+        if (opcao == 'conta_mensal') {
+          await _adicionarNaContaMensal();
+        } else if (opcao == 'com_parcelas') {
+          await _criarVendaComParcelas();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _adicionarNaContaMensal() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final resultado = await _vendaService.adicionarProdutosConta(
+        clienteId: _clienteSelecionado!.id!,
+        produtos: _itensVenda.map((item) => {
+          'produtoId': item.produto.id,
+          'quantidade': item.quantidade,
+          'valorUnitario': item.valorUnitario,
+        }).toList(),
+        observacoes: _observacoesController.text.isEmpty ? null : _observacoesController.text,
+      );
+
+      if (mounted) {
+        await SoundService.playSuccess();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ ${resultado['mensagem'] ?? 'Produtos adicionados à conta mensal!'}'),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        
+        await Future.delayed(const Duration(milliseconds: 500));
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _criarVendaComParcelas() async {
     if (_parcelas.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gere as parcelas')),
+        const SnackBar(content: Text('Gere as parcelas antes de continuar')),
       );
       return;
     }
-
-    // Confirmação antes de criar a venda
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.help_outline, color: Color(0xFF10B981), size: 28),
-            ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Text(
-                'Confirmar Venda',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Cliente: ${_clienteSelecionado!.nome}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text('Produtos: ${_itensVenda.length}'),
-            Text('Valor Total: ${_formatoMoeda.format(_valorTotal)}'),
-            Text('Parcelas: ${_parcelas.length}x'),
-            const SizedBox(height: 16),
-            const Text(
-              'Deseja confirmar esta venda a prazo?',
-              style: TextStyle(fontSize: 15),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF10B981),
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Confirmar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmar != true) return;
 
     setState(() => _isLoading = true);
 

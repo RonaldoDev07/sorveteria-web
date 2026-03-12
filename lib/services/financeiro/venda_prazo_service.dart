@@ -144,4 +144,104 @@ class VendaPrazoService {
       throw Exception('Erro ao cancelar venda: $e');
     }
   }
+
+  // ========== CONTA MENSAL ==========
+
+  Future<Map<String, dynamic>?> buscarContaAberta(String clienteId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/api/conta-mensal/conta-aberta/$clienteId'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        // Se retornar null, não há conta aberta
+        if (data == null) return null;
+        return data as Map<String, dynamic>;
+      } else if (response.statusCode == 404) {
+        return null; // Não há conta aberta
+      } else {
+        throw Exception('Erro ao buscar conta aberta: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erro ao buscar conta aberta: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> adicionarProdutosConta({
+    required String clienteId,
+    required List<Map<String, dynamic>> produtos,
+    String? observacoes,
+  }) async {
+    try {
+      final body = {
+        'clienteId': clienteId,
+        'produtos': produtos,
+        'observacoes': observacoes,
+      };
+
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/api/conta-mensal/adicionar-produtos'),
+        headers: _headers,
+        body: json.encode(body),
+      ).timeout(const Duration(minutes: 5));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      } else {
+        final error = json.decode(utf8.decode(response.bodyBytes));
+        throw Exception(error['detail'] ?? 'Erro ao adicionar produtos');
+      }
+    } catch (e) {
+      throw Exception('Erro ao adicionar produtos: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> fecharContaGerarParcelas({
+    required String contaId,
+    required List<Map<String, dynamic>> parcelas,
+  }) async {
+    try {
+      final body = {
+        'parcelas': parcelas,
+      };
+
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/api/conta-mensal/fechar-conta/$contaId'),
+        headers: _headers,
+        body: json.encode(body),
+      ).timeout(const Duration(minutes: 5));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      } else {
+        final error = json.decode(utf8.decode(response.bodyBytes));
+        throw Exception(error['detail'] ?? 'Erro ao fechar conta');
+      }
+    } catch (e) {
+      throw Exception('Erro ao fechar conta: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> listarContasAbertas({String? clienteId}) async {
+    try {
+      final queryParams = <String, String>{};
+      if (clienteId != null) queryParams['cliente_id'] = clienteId;
+
+      final uri = Uri.parse('${ApiConfig.baseUrl}/api/conta-mensal/contas-abertas')
+          .replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+      final response = await http.get(uri, headers: _headers);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Erro ao listar contas abertas: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erro ao listar contas abertas: $e');
+    }
+  }
 }
