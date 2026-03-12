@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../services/sound_service.dart';
 
 class EntradaEstoqueScreen extends StatefulWidget {
   final Map<String, dynamic> produto;
@@ -64,21 +65,36 @@ class _EntradaEstoqueScreenState extends State<EntradaEstoqueScreen> {
       );
 
       if (mounted) {
+        // Tocar som ANTES de qualquer ação
+        await SoundService.playSuccess();
+        
+        // Pequeno delay para garantir que o som seja ouvido
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Entrada registrada com sucesso!'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
           ),
         );
-        Navigator.pop(context, true); // Retorna true para indicar sucesso
+        
+        // Delay antes de fechar para o usuário ver a mensagem e ouvir o som
+        await Future.delayed(const Duration(milliseconds: 500));
+        Navigator.pop(context, true);
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        // Tocar som de erro ANTES de mostrar mensagem
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao registrar entrada: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }

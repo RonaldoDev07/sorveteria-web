@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../services/sound_service.dart';
 import 'barcode_scanner_universal.dart';
 
 class CarrinhoVendaScreen extends StatefulWidget {
@@ -693,10 +694,15 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
           precoUnitario,
           'SAIDA',
           'Venda via carrinho - $formaPagamento',
+          formaPagamento: formaPagamento, // PASSAR A FORMA DE PAGAMENTO
         );
       }
 
       if (mounted) {
+        // Tocar som ANTES de limpar carrinho
+        await SoundService.playSuccess();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         setState(() {
           _carrinho.clear();
           _isLoading = false;
@@ -706,6 +712,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
           const SnackBar(
             content: Text('Venda finalizada com sucesso!'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
           ),
         );
         
@@ -714,10 +721,15 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        // Tocar som de erro ANTES de mostrar mensagem
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao finalizar venda: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }

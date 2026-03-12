@@ -397,8 +397,9 @@ class ApiService {
     double quantidade,
     double valorUnitario,
     String tipo,
-    String? observacao,
-  ) async {
+    String? observacao, {
+    String? formaPagamento,  // Adicionar forma de pagamento
+  }) async {
     return _retryRequest(() async {
       final body = {
         'produto_id': produtoId,
@@ -408,6 +409,11 @@ class ApiService {
       
       if (tipo != 'AJUSTE' && valorUnitario > 0) {
         body['custo_unitario'] = valorUnitario;
+      }
+      
+      // Adicionar forma de pagamento se fornecida
+      if (formaPagamento != null) {
+        body['forma_pagamento'] = formaPagamento;
       }
 
       final response = await http.post(

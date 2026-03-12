@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../services/sound_service.dart';
 import '../utils/text_formatters.dart';
 
 class MovimentacoesScreen extends StatefulWidget {
@@ -183,20 +184,30 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
       final result = await ApiService.cancelarMovimentacao(auth.token!, movimentacaoId);
       
       if (mounted) {
+        // Tocar som ANTES de mostrar mensagem
+        await SoundService.playSuccess();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result['message']),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
           ),
         );
         _loadMovimentacoes();
       }
     } catch (e) {
       if (mounted) {
+        // Tocar som de erro ANTES de mostrar mensagem
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }

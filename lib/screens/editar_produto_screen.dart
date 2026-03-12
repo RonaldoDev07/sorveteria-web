@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../services/sound_service.dart';
 import '../utils/text_formatters.dart';
 import 'barcode_scanner_universal.dart';
 
@@ -127,21 +128,36 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
       );
 
       if (mounted) {
+        // Tocar som ANTES de qualquer ação
+        await SoundService.playSuccess();
+        
+        // Pequeno delay para garantir que o som seja ouvido
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Produto atualizado com sucesso'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
           ),
         );
+        
+        // Delay antes de fechar para o usuário ver a mensagem e ouvir o som
+        await Future.delayed(const Duration(milliseconds: 500));
         Navigator.pop(context, true);
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        // Tocar som de erro ANTES de mostrar mensagem
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }

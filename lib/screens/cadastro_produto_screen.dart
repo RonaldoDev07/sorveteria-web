@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../services/sound_service.dart';
 import 'barcode_scanner_universal.dart';
 
 class CadastroProdutoScreen extends StatefulWidget {
@@ -116,13 +117,23 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
       print('✅ DEBUG: Produto criado! Resultado: $resultado');
 
       if (mounted) {
+        // Tocar som ANTES de qualquer ação
+        await SoundService.playSuccess();
+        
+        // Pequeno delay para garantir que o som seja ouvido
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ Produto cadastrado com sucesso!'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
           ),
         );
-        Navigator.pop(context, true); // Retorna true para indicar sucesso
+        
+        // Delay antes de fechar para o usuário ver a mensagem e ouvir o som
+        await Future.delayed(const Duration(milliseconds: 500));
+        Navigator.pop(context, true);
       }
     } catch (e, stackTrace) {
       print('❌ DEBUG: ERRO ao cadastrar produto!');
@@ -131,6 +142,10 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
       
       setState(() => _isLoading = false);
       if (mounted) {
+        // Tocar som de erro ANTES de mostrar mensagem
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('❌ Erro: $e'),
