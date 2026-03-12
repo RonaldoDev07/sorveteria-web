@@ -75,5 +75,5 @@ String formatarHora(DateTime dataHora) {
 /// Formata moeda brasileira: R$ 1.234,56
 String formatarMoeda(dynamic valor) {
   final valorDouble = valor is String ? double.tryParse(valor) ?? 0.0 : (valor as num).toDouble();
-  return NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$').format(valorDouble);
+  return NumberFormat.currency(locale: 'pt_BR', symbol: r'R$').format(valorDouble);
 }

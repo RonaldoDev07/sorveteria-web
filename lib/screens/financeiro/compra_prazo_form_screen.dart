@@ -41,7 +41,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
   String _formaPagamento = 'dinheiro'; // Forma de pagamento padrão
   DateTime _dataCompra = DateTime.now(); // Data da compra
   final _observacoesController = TextEditingController();
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
 
   @override
   void initState() {
@@ -1921,7 +1921,7 @@ class __DialogGerarParcelasState extends State<_DialogGerarParcelas> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Valor Total: ${NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$').format(widget.valorTotal)}'),
+          Text('Valor Total: ${NumberFormat.currency(locale: 'pt_BR', symbol: r'R$').format(widget.valorTotal)}'),
           const SizedBox(height: 16),
           TextField(
             controller: _numeroParcelasController,

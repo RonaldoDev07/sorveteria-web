@@ -20,7 +20,7 @@ class _VendasPrazoListScreenState extends State<VendasPrazoListScreen> {
   RelatorioService? _relatorioService;
   String _filtroStatus = 'TODOS';
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final _formatoData = DateFormat('dd/MM/yyyy');
 
   @override

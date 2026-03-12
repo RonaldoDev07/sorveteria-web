@@ -37,7 +37,7 @@ class _CompraVistaFormScreenState extends State<CompraVistaFormScreen> {
   
   String _formaPagamento = 'dinheiro';
   final _observacoesController = TextEditingController();
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
 
   @override
   void initState() {

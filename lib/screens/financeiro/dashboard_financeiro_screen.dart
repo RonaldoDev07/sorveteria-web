@@ -18,7 +18,7 @@ class _DashboardFinanceiroScreenState extends State<DashboardFinanceiroScreen> {
   String? _errorMessage;
   DashboardService? _dashboardService;
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
 
   @override
   void didChangeDependencies() {
@@ -394,7 +394,7 @@ class _CardValor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    final formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
     
     return Container(
       decoration: BoxDecoration(
