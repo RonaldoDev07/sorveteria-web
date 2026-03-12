@@ -12,7 +12,8 @@ class ApiConfig {
   // URL atual - TROCAR ENTRE devUrl E prodUrl CONFORME NECESSÁRIO
   static const String baseUrl = prodUrl;  // ← USANDO PRODUÇÃO
   
-  // Timeout das requisições (aumentado para cold start do Render)
-  // Render free tier pode demorar até 180s para acordar
-  static const Duration timeout = Duration(seconds: 300); // 5 minutos para Android
+  // Timeout das requisições (otimizado)
+  // Render free tier pode demorar até 180s para acordar na primeira requisição
+  // Mas após acordar, 60s é suficiente para qualquer operação
+  static const Duration timeout = Duration(seconds: 60); // 1 minuto
 }
