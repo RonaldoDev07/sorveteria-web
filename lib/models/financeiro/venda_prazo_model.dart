@@ -21,6 +21,7 @@ class VendaPrazo {
   final DateTime createdAt;
   final DateTime? updatedAt;
   final List<dynamic>? produtos;  // Lista de produtos (opcional)
+  final List<dynamic>? historicoDetalhado;  // Histórico de adições (opcional)
 
   VendaPrazo({
     required this.id,
@@ -36,6 +37,7 @@ class VendaPrazo {
     required this.createdAt,
     this.updatedAt,
     this.produtos,
+    this.historicoDetalhado,
   });
 
   factory VendaPrazo.fromJson(Map<String, dynamic> json) {
@@ -81,6 +83,7 @@ class VendaPrazo {
       print('✅ updatedAt parsed: $updatedAt');
       
       final produtos = json['produtos'] as List<dynamic>?;
+      final historicoDetalhado = json['historicoDetalhado'] as List<dynamic>?;
       
       return VendaPrazo(
         id: id,
@@ -96,6 +99,7 @@ class VendaPrazo {
         createdAt: createdAt,
         updatedAt: updatedAt,
         produtos: produtos,
+        historicoDetalhado: historicoDetalhado,
       );
     } catch (e, stackTrace) {
       print('❌ Erro em VendaPrazo.fromJson: $e');
