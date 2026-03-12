@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../services/sound_service.dart';
 import '../utils/text_formatters.dart';
 
 class BaixaEstoqueScreen extends StatefulWidget {
@@ -286,6 +287,10 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
       );
 
       if (mounted) {
+        // Tocar som ANTES de qualquer ação
+        await SoundService.playSuccess();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ Venda registrada com sucesso!'),
@@ -293,11 +298,18 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
             duration: Duration(seconds: 2),
           ),
         );
-        Navigator.pop(context, true); // Retorna true para indicar sucesso
+        
+        // Delay antes de fechar para o usuário ver a mensagem e ouvir o som
+        await Future.delayed(const Duration(milliseconds: 500));
+        Navigator.pop(context, true);
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        // Tocar som de erro ANTES de mostrar mensagem
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('❌ Erro ao registrar venda: $e'),
