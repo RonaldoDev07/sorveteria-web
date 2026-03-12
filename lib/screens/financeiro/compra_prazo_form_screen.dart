@@ -38,7 +38,6 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
   bool _isLoadingProdutos = true;
   
   String _filtroProduto = '';
-  String _formaPagamento = 'dinheiro'; // Forma de pagamento padrão
   DateTime _dataCompra = DateTime.now(); // Data da compra
   final _observacoesController = TextEditingController();
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
@@ -434,7 +433,6 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           'dataVencimento': p.dataVencimento.toIso8601String().split('T')[0],
         }).toList(),
         observacoes: _observacoesController.text.isEmpty ? null : _observacoesController.text,
-        formaPagamento: _formaPagamento,
       );
 
       if (mounted) {
@@ -590,7 +588,7 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                             ),
                             const SizedBox(width: 10),
                             const Text(
-                              'Fornecedor e Pagamento',
+                              'Fornecedor',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -649,38 +647,6 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
                               ),
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: _formaPagamento,
-                          decoration: InputDecoration(
-                            labelText: 'Forma de Pagamento',
-                            prefixIcon: const Icon(Icons.payment, color: Color(0xFF9333EA)),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFF9333EA), width: 2),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey.shade50,
-                          ),
-                          items: const [
-                            DropdownMenuItem(value: 'dinheiro', child: Text('💵 Dinheiro')),
-                            DropdownMenuItem(value: 'pix', child: Text('📱 PIX')),
-                            DropdownMenuItem(value: 'cartao_credito', child: Text('💳 Cartão de Crédito')),
-                            DropdownMenuItem(value: 'cartao_debito', child: Text('💳 Cartão de Débito')),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => _formaPagamento = value);
-                            }
-                          },
                         ),
                         const SizedBox(height: 16),
                         InkWell(
