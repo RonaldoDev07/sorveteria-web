@@ -438,18 +438,31 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
       );
 
       if (mounted) {
+        await SoundService.playSuccess();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ Compra criada com sucesso!'),
             backgroundColor: Color(0xFF9333EA),
+            duration: Duration(seconds: 2),
           ),
         );
+        
+        await Future.delayed(const Duration(milliseconds: 500));
         Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Erro: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     } finally {

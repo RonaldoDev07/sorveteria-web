@@ -245,20 +245,28 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
         await ApiService.deletarProduto(auth.token!, produto['id']);
         
         if (mounted) {
+          await SoundService.playSuccess();
+          await Future.delayed(const Duration(milliseconds: 100));
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Produto "${produto['nome']}" deletado com sucesso!'),
               backgroundColor: const Color(0xFF10B981),
+              duration: const Duration(seconds: 2),
             ),
           );
           _loadProdutos();
         }
       } catch (e) {
         if (mounted) {
+          await SoundService.playError();
+          await Future.delayed(const Duration(milliseconds: 100));
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Erro ao deletar produto: $e'),
               backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
             ),
           );
         }
@@ -476,22 +484,30 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
       );
 
       if (mounted) {
+        await SoundService.playSuccess();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Estoque ajustado com sucesso! ${tipoAjuste == 'adicionar' ? '+' : ''}${_formatarNumero(quantidadeFinal)} ${produto['unidade']}'
             ),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
           ),
         );
         _loadProdutos();
       }
     } catch (e) {
       if (mounted) {
+        await SoundService.playError();
+        await Future.delayed(const Duration(milliseconds: 100));
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao ajustar estoque: $e'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
