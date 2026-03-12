@@ -257,7 +257,7 @@ class _ContasReceberScreenState extends State<ContasReceberScreen> {
                                     child: ListTile(
                                       leading: CircleAvatar(
                                         backgroundColor: _getStatusColor(venda.status),
-                                        child: const Icon(Icons.attach_money, color: Colors.white),
+                                        child: const Text('R\$', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                       ),
                                       title: Text(
                                         venda.cliente?.nome ?? 'Cliente',

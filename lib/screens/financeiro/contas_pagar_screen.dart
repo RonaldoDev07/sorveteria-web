@@ -261,7 +261,7 @@ class _ContasPagarScreenState extends State<ContasPagarScreen> {
                                     child: ListTile(
                                       leading: CircleAvatar(
                                         backgroundColor: _getStatusColor(compra.status),
-                                        child: const Icon(Icons.money_off, color: Colors.white),
+                                        child: const Text('R\$', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                       ),
                                       title: Text(
                                         compra.fornecedor?.nome ?? 'Fornecedor',
