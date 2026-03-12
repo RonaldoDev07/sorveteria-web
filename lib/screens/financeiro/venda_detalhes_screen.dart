@@ -460,6 +460,58 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                             );
                           }
                         }),
+                        // Produtos deste histórico
+                        ...produtos.map((produto) {
+                          try {
+                            final produtoMap = produto as Map<String, dynamic>;
+                            final produtoNome = produtoMap['produtoNome']?.toString() ?? 'Produto';
+                            final quantidade = produtoMap['quantidade'] ?? 0;
+                            final valorUnitario = _toDouble(produtoMap['valorUnitario']);
+                            final subtotal = _toDouble(produtoMap['subtotal']);
+                            
+                            return ListTile(
+                              dense: true,
+                              leading: const CircleAvatar(
+                                backgroundColor: Colors.green,
+                                radius: 18,
+                                child: Icon(Icons.shopping_bag, color: Colors.white, size: 18),
+                              ),
+                              title: Text(
+                                produtoNome,
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                              ),
+                              subtitle: Text(
+                                'Quantidade: $quantidade un.\nValor unitário: ${formatoMoeda.format(valorUnitario)}',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              isThreeLine: true,
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    'Subtotal',
+                                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                                  ),
+                                  Text(
+                                    formatoMoeda.format(subtotal),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } catch (e) {
+                            return ListTile(
+                              dense: true,
+                              leading: const Icon(Icons.error, size: 20, color: Colors.red),
+                              title: const Text('Erro ao carregar produto'),
+                            );
+                          }
+                        }),
                         
                         if (historico['observacoes'] != null && historico['observacoes'].toString().isNotEmpty) ...[
                           Padding(
