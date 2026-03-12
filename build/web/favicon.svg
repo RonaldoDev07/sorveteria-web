@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9C27B0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#BA68C8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fundo circular -->
+  <circle cx="50" cy="50" r="48" fill="url(#grad)"/>
+  
+  <!-- Sorvete (cone) -->
+  <path d="M 35 55 L 50 85 L 65 55 Z" fill="#D4A574" stroke="#B8935A" stroke-width="1"/>
+  
+  <!-- Sorvete (bola 1) -->
+  <circle cx="50" cy="45" r="15" fill="#FFE4E1"/>
+  
+  <!-- Sorvete (bola 2) -->
+  <circle cx="50" cy="30" r="13" fill="#FFB6C1"/>
+  
+  <!-- Cereja -->
+  <circle cx="50" cy="18" r="4" fill="#DC143C"/>
+  <path d="M 50 18 Q 48 12 50 8" stroke="#8B4513" stroke-width="1.5" fill="none"/>
+</svg>
