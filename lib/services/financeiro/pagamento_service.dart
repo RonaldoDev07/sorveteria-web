@@ -28,7 +28,9 @@ class PagamentoService {
   }) async {
     try {
       final body = {
-        'valorPago': valorPago,
+        'tipo': 'VENDA',
+        'referenciaId': vendaId,
+        'valor': valorPago,
         'formaPagamento': formaPagamento,
         'dataPagamento': (dataPagamento ?? DateTime.now()).toIso8601String(),
       };
@@ -37,21 +39,17 @@ class PagamentoService {
         Uri.parse('$_baseUrl/vendas/$vendaId/pagamentos'),
         headers: _headers,
         body: json.encode(body),
-      ).timeout(const Duration(minutes: 5));
-
-      print('📥 Resposta pagamento venda - Status: ${response.statusCode}');
-      print('   Headers: ${response.headers}');
+      ).timeout(ApiConfig.timeout);
 
       // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _headers,
             body: json.encode(body),
-          ).timeout(const Duration(minutes: 5));
+          ).timeout(ApiConfig.timeout);
           
           if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
             return Pagamento.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
@@ -98,7 +96,9 @@ class PagamentoService {
   }) async {
     try {
       final body = {
-        'valorPago': valorPago,
+        'tipo': 'COMPRA',
+        'referenciaId': compraId,
+        'valor': valorPago,
         'formaPagamento': formaPagamento,
         'dataPagamento': (dataPagamento ?? DateTime.now()).toIso8601String(),
       };
@@ -107,21 +107,17 @@ class PagamentoService {
         Uri.parse('$_baseUrl/compras/$compraId/pagamentos'),
         headers: _headers,
         body: json.encode(body),
-      ).timeout(const Duration(minutes: 5));
-
-      print('📥 Resposta pagamento compra - Status: ${response.statusCode}');
-      print('   Headers: ${response.headers}');
+      ).timeout(ApiConfig.timeout);
 
       // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _headers,
             body: json.encode(body),
-          ).timeout(const Duration(minutes: 5));
+          ).timeout(ApiConfig.timeout);
           
           if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
             return Pagamento.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));

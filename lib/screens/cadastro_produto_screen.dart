@@ -61,21 +61,14 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
   }
 
   Future<void> _handleCadastro() async {
-    print('🔵 DEBUG: _handleCadastro chamado!');
-    
     if (!_formKey.currentState!.validate()) {
-      print('❌ DEBUG: Validação do formulário falhou');
       return;
     }
 
-    print('✅ DEBUG: Validação OK, iniciando cadastro...');
     setState(() => _isLoading = true);
 
     try {
       final auth = Provider.of<AuthService>(context, listen: false);
-      
-      print('🔍 DEBUG: Token: ${auth.token != null ? "PRESENTE" : "AUSENTE"}');
-      print('🔍 DEBUG: Pode cadastrar: ${auth.canCadastrarProduto}');
       
       // Validação adicional no frontend (backend também valida)
       if (!auth.canCadastrarProduto) {
@@ -87,21 +80,11 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
       final precoStr = _precoController.text.replaceAll(',', '.');
       final estoqueStr = _estoqueController.text.replaceAll(',', '.');
 
-      print('📦 DEBUG: Dados do produto:');
-      print('   Nome: ${_nomeController.text}');
-      print('   Unidade: $_unidade');
-      print('   Custo: $custoStr');
-      print('   Preço: $precoStr');
-      print('   Estoque: $estoqueStr');
-
       // Formatar data de validade se existir (formato: YYYY-MM-DD)
       String? dataValidadeStr;
       if (_dataValidade != null) {
         dataValidadeStr = '${_dataValidade!.year}-${_dataValidade!.month.toString().padLeft(2, '0')}-${_dataValidade!.day.toString().padLeft(2, '0')}';
-        print('   Validade: $dataValidadeStr');
       }
-
-      print('🚀 DEBUG: Chamando ApiService.criarProduto...');
       
       final resultado = await ApiService.criarProduto(
         auth.token!,
@@ -113,8 +96,6 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
         dataValidade: dataValidadeStr,
         codigoBarras: _codigoBarrasController.text.isEmpty ? null : _codigoBarrasController.text,
       );
-
-      print('✅ DEBUG: Produto criado! Resultado: $resultado');
 
       if (mounted) {
         // Tocar som ANTES de qualquer ação
@@ -136,9 +117,6 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
         Navigator.pop(context, true);
       }
     } catch (e, stackTrace) {
-      print('❌ DEBUG: ERRO ao cadastrar produto!');
-      print('   Erro: $e');
-      print('   Stack: $stackTrace');
       
       setState(() => _isLoading = false);
       if (mounted) {
