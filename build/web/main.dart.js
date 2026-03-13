@@ -54253,7 +54253,7 @@ var $async$yw=A.u(function(a1,a2){if(a1===1){o=a2
 s=p}while(true)switch(s){case 0:d=null
 p=4
 g=d
-m=A.ai(["tipo","VENDA","referenciaId",a0,"valor",b,"formaPagamento",a,"dataPagamento",(g==null?new A.bz(Date.now(),0,!1):g).kG()],t.N,t.K)
+m=A.ai(["tipo","venda","referenciaId",a0,"valor",b,"formaPagamento",a,"dataPagamento",(g==null?new A.bz(Date.now(),0,!1):g).kG()],t.N,t.K)
 g=A.bo(u.A+a0+"/pagamentos",0,null)
 f=n.grd()
 s=7
@@ -54328,7 +54328,7 @@ var $async$yv=A.u(function(a1,a2){if(a1===1){o=a2
 s=p}while(true)switch(s){case 0:d=null
 p=4
 g=d
-m=A.ai(["tipo","COMPRA","referenciaId",a,"valor",a0,"formaPagamento",b,"dataPagamento",(g==null?new A.bz(Date.now(),0,!1):g).kG()],t.N,t.K)
+m=A.ai(["tipo","compra","referenciaId",a,"valor",a0,"formaPagamento",b,"dataPagamento",(g==null?new A.bz(Date.now(),0,!1):g).kG()],t.N,t.K)
 g=A.bo(u.a+a+"/pagamentos",0,null)
 f=n.grd()
 s=7

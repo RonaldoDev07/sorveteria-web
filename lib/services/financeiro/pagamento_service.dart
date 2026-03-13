@@ -28,7 +28,7 @@ class PagamentoService {
   }) async {
     try {
       final body = {
-        'tipo': 'VENDA',
+        'tipo': 'venda',
         'referenciaId': vendaId,
         'valor': valorPago,
         'formaPagamento': formaPagamento,
@@ -96,7 +96,7 @@ class PagamentoService {
   }) async {
     try {
       final body = {
-        'tipo': 'COMPRA',
+        'tipo': 'compra',
         'referenciaId': compraId,
         'valor': valorPago,
         'formaPagamento': formaPagamento,
