@@ -452,42 +452,6 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
                             
                             return ListTile(
                               dense: true,
-                              leading: const Icon(Icons.shopping_bag, size: 20, color: Colors.green),
-                              title: Text(
-                                produtoNome,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              subtitle: Text(
-                                'Quantidade: $quantidade un. • ${formatoMoeda.format(valorUnitario)}/un',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              trailing: Text(
-                                formatoMoeda.format(subtotal),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            );
-                          } catch (e) {
-                            return ListTile(
-                              dense: true,
-                              leading: const Icon(Icons.error, size: 20, color: Colors.red),
-                              title: const Text('Erro ao carregar produto'),
-                            );
-                          }
-                        }),
-                        // Produtos deste histórico
-                        ...produtos.map((produto) {
-                          try {
-                            final produtoMap = produto as Map<String, dynamic>;
-                            final produtoNome = produtoMap['produtoNome']?.toString() ?? 'Produto';
-                            final quantidade = produtoMap['quantidade'] ?? 0;
-                            final valorUnitario = _toDouble(produtoMap['valorUnitario']);
-                            final subtotal = _toDouble(produtoMap['subtotal']);
-                            
-                            return ListTile(
-                              dense: true,
                               leading: const CircleAvatar(
                                 backgroundColor: Colors.green,
                                 radius: 18,
