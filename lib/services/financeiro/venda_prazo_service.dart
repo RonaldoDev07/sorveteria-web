@@ -64,11 +64,15 @@ class VendaPrazoService {
       );
 
       if (response.statusCode == 200) {
-        return VendaPrazo.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        print('🔍 buscarVenda resposta: historicoDetalhado=${data['historicoDetalhado']?.length ?? 'null'}');
+        return VendaPrazo.fromJson(data);
       } else {
+        print('❌ buscarVenda erro ${response.statusCode}: ${response.body}');
         throw Exception('Venda não encontrada');
       }
     } catch (e) {
+      print('❌ buscarVenda exception: $e');
       throw Exception('Erro ao buscar venda: $e');
     }
   }
