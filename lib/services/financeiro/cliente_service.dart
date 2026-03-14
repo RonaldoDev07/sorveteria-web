@@ -4,7 +4,6 @@ import '../../models/financeiro/cliente_model.dart';
 import '../auth_service.dart';
 import '../../config/api_config.dart';
 
-/// Service para gerenciar clientes via API
 class ClienteService {
   final AuthService _authService;
 
@@ -20,17 +19,12 @@ class ClienteService {
     };
   }
 
-  /// Lista todos os clientes
-  Future<List<Cliente>> listarClientes({
-    int skip = 0,
-    int limit = 100,
-  }) async {
+  Future<List<Cliente>> listarClientes({int skip = 0, int limit = 100}) async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl?skip=$skip&limit=$limit'),
         headers: _headers,
       );
-
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return data.map((json) => Cliente.fromJson(json)).toList();
@@ -42,14 +36,12 @@ class ClienteService {
     }
   }
 
-  /// Busca um cliente por ID
   Future<Cliente> buscarCliente(String id) async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/$id'),
         headers: _headers,
       );
-
       if (response.statusCode == 200) {
         return Cliente.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       } else {
@@ -60,32 +52,22 @@ class ClienteService {
     }
   }
 
-  /// Cria um novo cliente
   Future<Cliente> criarCliente(Cliente cliente) async {
     try {
-      print('📤 Enviando para API: ${json.encode(cliente.toJson())}');
-      
       final response = await http.post(
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode(cliente.toJson()),
       ).timeout(const Duration(minutes: 5));
 
-      print('📥 Status: ${response.statusCode}');
-      print('📥 Headers: ${response.headers}');
-      print('📥 Response: ${utf8.decode(response.bodyBytes)}');
-
-      // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _headers,
             body: json.encode(cliente.toJson()),
           ).timeout(const Duration(minutes: 5));
-          
           if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
             return Cliente.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
           }
@@ -96,16 +78,13 @@ class ClienteService {
         return Cliente.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       } else {
         final error = json.decode(utf8.decode(response.bodyBytes));
-        print('❌ Erro do backend: $error');
         throw Exception(error['detail'] ?? error['message'] ?? 'Erro ao criar cliente');
       }
     } catch (e) {
-      print('❌ Exceção: $e');
       throw Exception('Erro ao criar cliente: $e');
     }
   }
 
-  /// Atualiza um cliente existente
   Future<Cliente> atualizarCliente(String id, Map<String, dynamic> dados) async {
     try {
       final response = await http.put(
@@ -114,20 +93,14 @@ class ClienteService {
         body: json.encode(dados),
       ).timeout(const Duration(minutes: 5));
 
-      print('📥 Resposta atualizar cliente - Status: ${response.statusCode}');
-      print('   Headers: ${response.headers}');
-
-      // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.put(
             Uri.parse(location),
             headers: _headers,
             body: json.encode(dados),
           ).timeout(const Duration(minutes: 5));
-          
           if (redirectResponse.statusCode == 200) {
             return Cliente.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
           }
@@ -145,14 +118,12 @@ class ClienteService {
     }
   }
 
-  /// Deleta um cliente (soft delete)
   Future<void> deletarCliente(String id) async {
     try {
       final response = await http.delete(
         Uri.parse('$_baseUrl/$id'),
         headers: _headers,
       );
-
       if (response.statusCode != 200 && response.statusCode != 204) {
         final error = json.decode(utf8.decode(response.bodyBytes));
         throw Exception(error['detail'] ?? 'Erro ao deletar cliente');

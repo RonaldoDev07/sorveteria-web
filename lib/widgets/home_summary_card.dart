@@ -54,7 +54,6 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
         });
       }
     } catch (e) {
-      print('Erro ao carregar resumo: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -95,7 +94,7 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
                 }
               }
             } catch (e) {
-              print('⚠️ Erro ao parsear data: $dataHora - $e');
+              // ignorar erro de parsing de data
             }
           }
         }
@@ -103,7 +102,6 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
       
       return totalVendas;
     } catch (e) {
-      print('❌ Erro ao buscar vendas de hoje: $e');
       return 0.0;
     }
   }

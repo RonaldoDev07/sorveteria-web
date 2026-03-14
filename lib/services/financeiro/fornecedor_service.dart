@@ -4,7 +4,6 @@ import '../../models/financeiro/fornecedor_model.dart';
 import '../auth_service.dart';
 import '../../config/api_config.dart';
 
-/// Service para gerenciar fornecedores via API
 class FornecedorService {
   final AuthService _authService;
 
@@ -20,17 +19,12 @@ class FornecedorService {
     };
   }
 
-  /// Lista todos os fornecedores
-  Future<List<Fornecedor>> listarFornecedores({
-    int skip = 0,
-    int limit = 100,
-  }) async {
+  Future<List<Fornecedor>> listarFornecedores({int skip = 0, int limit = 100}) async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl?skip=$skip&limit=$limit'),
         headers: _headers,
       );
-
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return data.map((json) => Fornecedor.fromJson(json)).toList();
@@ -42,14 +36,12 @@ class FornecedorService {
     }
   }
 
-  /// Busca um fornecedor por ID
   Future<Fornecedor> buscarFornecedor(String id) async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/$id'),
         headers: _headers,
       );
-
       if (response.statusCode == 200) {
         return Fornecedor.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       } else {
@@ -60,32 +52,22 @@ class FornecedorService {
     }
   }
 
-  /// Cria um novo fornecedor
   Future<Fornecedor> criarFornecedor(Fornecedor fornecedor) async {
     try {
-      print('📤 Enviando para API: ${json.encode(fornecedor.toJson())}');
-      
       final response = await http.post(
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode(fornecedor.toJson()),
       ).timeout(const Duration(minutes: 5));
 
-      print('📥 Status: ${response.statusCode}');
-      print('📥 Headers: ${response.headers}');
-      print('📥 Response: ${utf8.decode(response.bodyBytes)}');
-
-      // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _headers,
             body: json.encode(fornecedor.toJson()),
           ).timeout(const Duration(minutes: 5));
-          
           if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
             return Fornecedor.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
           }
@@ -96,16 +78,13 @@ class FornecedorService {
         return Fornecedor.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       } else {
         final error = json.decode(utf8.decode(response.bodyBytes));
-        print('❌ Erro do backend: $error');
         throw Exception(error['detail'] ?? error['message'] ?? 'Erro ao criar fornecedor');
       }
     } catch (e) {
-      print('❌ Exceção: $e');
       throw Exception('Erro ao criar fornecedor: $e');
     }
   }
 
-  /// Atualiza um fornecedor existente
   Future<Fornecedor> atualizarFornecedor(String id, Map<String, dynamic> dados) async {
     try {
       final response = await http.put(
@@ -114,20 +93,14 @@ class FornecedorService {
         body: json.encode(dados),
       ).timeout(const Duration(minutes: 5));
 
-      print('📥 Resposta atualizar fornecedor - Status: ${response.statusCode}');
-      print('   Headers: ${response.headers}');
-
-      // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.put(
             Uri.parse(location),
             headers: _headers,
             body: json.encode(dados),
           ).timeout(const Duration(minutes: 5));
-          
           if (redirectResponse.statusCode == 200) {
             return Fornecedor.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
           }
@@ -145,14 +118,12 @@ class FornecedorService {
     }
   }
 
-  /// Deleta um fornecedor (soft delete)
   Future<void> deletarFornecedor(String id) async {
     try {
       final response = await http.delete(
         Uri.parse('$_baseUrl/$id'),
         headers: _headers,
       );
-
       if (response.statusCode != 200 && response.statusCode != 204) {
         final error = json.decode(utf8.decode(response.bodyBytes));
         throw Exception(error['detail'] ?? 'Erro ao deletar fornecedor');

@@ -32,15 +32,10 @@ class CompraPrazoService {
         'skip': skip.toString(),
         'limit': limit.toString(),
       };
-      
       if (fornecedorId != null) queryParams['fornecedorId'] = fornecedorId;
       if (status != null) queryParams['status'] = status;
-      if (dataInicio != null) {
-        queryParams['dataInicio'] = dataInicio.toIso8601String().split('T')[0];
-      }
-      if (dataFim != null) {
-        queryParams['dataFim'] = dataFim.toIso8601String().split('T')[0];
-      }
+      if (dataInicio != null) queryParams['dataInicio'] = dataInicio.toIso8601String().split('T')[0];
+      if (dataFim != null) queryParams['dataFim'] = dataFim.toIso8601String().split('T')[0];
 
       final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParams);
       final response = await http.get(uri, headers: _headers);
@@ -62,7 +57,6 @@ class CompraPrazoService {
         Uri.parse('$_baseUrl/$id'),
         headers: _headers,
       );
-
       if (response.statusCode == 200) {
         return CompraPrazo.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       } else {
@@ -87,31 +81,22 @@ class CompraPrazoService {
         'parcelas': parcelas,
         'observacoes': observacoes,
       };
-      
-      if (formaPagamento != null) {
-        body['formaPagamento'] = formaPagamento;
-      }
-      
+      if (formaPagamento != null) body['formaPagamento'] = formaPagamento;
+
       final response = await http.post(
         Uri.parse(_baseUrl),
         headers: _headers,
         body: json.encode(body),
       ).timeout(const Duration(minutes: 5));
 
-      print('📥 Resposta criar compra a prazo - Status: ${response.statusCode}');
-      print('   Headers: ${response.headers}');
-
-      // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _headers,
             body: json.encode(body),
           ).timeout(const Duration(minutes: 5));
-          
           if (redirectResponse.statusCode == 200 || redirectResponse.statusCode == 201) {
             return CompraPrazo.fromJson(json.decode(utf8.decode(redirectResponse.bodyBytes)));
           }
@@ -135,7 +120,6 @@ class CompraPrazoService {
         Uri.parse('$_baseUrl/$id'),
         headers: _headers,
       );
-
       if (response.statusCode != 200 && response.statusCode != 204) {
         final error = json.decode(utf8.decode(response.bodyBytes));
         throw Exception(error['detail'] ?? 'Erro ao cancelar compra');

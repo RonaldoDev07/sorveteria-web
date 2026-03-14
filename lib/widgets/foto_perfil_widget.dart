@@ -10,12 +10,7 @@ class FotoPerfilWidget extends StatelessWidget {
   const FotoPerfilWidget({super.key, required this.auth});
 
   void _selecionarFotoWeb(BuildContext context) {
-    print('🔵 Abrindo página de upload');
-    
-    // Abrir página de upload em nova aba
     html.window.open('/upload.html', 'Upload Foto', 'width=600,height=600');
-    
-    // Fechar modal
     if (context.mounted) {
       Navigator.pop(context);
     }
@@ -23,7 +18,6 @@ class FotoPerfilWidget extends StatelessWidget {
 
   void _removerFoto(BuildContext context) async {
     try {
-      // Mostrar loading
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -41,7 +35,7 @@ class FotoPerfilWidget extends StatelessWidget {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Foto removida com sucesso!'),
+            content: Text('Foto removida com sucesso'),
             backgroundColor: Color(0xFF10B981),
           ),
         );
@@ -51,7 +45,7 @@ class FotoPerfilWidget extends StatelessWidget {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('❌ Erro ao remover foto: $e'),
+            content: Text('Erro ao remover foto: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -61,7 +55,6 @@ class FotoPerfilWidget extends StatelessWidget {
 
   void _mostrarOpcoes(BuildContext context) {
     if (kIsWeb) {
-      // Na web, mostrar modal com opções
       showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
@@ -83,10 +76,7 @@ class FotoPerfilWidget extends StatelessWidget {
               const SizedBox(height: 16),
               const Text(
                 'Foto de Perfil',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
               ListTile(
@@ -134,12 +124,8 @@ class FotoPerfilWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('🟢 FotoPerfilWidget build - fotoUrl: ${auth.fotoUrl}');
     return GestureDetector(
-      onTap: () {
-        print('🟢 Avatar clicado!');
-        _mostrarOpcoes(context);
-      },
+      onTap: () => _mostrarOpcoes(context),
       child: Stack(
         children: [
           CircleAvatar(
@@ -167,11 +153,7 @@ class FotoPerfilWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
               ),
-              child: const Icon(
-                Icons.camera_alt_rounded,
-                size: 14,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
             ),
           ),
         ],
