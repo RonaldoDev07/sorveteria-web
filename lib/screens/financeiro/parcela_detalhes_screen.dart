@@ -124,8 +124,17 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalhes da Parcela'),
-        backgroundColor: Colors.blue,
+        title: const Text('Detalhes da Parcela', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF2563EB), Color(0xFF60A5FA)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         foregroundColor: Colors.white,
       ),
       body: _isLoading
@@ -171,7 +180,7 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                                     _parcela.tipo == 'VENDA' || _parcela.tipo == 'venda'
                                         ? Icons.shopping_cart
                                         : Icons.shopping_bag,
-                                    color: Colors.blue,
+                                    color: const Color(0xFF2563EB),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -231,7 +240,7 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    const Icon(Icons.person, color: Colors.blue),
+                                    const Icon(Icons.person, color: Color(0xFF2563EB)),
                                     const SizedBox(width: 8),
                                     Text(
                                       _venda != null ? 'Cliente' : 'Fornecedor',
@@ -307,7 +316,7 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                               child: ListTile(
                                 leading: const CircleAvatar(
-                                  backgroundColor: Colors.blue,
+                                  backgroundColor: Color(0xFF2563EB),
                                   child: Icon(Icons.shopping_bag, color: Colors.white, size: 20),
                                 ),
                                 title: Text(
@@ -334,7 +343,7 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
-                                        color: Colors.blue,
+                                        color: Color(0xFF2563EB),
                                       ),
                                     ),
                                   ],
@@ -362,7 +371,7 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
                         const SizedBox(height: 16),
                         Card(
                           margin: const EdgeInsets.all(16),
-                          color: Colors.blue[50],
+                          color: const Color(0xFF2563EB).withOpacity(0.06),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
@@ -447,7 +456,7 @@ class _ParcelaDetalhesScreenState extends State<ParcelaDetalhesScreen> {
         label = 'Cancelada';
         break;
       default:
-        cor = Colors.blue;
+        cor = const Color(0xFF2563EB);
         label = status;
     }
 

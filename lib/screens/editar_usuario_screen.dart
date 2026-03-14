@@ -215,7 +215,7 @@ class _EditarUsuarioScreenState extends State<EditarUsuarioScreen> {
                               value: 'OPERADOR',
                               child: Row(
                                 children: [
-                                  Icon(Icons.person, color: Colors.blue),
+                                  Icon(Icons.person, color: const Color(0xFF2563EB)),
                                   SizedBox(width: 8),
                                   Text('OPERADOR'),
                                 ],

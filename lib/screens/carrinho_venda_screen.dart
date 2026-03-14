@@ -536,12 +536,12 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: troco >= 0 
-                                  ? [Colors.blue.withOpacity(0.1), Colors.blue.withOpacity(0.05)]
+                                  ? [const Color(0xFF2563EB).withOpacity(0.1), const Color(0xFF2563EB).withOpacity(0.05)]
                                   : [Colors.red.withOpacity(0.1), Colors.red.withOpacity(0.05)],
                             ),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: troco >= 0 ? Colors.blue : Colors.red,
+                              color: troco >= 0 ? const Color(0xFF2563EB) : Colors.red,
                               width: 2,
                             ),
                           ),
@@ -553,7 +553,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: troco >= 0 ? Colors.blue : Colors.red,
+                                      color: troco >= 0 ? const Color(0xFF2563EB) : Colors.red,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
@@ -568,7 +568,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
-                                      color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
+                                      color: troco >= 0 ? const Color(0xFF1D4ED8) : Colors.red[900],
                                     ),
                                   ),
                                 ],
@@ -578,7 +578,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
-                                  color: troco >= 0 ? Colors.blue[900] : Colors.red[900],
+                                  color: troco >= 0 ? const Color(0xFF1D4ED8) : Colors.red[900],
                                 ),
                               ),
                             ],
@@ -1188,7 +1188,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                                                     decoration: BoxDecoration(
                                                       color: estoque < 10
                                                           ? Colors.orange.withOpacity(0.1)
-                                                          : Colors.blue.withOpacity(0.1),
+                                                          : const Color(0xFF2563EB).withOpacity(0.1),
                                                       borderRadius: BorderRadius.circular(6),
                                                     ),
                                                     child: Row(
@@ -1199,7 +1199,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                                                           size: 14,
                                                           color: estoque < 10
                                                               ? Colors.orange
-                                                              : Colors.blue,
+                                                              : const Color(0xFF2563EB),
                                                         ),
                                                         const SizedBox(width: 4),
                                                         Text(
@@ -1209,7 +1209,7 @@ class _CarrinhoVendaScreenState extends State<CarrinhoVendaScreen> with SingleTi
                                                             fontWeight: FontWeight.w600,
                                                             color: estoque < 10
                                                                 ? Colors.orange
-                                                                : Colors.blue,
+                                                                : const Color(0xFF2563EB),
                                                           ),
                                                         ),
                                                       ],

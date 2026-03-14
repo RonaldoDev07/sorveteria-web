@@ -172,10 +172,10 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: const Color(0xFF2563EB).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.blue.withOpacity(0.3),
+                          color: const Color(0xFF2563EB).withOpacity(0.3),
                         ),
                       ),
                       child: Row(
@@ -186,7 +186,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.blue,
+                              color: Color(0xFF2563EB),
                             ),
                           ),
                           Text(
@@ -194,7 +194,7 @@ class _BaixaEstoqueScreenState extends State<BaixaEstoqueScreen> {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: Colors.blue,
+                              color: Color(0xFF2563EB),
                             ),
                           ),
                         ],

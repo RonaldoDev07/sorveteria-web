@@ -107,7 +107,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
         // Válido
         return {
           'status': 'valido',
-          'cor': Colors.blue,
+          'cor': const Color(0xFF2563EB),
           'icone': Icons.calendar_today_rounded,
           'texto': 'Válido até ${validade.day.toString().padLeft(2, '0')}/${validade.month.toString().padLeft(2, '0')}/${validade.year}',
         };
@@ -321,12 +321,12 @@ class _ProdutosScreenState extends State<ProdutosScreen> with AutoRefreshMixin {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: const Color(0xFF2563EB).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: Colors.blue, size: 16),
+                      const Icon(Icons.info_outline, color: Color(0xFF2563EB), size: 16),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(

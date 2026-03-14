@@ -1137,10 +1137,10 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.withOpacity(0.1),
+                                    color: const Color(0xFF2563EB).withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(Icons.calendar_month, color: Colors.blue, size: 24),
+                                  child: const Icon(Icons.calendar_month, color: Color(0xFF2563EB), size: 24),
                                 ),
                                 const SizedBox(width: 12),
                                 const Text(
@@ -1156,12 +1156,12 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Colors.blue, Colors.lightBlue],
+                                  colors: [Color(0xFF2563EB), Color(0xFF60A5FA)],
                                 ),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.blue.withOpacity(0.3),
+                                    color: const Color(0xFF2563EB).withOpacity(0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -1205,16 +1205,16 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                               margin: const EdgeInsets.only(bottom: 8),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
+                                color: const Color(0xFF2563EB).withOpacity(0.06),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.blue.shade100),
+                                border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.15)),
                               ),
                               child: Row(
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.blue.withOpacity(0.1),
+                                      color: const Color(0xFF2563EB).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -1222,7 +1222,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
-                                        color: Colors.blue,
+                                        color: Color(0xFF2563EB),
                                       ),
                                     ),
                                   ),
@@ -1253,7 +1253,7 @@ class _VendaPrazoFormScreenState extends State<VendaPrazoFormScreen> {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      color: Colors.blue,
+                                      color: Color(0xFF2563EB),
                                     ),
                                   ),
                                 ],
@@ -1850,7 +1850,7 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
                     message: 'Escanear código de barras',
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: const Color(0xFF2563EB),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(

@@ -404,7 +404,7 @@ class _EditarProdutoScreenState extends State<EditarProdutoScreen> {
                       children: [
                         Icon(
                           Icons.calendar_today_rounded,
-                          color: _dataValidade != null ? Colors.blue : Colors.grey,
+                          color: _dataValidade != null ? const Color(0xFF2563EB) : Colors.grey,
                         ),
                         const SizedBox(width: 12),
                         Expanded(

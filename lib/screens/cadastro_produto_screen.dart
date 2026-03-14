@@ -548,10 +548,10 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                       margin: const EdgeInsets.all(12),
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: const Color(0xFF2563EB).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.inventory_rounded, color: Colors.blue, size: 20),
+                      child: const Icon(Icons.inventory_rounded, color: Color(0xFF2563EB), size: 20),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -624,12 +624,12 @@ class _CadastroProdutoScreenState extends State<CadastroProdutoScreen> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: (_dataValidade != null ? Colors.blue : Colors.grey).withOpacity(0.1),
+                          color: (_dataValidade != null ? const Color(0xFF2563EB) : Colors.grey).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
                           Icons.calendar_today_rounded,
-                          color: _dataValidade != null ? Colors.blue : Colors.grey,
+                          color: _dataValidade != null ? const Color(0xFF2563EB) : Colors.grey,
                           size: 20,
                         ),
                       ),

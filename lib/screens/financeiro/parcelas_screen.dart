@@ -207,7 +207,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       case 'paga': return Colors.green;
       case 'atrasada': return Colors.red;
       case 'parcialmente_paga': return Colors.orange;
-      default: return Colors.blue;
+      default: return const Color(0xFF2563EB);
     }
   }
 

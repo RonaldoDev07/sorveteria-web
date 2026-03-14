@@ -318,13 +318,13 @@ class _BarcodeScannerUniversalState extends State<BarcodeScannerUniversal> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: const Color(0xFF2563EB).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                  border: Border.all(color: const Color(0xFF2563EB).withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: Colors.blue),
+                    const Icon(Icons.info_outline, color: Color(0xFF2563EB)),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(

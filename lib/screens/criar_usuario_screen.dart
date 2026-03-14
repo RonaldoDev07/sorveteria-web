@@ -230,7 +230,7 @@ class _CriarUsuarioScreenState extends State<CriarUsuarioScreen> {
                               value: 'OPERADOR',
                               child: Row(
                                 children: [
-                                  Icon(Icons.person, color: Colors.blue),
+                                  Icon(Icons.person, color: const Color(0xFF2563EB)),
                                   SizedBox(width: 8),
                                   Text('OPERADOR (só vende e consulta)'),
                                 ],
@@ -245,10 +245,11 @@ class _CriarUsuarioScreenState extends State<CriarUsuarioScreen> {
                 ),
                 const SizedBox(height: 16),
                 Card(
-                  elevation: 2,
-                  color: Colors.blue.shade50,
+                  elevation: 0,
+                  color: const Color(0xFF2563EB).withOpacity(0.06),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: const Color(0xFF2563EB).withOpacity(0.15)),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -257,13 +258,13 @@ class _CriarUsuarioScreenState extends State<CriarUsuarioScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.info_outline, color: Colors.blue.shade700),
+                            const Icon(Icons.info_outline, color: Color(0xFF2563EB)),
                             const SizedBox(width: 8),
-                            Text(
+                            const Text(
                               'Permissões',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blue.shade700,
+                                color: Color(0xFF2563EB),
                               ),
                             ),
                           ],

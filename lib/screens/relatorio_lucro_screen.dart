@@ -694,15 +694,13 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blue.shade50, Colors.blue.shade100],
-                    ),
+                    color: const Color(0xFF2563EB).withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: _buildResumoItem(
                     'Total Vendido',
                     resumo['total_vendido'],
-                    Colors.blue.shade700,
+                    const Color(0xFF2563EB),
                     icon: Icons.trending_up,
                   ),
                 ),
@@ -710,9 +708,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.orange.shade50, Colors.orange.shade100],
-                    ),
+                    color: Colors.orange.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: _buildResumoItem(
@@ -726,15 +722,13 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.green.shade50, Colors.green.shade100],
-                    ),
+                    color: const Color(0xFF10B981).withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: _buildResumoItem(
                     'Lucro Bruto',
                     resumo['lucro_bruto'],
-                    Colors.green.shade700,
+                    const Color(0xFF10B981),
                     icon: Icons.monetization_on,
                   ),
                 ),
@@ -742,15 +736,13 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.purple.shade50, Colors.purple.shade100],
-                    ),
+                    color: const Color(0xFF8B5CF6).withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: _buildResumoItem(
                     'Margem',
                     resumo['margem_percentual'],
-                    Colors.purple.shade700,
+                    const Color(0xFF8B5CF6),
                     isPercentual: true,
                     icon: Icons.percent,
                   ),
@@ -937,7 +929,7 @@ class _RelatorioLucroScreenState extends State<RelatorioLucroScreen> {
             _buildProdutoRow(
               'Receita',
               formatarMoeda(produto['receita_total']),
-              Colors.blue,
+              const Color(0xFF2563EB),
               Icons.arrow_upward,
             ),
             const SizedBox(height: 8),

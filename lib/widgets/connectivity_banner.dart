@@ -21,7 +21,7 @@ class ConnectivityBanner extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: offlineService.isOnline
-                    ? [Colors.blue.shade400, Colors.blue.shade600]
+                    ? [const Color(0xFF2563EB), const Color(0xFF60A5FA)]
                     : [Colors.orange.shade400, Colors.orange.shade600],
               ),
             ),
