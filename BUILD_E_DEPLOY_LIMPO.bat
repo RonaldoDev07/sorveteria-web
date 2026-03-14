@@ -41,13 +41,12 @@ echo.
 
 echo [4/5] Adicionando arquivos ao git...
 git add build/web
-git add lib/services/financeiro/pagamento_service.dart
-git add vercel.json
+git add lib/
 git status
 echo.
 
 echo [5/5] Fazendo commit e push...
-git commit -m "fix: rebuild com correcao de pagamento - campos corretos (tipo, referenciaId, valor)"
+git commit -m "feat: buscar detalhes completos da venda ao abrir tela de detalhes"
 git push origin main
 if errorlevel 1 (
     echo ERRO ao fazer push!
