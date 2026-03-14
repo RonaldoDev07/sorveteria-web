@@ -11,13 +11,10 @@ class ApiService {
   // 🔥 WAKE UP API - Acordar servidor antes de fazer login
   static Future<void> wakeUpApi() async {
     try {
-      print('⏰ Acordando API...');
       await http.get(
         Uri.parse('$baseUrl/health'),
       ).timeout(const Duration(seconds: 30));
-      print('✅ API acordada!');
     } catch (e) {
-      print('⚠️ Erro ao acordar API (ignorado): $e');
       // Ignorar erro - API pode já estar acordada
     }
   }
@@ -41,7 +38,6 @@ class ApiService {
             (e.toString().contains('XMLHttpRequest') || 
              e.toString().contains('ClientException') ||
              e.toString().contains('SocketException'))) {
-          print('⚠️ Tentativa $attempts falhou. Tentando novamente em ${retryDelay.inSeconds}s...');
           await Future.delayed(retryDelay);
           continue;
         }
@@ -112,29 +108,21 @@ class ApiService {
   static Future<Map<String, dynamic>> login(String login, String senha) async {
     return _retryRequest(() async {
       try {
-        print('📡 Enviando requisição de login para: $baseUrl/login/json');
-        
         final response = await http.post(
           Uri.parse('$baseUrl/login/json'),
           headers: _getHeaders(null),
           body: _encodeBody({'login': login, 'senha': senha}),
-        ).timeout(const Duration(seconds: 30)); // 🔥 Timeout aumentado para 30s
-
-        print('📥 Resposta recebida - Status: ${response.statusCode}');
+        ).timeout(const Duration(seconds: 30));
 
         if (response.statusCode == 200) {
           final data = _decodeResponse(response);
-          print('✅ Login bem-sucedido! Token recebido.');
           return data;
         } else if (response.statusCode == 401) {
-          print('❌ Credenciais inválidas (401)');
           throw Exception('Credenciais inválidas');
         } else {
-          print('❌ Erro no servidor: ${response.statusCode}');
           throw Exception('Erro no servidor: ${response.statusCode}');
         }
       } catch (e) {
-        print('❌ Exceção no login: $e');
         if (e.toString().contains('TimeoutException')) {
           throw Exception('Servidor demorando para responder. Aguarde e tente novamente.');
         }
@@ -162,7 +150,6 @@ class ApiService {
       if (response.statusCode == 200) {
         return _decodeResponse(response);
       } else if (response.statusCode == 401) {
-        print('❌ Token inválido ou expirado (401)');
         throw Exception('401');
       } else {
         throw Exception('Erro ao buscar produtos');
@@ -233,7 +220,6 @@ class ApiService {
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _getHeaders(token),
@@ -363,7 +349,6 @@ class ApiService {
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _getHeaders(token),
@@ -431,7 +416,6 @@ class ApiService {
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.post(
             Uri.parse(location),
             headers: _getHeaders(token),
@@ -718,18 +702,9 @@ class ApiService {
       
       // Download de relatório (funcionalidade web desabilitada para mobile)
       if (kIsWeb) {
-        // Importação dinâmica para web
-        // ignore: avoid_web_libraries_in_flutter
-        // final blob = html.Blob([bytes]);
-        // final url = html.Url.createObjectUrlFromBlob(blob);
-        // final anchor = html.AnchorElement(href: url)
-        //   ..setAttribute('download', 'relatorio_${DateTime.now().millisecondsSinceEpoch}.csv')
-        //   ..click();
-        // html.Url.revokeObjectUrl(url);
-        print('Download de relatório disponível apenas na versão web');
+        // Download web desabilitado
       } else {
         // No mobile, funcionalidade não implementada
-        print('Download de relatório não disponível no mobile');
       }
       return;
     } else {

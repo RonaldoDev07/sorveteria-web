@@ -77,33 +77,15 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
 
   Future<void> _carregarProdutos() async {
     try {
-      print('🔍 Carregando produtos para compra...');
       final produtos = await _produtoService.listarProdutos();
-      print('✅ ${produtos.length} produtos carregados da API');
       
       if (mounted) {
         setState(() {
           _produtos = produtos;
           _isLoadingProdutos = false;
         });
-        print('📦 ${_produtos.length} produtos disponíveis no dropdown');
-        
-        // Listar os produtos para debug
-        if (_produtos.isNotEmpty) {
-          print('📋 Produtos carregados:');
-          for (var p in _produtos.take(5)) {
-            print('   - ${p.nome} (ID: ${p.id}, Estoque: ${p.quantidade})');
-          }
-          if (_produtos.length > 5) {
-            print('   ... e mais ${_produtos.length - 5} produtos');
-          }
-        } else {
-          print('⚠️ AVISO: Lista de produtos está vazia!');
-        }
       }
     } catch (e, stackTrace) {
-      print('❌ Erro ao carregar produtos: $e');
-      print('Stack trace: $stackTrace');
       if (mounted) {
         setState(() => _isLoadingProdutos = false);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -272,8 +254,6 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           telefone: telefoneController.text.trim().isEmpty ? null : telefoneController.text.trim(),
         );
         
-        print('🔍 Criando fornecedor: ${novoFornecedor.toJson()}');
-        
         await _fornecedorService.criarFornecedor(novoFornecedor);
 
         // Recarregar lista de fornecedores
@@ -292,7 +272,6 @@ class _CompraPrazoFormScreenState extends State<CompraPrazoFormScreen> {
           );
         }
       } catch (e) {
-        print('❌ Erro ao criar fornecedor: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -1214,20 +1193,11 @@ class __DialogAdicionarProdutoState extends State<_DialogAdicionarProduto> {
   @override
   void initState() {
     super.initState();
-    print('🔍 Dialog Adicionar Produto (Compras) iniciado');
-    print('   Produtos recebidos: ${widget.produtos.length}');
     
     // Se foi passado um produto inicial, selecionar automaticamente
     if (widget.produtoInicial != null) {
       _produtoSelecionado = widget.produtoInicial;
       _valorController.text = widget.produtoInicial!.preco.toStringAsFixed(2);
-      print('   ✅ Produto pré-selecionado: ${widget.produtoInicial!.nome}');
-    }
-    
-    if (widget.produtos.isNotEmpty) {
-      print('   Exemplo: ${widget.produtos.first.nome}');
-    } else {
-      print('   ⚠️ AVISO: Lista de produtos vazia no dialog!');
     }
   }
 
