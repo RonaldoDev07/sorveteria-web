@@ -21,6 +21,7 @@ class CompraPrazo {
   final DateTime createdAt;
   final DateTime? updatedAt;
   final List<dynamic>? produtos;  // Lista de produtos (opcional)
+  final List<dynamic>? historicoDetalhado;  // Histórico detalhado de adições
 
   CompraPrazo({
     required this.id,
@@ -36,6 +37,7 @@ class CompraPrazo {
     required this.createdAt,
     this.updatedAt,
     this.produtos,
+    this.historicoDetalhado,
   });
 
   factory CompraPrazo.fromJson(Map<String, dynamic> json) {
@@ -56,6 +58,7 @@ class CompraPrazo {
             ? DateTime.parse(json['updatedAt'] ?? json['updated_at']) 
             : null,
         produtos: json['produtos'] as List<dynamic>?,
+        historicoDetalhado: json['historicoDetalhado'] as List<dynamic>?,
       );
     } catch (e) {
       print('❌ Erro em CompraPrazo.fromJson: $e');

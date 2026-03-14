@@ -28,12 +28,29 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
   late CompraPrazo _compra;
   List<Pagamento> _pagamentos = [];
   bool _isLoadingPagamentos = false;
+  bool _isLoadingDetalhes = false;
 
   @override
   void initState() {
     super.initState();
     _compra = widget.compra;
+    _carregarDetalhesCompletos();
     _carregarPagamentos();
+  }
+
+  Future<void> _carregarDetalhesCompletos() async {
+    setState(() => _isLoadingDetalhes = true);
+    try {
+      final auth = Provider.of<AuthService>(context, listen: false);
+      final service = CompraPrazoService(auth);
+      final compraCompleta = await service.buscarCompra(_compra.id);
+      setState(() {
+        _compra = compraCompleta;
+        _isLoadingDetalhes = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingDetalhes = false);
+    }
   }
 
   Future<void> _carregarPagamentos() async {
@@ -322,12 +339,12 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
               const SizedBox(height: 8),
             ],
 
-            // Card de Produtos
+            // Card de Produtos com Histórico Detalhado
             if (_compra.produtos != null && _compra.produtos!.isNotEmpty) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Produtos (${_compra.produtos!.length})',
+                  'Histórico de Adições',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -335,104 +352,209 @@ class _CompraDetalhesScreenState extends State<CompraDetalhesScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              ..._compra.produtos!.map((produto) {
-                try {
-                  // Acessar como Map para evitar erro de tipo
-                  final produtoMap = produto as Map<String, dynamic>;
-                  
-                  // Debug: imprimir estrutura do produto
-                  print('🔍 Produto da compra recebido: $produtoMap');
-                  
-                  final produtoId = produtoMap['produto_id']?.toString() ?? 
-                                   produtoMap['produtoId']?.toString() ?? 
-                                   produtoMap['id']?.toString() ??
-                                   'N/A';
-                  
-                  // Tentar pegar o nome do produto de várias formas possíveis
-                  String produtoNome = produtoMap['produto_nome']?.toString() ?? 
-                                      produtoMap['produtoNome']?.toString() ?? 
-                                      produtoMap['nome']?.toString() ??
-                                      produtoMap['produto']?.toString() ??
-                                      produtoMap['name']?.toString() ?? '';
-                  
-                  // Se ainda não tem nome, tentar buscar em objetos aninhados
-                  if (produtoNome.isEmpty && produtoMap['produto_info'] != null) {
-                    final produtoInfo = produtoMap['produto_info'] as Map<String, dynamic>;
-                    produtoNome = produtoInfo['nome']?.toString() ?? '';
-                  }
-                  
-                  // Se ainda não tem nome, usar um padrão mais descritivo
-                  if (produtoNome.isEmpty) {
-                    produtoNome = 'Produto (ID: $produtoId)';
-                    print('⚠️ Nome do produto da compra não encontrado, usando fallback: $produtoNome');
-                  } else {
-                    print('✅ Nome do produto da compra encontrado: $produtoNome');
-                  }
-                  
-                  final quantidade = produtoMap['quantidade'] ?? 0;
-                  final valorUnitario = _toDouble(
-                    produtoMap['valor_unitario'] ?? 
-                    produtoMap['valorUnitario'] ??
-                    produtoMap['preco_unitario'] ??
-                    produtoMap['precoUnitario']
-                  );
-                  final subtotal = _toDouble(produtoMap['subtotal']);
-                  
+
+              // Verificar se tem histórico detalhado
+              if (_compra.historicoDetalhado != null && _compra.historicoDetalhado!.isNotEmpty) ...[
+                ..._compra.historicoDetalhado!.map((historico) {
+                  final dataAdicao = DateTime.parse(historico['dataAdicao']).toLocal();
+                  final usuarioNome = historico['usuarioNome'] ?? 'Usuário';
+                  final valorAdicionado = _toDouble(historico['valorAdicionado']);
+                  final produtos = historico['produtos'] as List<dynamic>? ?? [];
+
                   return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: Colors.purple,
-                        child: Icon(Icons.inventory, color: Colors.white, size: 20),
-                      ),
-                      title: Text(
-                        produtoNome,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        'ID: $produtoId\n'
-                        'Quantidade: $quantidade un.\n'
-                        'Valor unitário: ${formatoMoeda.format(valorUnitario)}',
-                      ),
-                      isThreeLine: true,
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'Subtotal',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    elevation: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Cabeçalho do histórico
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.shade50,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4),
+                            ),
                           ),
-                          Text(
-                            formatoMoeda.format(subtotal),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.purple,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.access_time, size: 18, color: Colors.purple),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${formatoData.format(dataAdicao)} às ${formatoHora.format(dataAdicao)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Adicionado por: $usuarioNome',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.purple,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  formatoMoeda.format(valorAdicionado),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Produtos deste histórico
+                        ...produtos.map((produto) {
+                          try {
+                            final produtoMap = produto as Map<String, dynamic>;
+                            final produtoNome = produtoMap['produtoNome']?.toString() ?? 'Produto';
+                            final quantidade = produtoMap['quantidade'] ?? 0;
+                            final valorUnitario = _toDouble(produtoMap['valorUnitario']);
+                            final subtotal = _toDouble(produtoMap['subtotal']);
+
+                            return ListTile(
+                              dense: true,
+                              leading: const CircleAvatar(
+                                backgroundColor: Colors.purple,
+                                radius: 18,
+                                child: Icon(Icons.inventory, color: Colors.white, size: 18),
+                              ),
+                              title: Text(
+                                produtoNome,
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                              ),
+                              subtitle: Text(
+                                'Quantidade: $quantidade un.\nValor unitário: ${formatoMoeda.format(valorUnitario)}',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              isThreeLine: true,
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    'Subtotal',
+                                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                                  ),
+                                  Text(
+                                    formatoMoeda.format(subtotal),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Colors.purple,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } catch (e) {
+                            return const ListTile(
+                              dense: true,
+                              leading: Icon(Icons.error, size: 20, color: Colors.red),
+                              title: Text('Erro ao carregar produto'),
+                            );
+                          }
+                        }),
+
+                        if (historico['observacoes'] != null && historico['observacoes'].toString().isNotEmpty) ...[
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.note, size: 16, color: Colors.grey[600]),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    historico['observacoes'].toString(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[700],
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
-                      ),
+                      ],
                     ),
                   );
-                } catch (e) {
-                  print('❌ Erro ao processar produto da compra: $e');
-                  print('📄 Produto data: $produto');
-                  return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: Colors.red,
-                        child: Icon(Icons.error, color: Colors.white, size: 20),
+                }),
+              ] else ...[
+                // Fallback sem histórico
+                ..._compra.produtos!.map((produto) {
+                  try {
+                    final produtoMap = produto as Map<String, dynamic>;
+                    final produtoNome = produtoMap['produtoNome']?.toString() ??
+                        produtoMap['produto_nome']?.toString() ?? 'Produto';
+                    final quantidade = produtoMap['quantidade'] ?? 0;
+                    final valorUnitario = _toDouble(
+                        produtoMap['valorUnitario'] ?? produtoMap['valor_unitario']);
+                    final subtotal = _toDouble(produtoMap['subtotal']);
+
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: ListTile(
+                        leading: const CircleAvatar(
+                          backgroundColor: Colors.purple,
+                          child: Icon(Icons.inventory, color: Colors.white, size: 20),
+                        ),
+                        title: Text(produtoNome,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(
+                            'Quantidade: $quantidade un.\nValor unitário: ${formatoMoeda.format(valorUnitario)}'),
+                        isThreeLine: true,
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const Text('Subtotal',
+                                style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            Text(formatoMoeda.format(subtotal),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.purple)),
+                          ],
+                        ),
                       ),
-                      title: const Text('Erro ao carregar produto'),
-                      subtitle: Text('Detalhes: $e'),
-                    ),
-                  );
-                }
-              }),
+                    );
+                  } catch (e) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: ListTile(
+                        leading: const CircleAvatar(
+                            backgroundColor: Colors.red,
+                            child: Icon(Icons.error, color: Colors.white, size: 20)),
+                        title: const Text('Erro ao carregar produto'),
+                        subtitle: Text('Detalhes: $e'),
+                      ),
+                    );
+                  }
+                }),
+              ],
             ],
 
             const SizedBox(height: 16),
