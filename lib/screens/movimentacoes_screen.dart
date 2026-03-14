@@ -219,148 +219,96 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
     final auth = Provider.of<AuthService>(context);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Histórico Completo'),
+        title: const Text('Histórico Completo', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
         elevation: 0,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange, Colors.deepOrange],
+              colors: [Color(0xFFEA580C), Color(0xFFFB923C)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadMovimentacoes,
-          ),
+          IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _loadMovimentacoes),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.orange.shade50, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _movimentacoes.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.history,
-                          size: 80,
-                          color: Colors.grey.shade300,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Nenhuma movimentação encontrada',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : SingleChildScrollView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _movimentacoes.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.history_rounded, size: 80, color: Colors.grey.shade300),
+                      const SizedBox(height: 16),
+                      Text('Nenhuma movimentação encontrada',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade600)),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
                     child: Column(
                       children: [
                         // Campo de pesquisa
                         Padding(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                           child: TextField(
                             controller: _searchController,
                             onChanged: _filtrarPorVendedor,
                             decoration: InputDecoration(
                               hintText: 'Pesquisar por pessoa...',
-                              hintStyle: TextStyle(color: Colors.grey[400]),
-                              prefixIcon: const Icon(Icons.search_rounded, color: Colors.orange, size: 20),
+                              prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFFEA580C)),
                               suffixIcon: _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded, size: 20),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                        _filtrarPorVendedor('');
-                                      },
-                                    )
+                                  ? IconButton(icon: const Icon(Icons.clear_rounded), onPressed: () { _searchController.clear(); _filtrarPorVendedor(''); })
                                   : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFEA580C), width: 2)),
+                              filled: true, fillColor: Colors.white,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
                           ),
                         ),
                       // Chips de período
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                         child: Row(
                           children: [
-                            Expanded(
-                              child: ChoiceChip(
-                                label: const Text('Hoje'),
-                                selected: _periodoSelecionado == 'hoje',
-                                onSelected: (selected) => _alternarPeriodo('hoje'),
-                                selectedColor: Colors.orange,
-                                labelStyle: TextStyle(
-                                  color: _periodoSelecionado == 'hoje' ? Colors.white : Colors.grey[700],
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
+                            Expanded(child: ChoiceChip(
+                              label: const Text('Hoje'),
+                              selected: _periodoSelecionado == 'hoje',
+                              onSelected: (selected) => _alternarPeriodo('hoje'),
+                              selectedColor: const Color(0xFFEA580C),
+                              labelStyle: TextStyle(color: _periodoSelecionado == 'hoje' ? Colors.white : Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 13),
+                            )),
                             const SizedBox(width: 6),
-                            Expanded(
-                              child: ChoiceChip(
-                                label: const Text('Semanal'),
-                                selected: _periodoSelecionado == 'semanal',
-                                onSelected: (selected) => _alternarPeriodo('semanal'),
-                                selectedColor: Colors.orange,
-                                labelStyle: TextStyle(
-                                  color: _periodoSelecionado == 'semanal' ? Colors.white : Colors.grey[700],
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
+                            Expanded(child: ChoiceChip(
+                              label: const Text('Semanal'),
+                              selected: _periodoSelecionado == 'semanal',
+                              onSelected: (selected) => _alternarPeriodo('semanal'),
+                              selectedColor: const Color(0xFFEA580C),
+                              labelStyle: TextStyle(color: _periodoSelecionado == 'semanal' ? Colors.white : Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 13),
+                            )),
                             const SizedBox(width: 6),
-                            Expanded(
-                              child: ChoiceChip(
-                                label: const Text('Mensal'),
-                                selected: _periodoSelecionado == 'mensal',
-                                onSelected: (selected) => _alternarPeriodo('mensal'),
-                                selectedColor: Colors.orange,
-                                labelStyle: TextStyle(
-                                  color: _periodoSelecionado == 'mensal' ? Colors.white : Colors.grey[700],
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
+                            Expanded(child: ChoiceChip(
+                              label: const Text('Mensal'),
+                              selected: _periodoSelecionado == 'mensal',
+                              onSelected: (selected) => _alternarPeriodo('mensal'),
+                              selectedColor: const Color(0xFFEA580C),
+                              labelStyle: TextStyle(color: _periodoSelecionado == 'mensal' ? Colors.white : Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 13),
+                            )),
                             const SizedBox(width: 6),
-                            Expanded(
-                              child: ChoiceChip(
-                                label: const Text('Anual'),
-                                selected: _periodoSelecionado == 'anual',
-                                onSelected: (selected) => _alternarPeriodo('anual'),
-                                selectedColor: Colors.orange,
-                                labelStyle: TextStyle(
-                                  color: _periodoSelecionado == 'anual' ? Colors.white : Colors.grey[700],
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
+                            Expanded(child: ChoiceChip(
+                              label: const Text('Anual'),
+                              selected: _periodoSelecionado == 'anual',
+                              onSelected: (selected) => _alternarPeriodo('anual'),
+                              selectedColor: const Color(0xFFEA580C),
+                              labelStyle: TextStyle(color: _periodoSelecionado == 'anual' ? Colors.white : Colors.grey[700], fontWeight: FontWeight.w600, fontSize: 13),
+                            )),
                           ],
                         ),
                       ),
@@ -517,38 +465,35 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                         itemCount: _movimentacoesFiltradas.length,
                     itemBuilder: (context, index) {
                       final mov = _movimentacoesFiltradas[index];
                       final isEntrada = mov['tipo'] == 'ENTRADA';
-                      final cor = isEntrada ? Colors.teal : Colors.green;
-                      final icone = isEntrada ? Icons.arrow_downward : Icons.arrow_upward;
+                      final corBase = isEntrada ? const Color(0xFF0D9488) : const Color(0xFF10B981);
+                      final icone = isEntrada ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded;
                       final titulo = isEntrada ? 'COMPRA' : 'VENDA';
-                      
-                      // Detectar se é à vista ou a prazo
                       final formaPagamento = mov['forma_pagamento']?.toString().toUpperCase();
                       final isAPrazo = formaPagamento == 'PRAZO';
                       final badgeText = isAPrazo ? 'A PRAZO' : 'À VISTA';
-                      final badgeColor = isAPrazo ? Colors.blue : Colors.orange;
+                      final badgeColor = isAPrazo ? const Color(0xFF2563EB) : const Color(0xFFEA580C);
 
-                      return Card(
-                        elevation: 4,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
                         ),
                         child: Column(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [cor.shade100, cor.shade50],
-                                ),
+                                color: corBase.withOpacity(0.06),
                                 borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(12),
-                                  topRight: Radius.circular(12),
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
                                 ),
                               ),
                               child: Row(
@@ -556,14 +501,10 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: cor,
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: corBase,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: Icon(
-                                      icone,
-                                      color: Colors.white,
-                                      size: 24,
-                                    ),
+                                    child: Icon(icone, color: Colors.white, size: 20),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -575,69 +516,50 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                                             Text(
                                               titulo,
                                               style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.bold,
-                                                color: cor.shade700,
+                                                color: corBase,
                                               ),
                                             ),
                                             const SizedBox(width: 8),
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                               decoration: BoxDecoration(
-                                                color: badgeColor,
-                                                borderRadius: BorderRadius.circular(12),
+                                                color: badgeColor.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 badgeText,
-                                                style: const TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
+                                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: badgeColor),
                                               ),
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: 2),
                                         Text(
                                           mov['produto_nome'] ?? 'Produto',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                                          maxLines: 1, overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
                                   ),
                                   if (auth.isAdmin)
                                     IconButton(
-                                      icon: const Icon(Icons.delete_outline),
-                                      color: Colors.red,
-                                      onPressed: () => _cancelarMovimentacao(
-                                        mov['id'],
-                                        mov['tipo'],
-                                        mov['produto_nome'] ?? 'Produto',
-                                      ),
+                                      icon: Icon(Icons.delete_outline_rounded, color: Colors.red.shade400),
+                                      onPressed: () => _cancelarMovimentacao(mov['id'], mov['tipo'], mov['produto_nome'] ?? 'Produto'),
                                       tooltip: 'Cancelar',
                                     ),
                                 ],
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
                               child: Column(
                                 children: [
-                                  _buildInfoRow(
-                                    'Quantidade',
-                                    '${_formatarNumero(mov['quantidade'])} ${mov['unidade'] ?? 'UN'}',
-                                    Icons.inventory,
-                                  ),
+                                  _buildInfoRow('Quantidade', '${_formatarNumero(mov['quantidade'])} ${mov['unidade'] ?? 'UN'}', Icons.inventory_2_outlined),
                                   const SizedBox(height: 8),
-                                  _buildInfoRow(
-                                    'Valor Unitário',
-                                    formatarMoeda(mov['valor_unitario']),
-                                    Icons.payments_rounded,
-                                  ),
+                                  _buildInfoRow('Valor Unitário', formatarMoeda(mov['valor_unitario']), Icons.payments_rounded),
                                   if (!isEntrada && mov['lucro_total'] != null) ...[
                                     const SizedBox(height: 8),
                                     _buildInfoRow(
@@ -700,7 +622,6 @@ class _MovimentacoesScreenState extends State<MovimentacoesScreen> {
                       ],
                     ),
                   ),
-      ),
     );
   }
 

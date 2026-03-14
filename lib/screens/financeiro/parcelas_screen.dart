@@ -15,27 +15,33 @@ class ParcelasScreen extends StatefulWidget {
 
 class _ParcelasScreenState extends State<ParcelasScreen> {
   List<Parcela> _parcelas = [];
-  List<Parcela> _parcelasFiltradas = [];
+  List<Parcela> _filtradas = [];
   bool _isLoading = true;
   String? _errorMessage;
   ParcelaService? _parcelaService;
-  
   String? _filtroTipo;
   String? _filtroStatus;
-  final _searchController = TextEditingController();
+  final _searchCtrl = TextEditingController();
 
-  final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
-  final _formatoData = DateFormat('dd/MM/yyyy');
+  static const _cor = Color(0xFF4F46E5);
+  static const _gradiente = LinearGradient(
+    colors: [Color(0xFF4F46E5), Color(0xFF818CF8)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  final _fmt = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
+  final _fmtData = DateFormat('dd/MM/yyyy');
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_filtrarParcelas);
+    _searchCtrl.addListener(_filtrar);
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchCtrl.dispose();
     super.dispose();
   }
 
@@ -43,108 +49,73 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_parcelaService == null) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      _parcelaService = ParcelaService(authService);
-      _carregarParcelas();
+      _parcelaService = ParcelaService(Provider.of<AuthService>(context, listen: false));
+      _carregar();
     }
   }
 
-  void _filtrarParcelas() {
-    final query = _searchController.text.toLowerCase();
+  void _filtrar() {
+    final q = _searchCtrl.text.toLowerCase();
     setState(() {
-      if (query.isEmpty) {
-        _parcelasFiltradas = _parcelas;
-      } else {
-        _parcelasFiltradas = _parcelas.where((parcela) {
-          final nomeCliente = parcela.clienteNome?.toLowerCase() ?? '';
-          final nomeFornecedor = parcela.fornecedorNome?.toLowerCase() ?? '';
-          return nomeCliente.contains(query) || nomeFornecedor.contains(query);
-        }).toList();
-      }
+      _filtradas = _parcelas.where((p) {
+        final nome = (p.clienteNome ?? p.fornecedorNome ?? '').toLowerCase();
+        return nome.contains(q);
+      }).toList();
     });
   }
 
-  Future<void> _carregarParcelas() async {
+  Future<void> _carregar() async {
     if (!mounted || _parcelaService == null) return;
-    
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
+    setState(() { _isLoading = true; _errorMessage = null; });
     try {
-      print('🔄 Carregando parcelas...');
-      print('📋 Filtros: tipo=$_filtroTipo, status=$_filtroStatus');
-      
-      final parcelas = await _parcelaService!.listarParcelas(
-        tipo: _filtroTipo,
-        status: _filtroStatus,
-      );
-      
+      final lista = await _parcelaService!.listarParcelas(tipo: _filtroTipo, status: _filtroStatus);
       if (!mounted) return;
-      
-      print('✅ Parcelas carregadas: ${parcelas.length}');
-      
       setState(() {
-        _parcelas = parcelas;
-        _parcelasFiltradas = parcelas;
+        _parcelas = lista;
+        _filtrar();
         _isLoading = false;
       });
-    } catch (e, stackTrace) {
-      print('❌ Erro ao carregar parcelas: $e');
-      print('📍 Stack trace: $stackTrace');
-      
+    } catch (e) {
       if (!mounted) return;
-      
-      setState(() {
-        _errorMessage = 'Erro ao carregar parcelas: ${e.toString().replaceAll('Exception: ', '')}';
-        _isLoading = false;
-      });
+      setState(() { _errorMessage = e.toString().replaceAll('Exception: ', ''); _isLoading = false; });
     }
   }
 
   Future<void> _darBaixa(Parcela parcela) async {
-    final valorController = TextEditingController(
-      text: parcela.saldoRestante.toStringAsFixed(2),
-    );
+    final valorCtrl = TextEditingController(text: parcela.saldoRestante.toStringAsFixed(2));
     String formaPagamento = 'pix';
-
-    final resultado = await showDialog<bool>(
+    final ok = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Dar Baixa na Parcela'),
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(children: [
+          Container(padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.payment_rounded, color: Colors.green, size: 22)),
+          const SizedBox(width: 12),
+          const Text('Dar Baixa', style: TextStyle(fontSize: 18)),
+        ]),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Parcela ${parcela.numeroParcela}'),
-            Text('Saldo: ${_formatoMoeda.format(parcela.saldoRestante)}'),
+            Text('Parcela ${parcela.numeroParcela} • Saldo: ${_fmt.format(parcela.saldoRestante)}',
+                style: TextStyle(color: Colors.grey[600], fontSize: 13)),
             const SizedBox(height: 16),
             TextField(
-              controller: valorController,
-              decoration: const InputDecoration(
-                labelText: 'Valor Pago',
-                prefixText: 'R\$ ',
-                border: OutlineInputBorder(),
+              controller: valorCtrl,
+              decoration: InputDecoration(
+                labelText: 'Valor Pago', prefixText: 'R\$ ',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.done,
               autofocus: true,
-              onTap: () {
-                if (valorController.text.isNotEmpty) {
-                  valorController.selection = TextSelection(
-                    baseOffset: 0,
-                    extentOffset: valorController.text.length,
-                  );
-                }
-              },
+              onTap: () => valorCtrl.selection = TextSelection(baseOffset: 0, extentOffset: valorCtrl.text.length),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: formaPagamento,
-              decoration: const InputDecoration(
-                labelText: 'Forma de Pagamento',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Forma de Pagamento',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
               items: const [
                 DropdownMenuItem(value: 'dinheiro', child: Text('Dinheiro')),
                 DropdownMenuItem(value: 'pix', child: Text('PIX')),
@@ -152,35 +123,30 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                 DropdownMenuItem(value: 'cartao_credito', child: Text('Cartão Crédito')),
                 DropdownMenuItem(value: 'transferencia', child: Text('Transferência')),
               ],
-              onChanged: (value) {
-                if (value != null) formaPagamento = value;
-              },
+              onChanged: (v) { if (v != null) formaPagamento = v; },
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Cancelar', style: TextStyle(color: Colors.grey[600]))),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             child: const Text('Confirmar'),
           ),
         ],
       ),
     );
-
-    if (resultado == true) {
+    if (ok == true) {
       try {
-        final valor = double.parse(valorController.text.replaceAll(',', '.'));
+        final valor = double.parse(valorCtrl.text.replaceAll(',', '.'));
         await _parcelaService!.darBaixaParcela(parcela.id, valor, formaPagamento);
-        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Baixa realizada com sucesso')),
+            const SnackBar(content: Text('Baixa realizada com sucesso'), backgroundColor: Colors.green),
           );
-          _carregarParcelas();
+          _carregar();
         }
       } catch (e) {
         if (mounted) {
@@ -192,40 +158,39 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     }
   }
 
-  Future<void> _cancelarParcela(Parcela parcela) async {
-    final confirmar = await showDialog<bool>(
+  Future<void> _cancelar(Parcela parcela) async {
+    final ok = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar cancelamento'),
-        content: Text(
-          'Deseja realmente cancelar esta parcela?\n\n'
-          '${parcela.tipo == 'venda' ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}\n'
-          'Valor: ${_formatoMoeda.format(parcela.valorParcela)}\n'
-          'Status: ${_getStatusLabel(parcela.status)}',
-        ),
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(children: [
+          Container(padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.cancel_rounded, color: Colors.red, size: 22)),
+          const SizedBox(width: 12),
+          const Text('Cancelar Parcela', style: TextStyle(fontSize: 18)),
+        ]),
+        content: Text('${parcela.tipo == 'venda' ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}\n'
+            'Valor: ${_fmt.format(parcela.valorParcela)}'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Não'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sim, Cancelar'),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Não', style: TextStyle(color: Colors.grey[600]))),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            child: const Text('Cancelar'),
           ),
         ],
       ),
     );
-
-    if (confirmar == true) {
+    if (ok == true) {
       try {
         await _parcelaService!.cancelarParcela(parcela.id);
-        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Parcela cancelada com sucesso')),
+            const SnackBar(content: Text('Parcela cancelada'), backgroundColor: Colors.green),
           );
-          _carregarParcelas();
+          _carregar();
         }
       } catch (e) {
         if (mounted) {
@@ -237,29 +202,21 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     }
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'paga':
-        return Colors.green;
-      case 'atrasada':
-        return Colors.red;
-      case 'parcialmente_paga':
-        return Colors.orange;
-      default:
-        return Colors.blue;
+  Color _statusColor(String s) {
+    switch (s) {
+      case 'paga': return Colors.green;
+      case 'atrasada': return Colors.red;
+      case 'parcialmente_paga': return Colors.orange;
+      default: return Colors.blue;
     }
   }
 
-  String _getStatusLabel(String status) {
-    switch (status) {
-      case 'paga':
-        return 'Paga';
-      case 'atrasada':
-        return 'Atrasada';
-      case 'parcialmente_paga':
-        return 'Parcial';
-      default:
-        return 'Pendente';
+  String _statusLabel(String s) {
+    switch (s) {
+      case 'paga': return 'Paga';
+      case 'atrasada': return 'Atrasada';
+      case 'parcialmente_paga': return 'Parcial';
+      default: return 'Pendente';
     }
   }
 
@@ -268,336 +225,268 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text(
-          'Parcelas',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-        ),
+        title: const Text('Parcelas', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        flexibleSpace: Container(decoration: const BoxDecoration(gradient: _gradiente)),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (value) {
+            icon: const Icon(Icons.filter_list_rounded),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            onSelected: (v) {
               setState(() {
-                if (value == 'todas') {
-                  _filtroTipo = null;
-                  _filtroStatus = null;
-                } else if (value == 'venda' || value == 'compra') {
-                  _filtroTipo = value;
-                } else {
-                  _filtroStatus = value;
-                }
+                if (v == 'todas') { _filtroTipo = null; _filtroStatus = null; }
+                else if (v == 'venda' || v == 'compra') _filtroTipo = v;
+                else _filtroStatus = v;
               });
-              _carregarParcelas();
+              _carregar();
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'todas', child: Text('Todas')),
-              const PopupMenuDivider(),
-              const PopupMenuItem(value: 'venda', child: Text('Vendas')),
-              const PopupMenuItem(value: 'compra', child: Text('Compras')),
-              const PopupMenuDivider(),
-              const PopupMenuItem(value: 'pendente', child: Text('Pendentes')),
-              const PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
-              const PopupMenuItem(value: 'paga', child: Text('Pagas')),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'todas', child: Text('Todas')),
+              PopupMenuDivider(),
+              PopupMenuItem(value: 'venda', child: Text('Vendas')),
+              PopupMenuItem(value: 'compra', child: Text('Compras')),
+              PopupMenuDivider(),
+              PopupMenuItem(value: 'pendente', child: Text('Pendentes')),
+              PopupMenuItem(value: 'atrasada', child: Text('Atrasadas')),
+              PopupMenuItem(value: 'paga', child: Text('Pagas')),
             ],
           ),
+          IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _carregar),
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
               ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error_outline_rounded, size: 64, color: Colors.red.shade300),
+                        const SizedBox(height: 16),
+                        Text('Erro ao carregar parcelas',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+                        const SizedBox(height: 8),
+                        Text(_errorMessage!, style: TextStyle(color: Colors.grey.shade600), textAlign: TextAlign.center),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: _carregar,
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: const Text('Tentar novamente'),
+                          style: ElevatedButton.styleFrom(backgroundColor: _cor, foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      child: TextField(
+                        controller: _searchCtrl,
+                        decoration: InputDecoration(
+                          hintText: 'Buscar por cliente ou fornecedor...',
+                          prefixIcon: const Icon(Icons.search_rounded, color: _cor),
+                          suffixIcon: _searchCtrl.text.isNotEmpty
+                              ? IconButton(icon: const Icon(Icons.clear_rounded), onPressed: () { _searchCtrl.clear(); })
+                              : null,
+                          filled: true, fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: _cor, width: 2)),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(children: [
+                        Text('${_filtradas.length} parcela${_filtradas.length != 1 ? 's' : ''}',
+                            style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                      ]),
+                    ),
+                    Expanded(
+                      child: _filtradas.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.calendar_today_outlined, size: 80, color: Colors.grey.shade300),
+                                  const SizedBox(height: 16),
+                                  Text('Nenhuma parcela encontrada',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade600)),
+                                ],
+                              ),
+                            )
+                          : RefreshIndicator(
+                              onRefresh: _carregar,
+                              child: ListView.builder(
+                                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                                itemCount: _filtradas.length,
+                                itemBuilder: (context, i) => _ParcelaCard(
+                                  parcela: _filtradas[i],
+                                  fmt: _fmt,
+                                  fmtData: _fmtData,
+                                  statusColor: _statusColor(_filtradas[i].status),
+                                  statusLabel: _statusLabel(_filtradas[i].status),
+                                  onTap: () => Navigator.push(context,
+                                      MaterialPageRoute(builder: (_) => ParcelaDetalhesScreen(parcela: _filtradas[i])))
+                                      .then((_) => _carregar()),
+                                  onBaixa: _filtradas[i].estaPaga ? null : () => _darBaixa(_filtradas[i]),
+                                  onCancelar: () => _cancelar(_filtradas[i]),
+                                ),
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+    );
+  }
+}
+
+class _ParcelaCard extends StatelessWidget {
+  final Parcela parcela;
+  final NumberFormat fmt;
+  final DateFormat fmtData;
+  final Color statusColor;
+  final String statusLabel;
+  final VoidCallback onTap;
+  final VoidCallback? onBaixa;
+  final VoidCallback onCancelar;
+
+  const _ParcelaCard({
+    required this.parcela,
+    required this.fmt,
+    required this.fmtData,
+    required this.statusColor,
+    required this.statusLabel,
+    required this.onTap,
+    required this.onBaixa,
+    required this.onCancelar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isVenda = parcela.tipo == 'venda';
+    final cor = isVenda ? const Color(0xFF10B981) : const Color(0xFF9333EA);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                // Avatar com número
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [cor, cor.withOpacity(0.7)]),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(_errorMessage!),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _carregarParcelas,
-                        child: const Text('Tentar novamente'),
-                      ),
+                      Text('${parcela.numeroParcela}',
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(isVenda ? 'V' : 'C',
+                          style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w600)),
                     ],
                   ),
-                )
-              : _parcelasFiltradas.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                const SizedBox(width: 12),
+                // Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Icon(Icons.calendar_today, size: 48, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text('Nenhuma parcela encontrada'),
-                        ],
-                      ),
-                    )
-                  : Column(
-                      children: [
-                        // Campo de pesquisa
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: TextField(
-                            controller: _searchController,
-                            decoration: InputDecoration(
-                              hintText: 'Pesquisar por cliente ou fornecedor...',
-                              prefixIcon: const Icon(Icons.search),
-                              suffixIcon: _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                      icon: const Icon(Icons.clear),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                      },
-                                    )
-                                  : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
+                          Expanded(
+                            child: Text(
+                              '${isVenda ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}',
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: _carregarParcelas,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              itemCount: _parcelasFiltradas.length,
-                              itemBuilder: (context, index) {
-                                final parcela = _parcelasFiltradas[index];
-                          final cor = parcela.tipo == 'venda' ? const Color(0xFF10B981) : const Color(0xFF9333EA);
-                          final formatoHora = DateFormat('HH:mm');
-                          
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                              color: statusColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: statusColor, width: 1),
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(16),
-                              leading: Container(
-                                width: 56,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [cor, cor.withOpacity(0.7)],
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      parcela.numeroParcela.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.3),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        parcela.tipo == 'venda' ? 'V' : 'C',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              title: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${parcela.tipo == 'venda' ? 'Venda' : 'Compra'} - Parcela ${parcela.numeroParcela}',
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              parcela.tipo == 'venda' ? Icons.person : Icons.business,
-                                              size: 14,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text(
-                                                parcela.nomeRelacionado,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  color: Colors.grey.shade700,
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: _getStatusColor(parcela.status).withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: _getStatusColor(parcela.status),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      _getStatusLabel(parcela.status),
-                                      style: TextStyle(
-                                        color: _getStatusColor(parcela.status),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.calendar_today, size: 14, color: Colors.grey.shade600),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Venc: ${_formatoData.format(parcela.dataVencimento)}',
-                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        formatoHora.format(parcela.createdAt),
-                                        style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Valor: ${_formatoMoeda.format(parcela.valorParcela)}',
-                                        style: TextStyle(
-                                          color: Colors.grey.shade800,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      if (parcela.valorPago > 0) ...[
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          '• Pago: ${_formatoMoeda.format(parcela.valorPago)}',
-                                          style: const TextStyle(
-                                            color: Color(0xFF10B981),
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  if (parcela.saldoRestante > 0) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Saldo: ${_formatoMoeda.format(parcela.saldoRestante)}',
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ParcelaDetalhesScreen(parcela: parcela),
-                                  ),
-                                ).then((_) => _carregarParcelas());
-                              },
-                              trailing: PopupMenuButton(
-                                itemBuilder: (context) => [
-                                  if (!parcela.estaPaga)
-                                    const PopupMenuItem(
-                                      value: 'baixa',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.payment, size: 20, color: Color(0xFF10B981)),
-                                          SizedBox(width: 8),
-                                          Text('Dar Baixa'),
-                                        ],
-                                      ),
-                                    ),
-                                  const PopupMenuItem(
-                                    value: 'cancelar',
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.cancel, size: 20, color: Colors.red),
-                                        SizedBox(width: 8),
-                                        Text('Cancelar', style: TextStyle(color: Colors.red)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                                onSelected: (value) {
-                                  if (value == 'baixa') {
-                                    _darBaixa(parcela);
-                                  } else if (value == 'cancelar') {
-                                    _cancelarParcela(parcela);
-                                  }
-                                },
-                              ),
-                            ),
-                          );
-                        },
+                            child: Text(statusLabel, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: statusColor)),
+                          ),
+                        ],
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      Row(children: [
+                        Icon(isVenda ? Icons.person_outline_rounded : Icons.business_outlined,
+                            size: 13, color: Colors.grey.shade500),
+                        const SizedBox(width: 4),
+                        Expanded(child: Text(parcela.nomeRelacionado,
+                            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                            maxLines: 1, overflow: TextOverflow.ellipsis)),
+                      ]),
+                      const SizedBox(height: 4),
+                      Row(children: [
+                        Icon(Icons.calendar_today_outlined, size: 12, color: Colors.grey.shade500),
+                        const SizedBox(width: 4),
+                        Text('Venc: ${fmtData.format(parcela.dataVencimento)}',
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                        const SizedBox(width: 10),
+                        Text(fmt.format(parcela.valorParcela),
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1F2937))),
+                      ]),
+                      if (parcela.saldoRestante > 0)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text('Saldo: ${fmt.format(parcela.saldoRestante)}',
+                              style: const TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.w600)),
+                        ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                // Menu
+                PopupMenuButton(
+                  icon: Icon(Icons.more_vert_rounded, color: Colors.grey.shade500),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  itemBuilder: (_) => [
+                    if (onBaixa != null)
+                      const PopupMenuItem(value: 'baixa', child: Row(children: [
+                        Icon(Icons.payment_rounded, size: 20, color: Color(0xFF10B981)),
+                        SizedBox(width: 12), Text('Dar Baixa'),
+                      ])),
+                    const PopupMenuItem(value: 'cancelar', child: Row(children: [
+                      Icon(Icons.cancel_outlined, size: 20, color: Colors.red),
+                      SizedBox(width: 12), Text('Cancelar', style: TextStyle(color: Colors.red)),
+                    ])),
+                  ],
+                  onSelected: (v) {
+                    if (v == 'baixa' && onBaixa != null) onBaixa!();
+                    else if (v == 'cancelar') onCancelar();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
