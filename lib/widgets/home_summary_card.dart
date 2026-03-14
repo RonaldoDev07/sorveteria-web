@@ -104,9 +104,8 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
       margin: const EdgeInsets.fromLTRB(12, 16, 12, 4),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: AppTheme.surfaceVariant,
         borderRadius: AppTheme.radiusLg,
-        boxShadow: AppTheme.shadowSm,
         border: Border.all(color: AppTheme.border, width: 0.5),
       ),
       child: _isLoading ? _buildSkeleton() : _buildContent(),
