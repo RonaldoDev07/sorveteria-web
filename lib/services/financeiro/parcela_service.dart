@@ -38,7 +38,7 @@ class ParcelaService {
       
       if (tipo != null) queryParams['tipo'] = tipo;
       if (status != null) queryParams['status'] = status;
-      if (referenciaId != null) queryParams['referenciaId'] = referenciaId;
+      if (referenciaId != null) queryParams['referencia_id'] = referenciaId;
       if (vencimentoAte != null) {
         queryParams['vencimentoAte'] = vencimentoAte.toIso8601String().split('T')[0];
       }

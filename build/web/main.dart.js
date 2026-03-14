@@ -54441,7 +54441,7 @@ g=t.N
 m=A.ai(["skip",J.ak(c),"limit",J.ak(e)],g,g)
 if(a1!=null)J.d9(m,"tipo",a1)
 if(a0!=null)J.d9(m,"status",a0)
-if(d!=null)J.d9(m,"referenciaId",d)
+if(d!=null)J.d9(m,"referencia_id",d)
 if(b!=null)J.d9(m,"vencimentoAte",b.kG().m2(0,"T").h(0,0))
 l=A.bo("https://sorveteria-camila-api.onrender.com/api/v1/financeiro/parcelas",0,null).Fd(m)
 A.Z("\ud83c\udf10 URL: "+A.e(l))
