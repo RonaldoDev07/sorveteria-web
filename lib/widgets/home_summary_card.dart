@@ -100,16 +100,7 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 16, 12, 4),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceVariant,
-        borderRadius: AppTheme.radiusLg,
-        border: Border.all(color: AppTheme.border, width: 0.5),
-      ),
-      child: _isLoading ? _buildSkeleton() : _buildContent(),
-    );
+    return _isLoading ? _buildSkeleton() : _buildContent();
   }
 
   Widget _buildSkeleton() {
@@ -117,11 +108,11 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
       children: [
         _SkeletonBox(width: 120, height: 48),
         const SizedBox(width: 12),
-        Container(width: 1, height: 40, color: AppTheme.border),
+        Container(width: 1, height: 40, color: Colors.white24),
         const SizedBox(width: 12),
         _SkeletonBox(width: 100, height: 48),
         const Spacer(),
-        _SkeletonBox(width: 60, height: 28, radius: 20),
+        _SkeletonBox(width: 32, height: 32, radius: 8),
       ],
     );
   }
@@ -129,35 +120,33 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
   Widget _buildContent() {
     return Row(
       children: [
-        // Vendas hoje
         Expanded(
           child: _StatItem(
             icon: Icons.trending_up_rounded,
-            iconColor: AppTheme.success,
+            iconColor: Colors.greenAccent,
             label: 'Vendas hoje',
             value: formatarMoeda(_vendasHoje),
-            valueColor: AppTheme.success,
+            valueColor: Colors.white,
           ),
         ),
-        Container(width: 1, height: 44, color: AppTheme.border),
+        Container(width: 1, height: 44, color: Colors.white24),
         Expanded(
           child: _produtosEstoqueBaixo > 0
               ? _StatItem(
                   icon: Icons.warning_amber_rounded,
-                  iconColor: AppTheme.warning,
+                  iconColor: Colors.orangeAccent,
                   label: 'Estoque baixo',
                   value: '$_produtosEstoqueBaixo produto${_produtosEstoqueBaixo > 1 ? 's' : ''}',
-                  valueColor: AppTheme.warning,
+                  valueColor: Colors.orangeAccent,
                 )
               : _StatItem(
                   icon: Icons.check_circle_rounded,
-                  iconColor: AppTheme.success,
+                  iconColor: Colors.greenAccent,
                   label: 'Estoque',
                   value: 'Tudo OK',
-                  valueColor: AppTheme.success,
+                  valueColor: Colors.white,
                 ),
         ),
-        // Botão refresh
         GestureDetector(
           onTap: () {
             setState(() => _isLoading = true);
@@ -166,10 +155,10 @@ class _HomeSummaryCardState extends State<HomeSummaryCard> {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.primarySurface,
+              color: Colors.white.withOpacity(0.15),
               borderRadius: AppTheme.radiusSm,
             ),
-            child: const Icon(Icons.refresh_rounded, size: 16, color: AppTheme.primary),
+            child: const Icon(Icons.refresh_rounded, size: 16, color: Colors.white),
           ),
         ),
       ],
@@ -201,7 +190,7 @@ class _StatItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: iconColor.withOpacity(0.2),
               borderRadius: AppTheme.radiusSm,
             ),
             child: Icon(icon, color: iconColor, size: 18),
@@ -216,7 +205,7 @@ class _StatItem extends StatelessWidget {
                   label,
                   style: const TextStyle(
                     fontSize: 10,
-                    color: AppTheme.textTertiary,
+                    color: Colors.white70,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

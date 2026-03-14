@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen>
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 12, 20),
+          padding: const EdgeInsets.fromLTRB(20, 12, 12, 16),
           child: Column(
             children: [
               // Linha superior: logo + status + logout
@@ -262,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               // Linha inferior: avatar + saudação + versão
               Row(
                 children: [
@@ -341,6 +341,17 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ],
               ),
+              const SizedBox(height: 14),
+              // Stats dentro do header
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: AppTheme.radiusLg,
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                ),
+                child: const HomeSummaryCard(),
+              ),
             ],
           ),
         ),
@@ -354,8 +365,6 @@ class _HomeScreenState extends State<HomeScreen>
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
       children: [
-        // Card de resumo
-        const HomeSummaryCard(),
         // Grid de menus
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
