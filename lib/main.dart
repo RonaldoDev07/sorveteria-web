@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
 import 'services/offline_service.dart';
 import 'widgets/auth_wrapper.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   // Capturar erros do Flutter
@@ -55,10 +56,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [
         Locale('pt', 'BR'),
       ],
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: AppTheme.theme,
       home: const AuthWrapper(),
       // Tratamento de erros de navegação
       builder: (context, widget) {

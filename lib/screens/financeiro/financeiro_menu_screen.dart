@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
+import '../../theme/app_theme.dart';
 import 'clientes_screen.dart';
 import 'fornecedores_screen.dart';
 import 'dashboard_financeiro_screen.dart';
@@ -11,331 +12,371 @@ import '../relatorio_lucro_screen.dart';
 import 'vendas_prazo_list_screen.dart';
 import 'compras_prazo_list_screen.dart';
 
-/// Tela de menu do módulo financeiro - v2
 class FinanceiroMenuScreen extends StatelessWidget {
   const FinanceiroMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
-    
-    // Debug: verificar se código novo está sendo executado
-    print('🔥 FINANCEIRO MENU V3 - COM PERMISSÕES');
-    print('   Perfil: ${auth.perfil}');
-    print('   Pode gerenciar clientes: ${auth.canGerenciarClientes}');
-    
-    // Criar lista de cards
-    final cards = <Widget>[
-            // Clientes e Fornecedores - apenas ADMIN e VENDEDOR
-            if (auth.canGerenciarClientes) ...[
-              _MenuCard(
-                emoji: '👤',
-                title: 'Clientes',
-                subtitle: 'Cadastro de clientes',
-                color: const Color(0xFF3B82F6), // Azul
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ClientesScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-            if (auth.canGerenciarFornecedores) ...[
-              _MenuCard(
-                emoji: '🏢',
-                title: 'Fornecedores',
-                subtitle: 'Cadastro de fornecedores',
-                color: const Color(0xFFF97316), // Laranja
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const FornecedoresScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-            // Contas a Receber e Pagar - todos podem ver
-            _MenuCard(
-              emoji: '💰',
-              title: 'Contas a Receber',
-              subtitle: 'Recebimentos pendentes',
-              color: const Color(0xFF14B8A6), // Teal
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ContasReceberScreen(),
-                  ),
-                );
-              },
-            ),
-            if (auth.isAdmin)
-              _MenuCard(
-                emoji: '💸',
-                title: 'Contas a Pagar',
-                subtitle: 'Pagamentos pendentes',
-                color: const Color(0xFFEF4444), // Vermelho
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ContasPagarScreen(),
-                    ),
-                  );
-                },
-              ),
-            // Vendas e Compras a Prazo - apenas ADMIN e VENDEDOR
-            if (auth.canVenderPrazo) ...[
-              _MenuCard(
-                emoji: '📋',
-                title: 'Vendas a Prazo',
-                subtitle: 'Histórico de vendas',
-                color: const Color(0xFF10B981), // Verde
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const VendasPrazoListScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-            if (auth.canComprarPrazo) ...[
-              _MenuCard(
-                emoji: '📦',
-                title: 'Compras a Prazo',
-                subtitle: 'Histórico de compras',
-                color: const Color(0xFF06B6D4), // Cyan
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ComprasPrazoListScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-            // Parcelas - todos podem ver
-            _MenuCard(
-              emoji: '📅',
-              title: 'Parcelas',
-              subtitle: 'Controle de parcelas',
-              color: const Color(0xFF6366F1), // Índigo
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ParcelasScreen(),
-                  ),
-                );
-              },
-            ),
-            // Relatórios - apenas ADMIN e VENDEDOR
-            if (auth.canVerRelatorios) ...[
-              _MenuCard(
-                emoji: '📈',
-                title: 'Relatório de Lucro',
-                subtitle: 'Análise de vendas e lucros',
-                color: const Color(0xFF8B5CF6), // Roxo
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RelatorioLucroScreen(),
-                    ),
-                  );
-                },
-              ),
-              _MenuCard(
-                emoji: '📊',
-                title: 'Dashboard',
-                subtitle: 'Visão geral financeira',
-                color: const Color(0xFFEC4899), // Pink
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DashboardFinanceiroScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-    ];
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gestão Financeira'),
-        backgroundColor: const Color(0xFFEC4899),
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 1.0,
-          children: cards,
-        ),
-      ),
-    );
-  }
-}
 
-class _MenuCard extends StatefulWidget {
-  final String emoji;
-  final String title;
-  final String subtitle;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _MenuCard({
-    required this.emoji,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  State<_MenuCard> createState() => _MenuCardState();
-}
-
-class _MenuCardState extends State<_MenuCard> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedScale(
-        scale: _isPressed ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
-        child: Card(
-          elevation: 8,
-          shadowColor: widget.color.withOpacity(0.4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+    final cards = <_CardData>[
+      if (auth.canGerenciarClientes)
+        _CardData(
+          icon: Icons.people_alt_rounded,
+          title: 'Clientes',
+          subtitle: 'Cadastro e gestão',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1D4ED8), Color(0xFF60A5FA)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ClientesScreen())),
+        ),
+      if (auth.canGerenciarFornecedores)
+        _CardData(
+          icon: Icons.business_rounded,
+          title: 'Fornecedores',
+          subtitle: 'Cadastro e gestão',
+          gradient: const LinearGradient(
+            colors: [Color(0xFFB45309), Color(0xFFFBBF24)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const FornecedoresScreen())),
+        ),
+      _CardData(
+        icon: Icons.arrow_circle_down_rounded,
+        title: 'A Receber',
+        subtitle: 'Cobranças pendentes',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF059669), Color(0xFF34D399)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const ContasReceberScreen())),
+      ),
+      if (auth.isAdmin)
+        _CardData(
+          icon: Icons.arrow_circle_up_rounded,
+          title: 'A Pagar',
+          subtitle: 'Pagamentos pendentes',
+          gradient: const LinearGradient(
+            colors: [Color(0xFFDC2626), Color(0xFFF87171)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ContasPagarScreen())),
+        ),
+      if (auth.canVenderPrazo)
+        _CardData(
+          icon: Icons.receipt_long_rounded,
+          title: 'Vendas a Prazo',
+          subtitle: 'Histórico de vendas',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF047857), Color(0xFF6EE7B7)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const VendasPrazoListScreen())),
+        ),
+      if (auth.canComprarPrazo)
+        _CardData(
+          icon: Icons.inventory_rounded,
+          title: 'Compras a Prazo',
+          subtitle: 'Histórico de compras',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0E7490), Color(0xFF67E8F9)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ComprasPrazoListScreen())),
+        ),
+      _CardData(
+        icon: Icons.calendar_month_rounded,
+        title: 'Parcelas',
+        subtitle: 'Controle de parcelas',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4338CA), Color(0xFF818CF8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const ParcelasScreen())),
+      ),
+      if (auth.canVerRelatorios) ...[
+        _CardData(
+          icon: Icons.bar_chart_rounded,
+          title: 'Relatório',
+          subtitle: 'Lucros e vendas',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6D28D9), Color(0xFFA78BFA)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const RelatorioLucroScreen())),
+        ),
+        _CardData(
+          icon: Icons.dashboard_rounded,
+          title: 'Dashboard',
+          subtitle: 'Visão geral',
+          gradient: const LinearGradient(
+            colors: [Color(0xFFBE185D), Color(0xFFF9A8D4)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const DashboardFinanceiroScreen())),
+        ),
+      ],
+    ];
+
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: Column(
+        children: [
+          // Header
+          Container(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
+                colors: [Color(0xFFBE185D), Color(0xFFEC4899)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  widget.color,
-                  widget.color.withOpacity(0.85),
-                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.color.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: widget.onTap,
-                borderRadius: BorderRadius.circular(16),
-                splashColor: Colors.white.withOpacity(0.2),
-                highlightColor: Colors.white.withOpacity(0.1),
-                child: Stack(
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 8, 20),
+                child: Row(
                   children: [
-                    // Conteúdo
-                    Padding(
-                      padding: const EdgeInsets.all(12),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 4),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: AppTheme.radiusMd,
+                      ),
+                      child: const Icon(Icons.account_balance_wallet_rounded,
+                          color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Center(
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                widget.emoji,
-                                style: const TextStyle(fontSize: 36),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
                           Text(
-                            widget.title,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              letterSpacing: 0.3,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black26,
-                                  offset: Offset(0, 1),
-                                  blurRadius: 2,
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.subtitle,
+                            'Módulo',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.white.withOpacity(0.9),
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
+                              color: Colors.white70,
+                              letterSpacing: 1.5,
                             ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'Financeiro',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              height: 1.1,
+                            ),
                           ),
                         ],
-                      ),
-                    ),
-                    // Ícone de seta
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 12,
-                          color: Colors.white.withOpacity(0.8),
-                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
+          ),
+          // Grid
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final cols = constraints.maxWidth > 600 ? 3 : 2;
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 1.1,
+                    ),
+                    itemCount: cards.length,
+                    itemBuilder: (context, i) => _FinanceiroCard(data: cards[i]),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardData {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final LinearGradient gradient;
+  final VoidCallback onTap;
+
+  const _CardData({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.gradient,
+    required this.onTap,
+  });
+}
+
+class _FinanceiroCard extends StatefulWidget {
+  final _CardData data;
+  const _FinanceiroCard({required this.data});
+
+  @override
+  State<_FinanceiroCard> createState() => _FinanceiroCardState();
+}
+
+class _FinanceiroCardState extends State<_FinanceiroCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scale = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final firstColor = widget.data.gradient.colors.first;
+    return GestureDetector(
+      onTapDown: (_) => _ctrl.forward(),
+      onTapUp: (_) {
+        _ctrl.reverse();
+        widget.data.onTap();
+      },
+      onTapCancel: () => _ctrl.reverse(),
+      child: ScaleTransition(
+        scale: _scale,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: widget.data.gradient,
+            borderRadius: AppTheme.radiusXl,
+            boxShadow: [
+              BoxShadow(
+                color: firstColor.withOpacity(0.3),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+                spreadRadius: -2,
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Decoração
+              Positioned(
+                right: -14,
+                bottom: -14,
+                child: Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              // Conteúdo
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: AppTheme.radiusMd,
+                      ),
+                      child: Icon(widget.data.icon, color: Colors.white, size: 22),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.data.title,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          widget.data.subtitle,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Seta
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: AppTheme.radiusSm,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 9,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

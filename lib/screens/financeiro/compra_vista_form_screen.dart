@@ -170,7 +170,7 @@ class _CompraVistaFormScreenState extends State<CompraVistaFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FinanceiroStyles.appBar('Nova Compra à Vista', FinanceiroStyles.corCompra),
+      appBar: FinanceiroStyles.appBar('Nova Compra à Vista', [FinanceiroStyles.corCompra, FinanceiroStyles.corCompra]),
       body: _isLoadingFornecedores || _isLoadingProdutos
           ? const Center(child: CircularProgressIndicator())
           : Form(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/offline_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/auth_wrapper.dart';
 import '../widgets/connectivity_banner.dart';
 import '../widgets/home_summary_card.dart';
@@ -21,122 +22,113 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animCtrl;
+  late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+    _animCtrl = AnimationController(
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.05),
+    _fadeAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut);
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.04),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
-    _animationController.forward();
+    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic));
+    _animCtrl.forward();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _confirmarLogout(BuildContext context, AuthService auth) async {
     final resultado = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFF9C27B0).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: AppTheme.radiusXxl),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppTheme.errorLight,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.logout_rounded, color: AppTheme.error, size: 32),
               ),
-              child: const Icon(
-                Icons.logout_rounded,
-                color: Color(0xFF9C27B0),
-                size: 24,
+              const SizedBox(height: 16),
+              const Text(
+                'Sair do Sistema',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary,
+                ),
               ),
-            ),
-            const SizedBox(width: 14),
-            const Text(
-              'Sair do Sistema',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 8),
+              const Text(
+                'Deseja realmente sair?',
+                style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
               ),
-            ),
-          ],
-        ),
-        content: const Text(
-          'Deseja realmente sair do sistema?',
-          style: TextStyle(
-            fontSize: 16,
-            height: 1.4,
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.textSecondary,
+                        side: const BorderSide(color: AppTheme.border),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: AppTheme.radiusMd),
+                      ),
+                      child: const Text('Cancelar', style: TextStyle(fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.error,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: AppTheme.radiusMd),
+                        elevation: 0,
+                      ),
+                      child: const Text('Sair', style: TextStyle(fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'Cancelar',
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF9C27B0),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              'Sair',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
 
     if (resultado == true) {
       await auth.logout();
-      
       if (!context.mounted) return;
-      
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => const AuthWrapper(),
-          settings: const RouteSettings(name: '/'),
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const AuthWrapper(),
+          transitionsBuilder: (_, anim, __, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: const Duration(milliseconds: 300),
         ),
         (route) => false,
       );
@@ -148,317 +140,206 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final auth = Provider.of<AuthService>(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
-      appBar: AppBar(
-          title: Row(
+      backgroundColor: AppTheme.background,
+      body: Column(
+        children: [
+          // Header customizado
+          _buildHeader(context, auth),
+          // Banner de conectividade
+          const ConnectivityBanner(),
+          // Conteúdo
+          Expanded(
+            child: FadeTransition(
+              opacity: _fadeAnim,
+              child: SlideTransition(
+                position: _slideAnim,
+                child: _buildBody(context, auth),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, AuthService auth) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: AppTheme.headerGradient,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 12, 20),
+          child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFBA68C8), // Lilás claro
-                      Color(0xFFE1BEE7), // Lilás bem claro
-                    ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF9C27B0).withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.icecream_rounded,
-                size: 32,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Sorveteria',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 2,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'CAMILA',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.5,
-                    height: 1,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withOpacity(0.1),
-                        offset: const Offset(0, 2),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-        titleSpacing: 16,
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(24),
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF9C27B0), // Lilás
-                Color(0xFFBA68C8), // Lilás claro
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(24),
-            ),
-          ),
-        ),
-        actions: [
-          Consumer<OfflineService>(
-            builder: (context, offlineService, child) {
-              return Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: offlineService.isOnline 
-                      ? Colors.green.withOpacity(0.2)
-                      : Colors.red.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: offlineService.isOnline ? Colors.green : Colors.red,
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      offlineService.isOnline ? Icons.wifi : Icons.wifi_off,
-                      size: 16,
-                      color: offlineService.isOnline ? Colors.green : Colors.red,
+              // Linha superior: logo + status + logout
+              Row(
+                children: [
+                  // Logo
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: AppTheme.radiusMd,
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      offlineService.isOnline ? 'Online' : 'Offline',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: offlineService.isOnline ? Colors.green : Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            onPressed: () => _confirmarLogout(context, auth),
-            tooltip: 'Sair',
-          ),
-        ],
-      ),
-        body: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: Column(
-              children: [
-                // Banner de conectividade
-                const ConnectivityBanner(),
-                // Header com informações do usuário
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: const Color(0xFF9C27B0).withOpacity(0.1),
-                      backgroundImage: auth.fotoUrl != null ? NetworkImage(auth.fotoUrl!) : null,
-                      child: auth.fotoUrl == null
-                          ? Text(
-                              auth.username?.substring(0, 1).toUpperCase() ?? 'U',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF9C27B0),
-                              ),
-                            )
-                          : null,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Olá, ${auth.username ?? 'Usuário'}!',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                    child: const Icon(Icons.icecream_rounded, size: 26, color: Colors.white),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Sorveteria',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.white70,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w400,
                           ),
-                          Text(
-                            auth.isAdmin ? 'Administrador' : (auth.isVendedor ? 'Proprietária' : 'Operador'),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Badge de sistema completo
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF10B981), Color(0xFF34D399)],
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        const Text(
+                          'CAMILA',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: 1.5,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Status online
+                  Consumer<OfflineService>(
+                    builder: (_, offline, __) => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: offline.isOnline
+                            ? Colors.green.withOpacity(0.2)
+                            : Colors.red.withOpacity(0.2),
+                        borderRadius: AppTheme.radiusFull,
+                        border: Border.all(
+                          color: offline.isOnline
+                              ? Colors.green.withOpacity(0.5)
+                              : Colors.red.withOpacity(0.5),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.check_circle, color: Colors.white, size: 14),
-                          const SizedBox(width: 4),
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: BoxDecoration(
+                              color: offline.isOnline ? Colors.greenAccent : Colors.redAccent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
                           Text(
-                            'v1.2.4',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            offline.isOnline ? 'Online' : 'Offline',
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
+                              color: offline.isOnline ? Colors.greenAccent : Colors.redAccent,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 4),
+                  // Botão logout
+                  IconButton(
+                    icon: const Icon(Icons.logout_rounded, color: Colors.white70, size: 22),
+                    onPressed: () => _confirmarLogout(context, auth),
+                    tooltip: 'Sair',
+                  ),
+                ],
               ),
-              // Card de Resumo
-              const HomeSummaryCard(),
-              // Grid de cards
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    // Calcula o número de colunas baseado na largura
-                    final width = constraints.maxWidth;
-                    final crossAxisCount = width > 600 ? 3 : 2;
-                    
-                    // Criar lista de cards
-                    final cards = <Widget>[
-                      _MenuCard(
-                        emoji: '🛒',
-                        title: 'Vendas',
-                        color: const Color(0xFF10B981), // Verde vibrante
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const VendasMenuScreen()),
+              const SizedBox(height: 16),
+              // Linha inferior: avatar + saudação + versão
+              Row(
+                children: [
+                  // Avatar
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withOpacity(0.4), width: 2),
+                      image: auth.fotoUrl != null
+                          ? DecorationImage(
+                              image: NetworkImage(auth.fotoUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: auth.fotoUrl == null
+                        ? Center(
+                            child: Text(
+                              (auth.username ?? 'U')[0].toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Olá, ${auth.username ?? 'Usuário'}!',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      _MenuCard(
-                        emoji: '🛍️',
-                        title: 'Carrinho (Vários Itens)',
-                        color: const Color(0xFF059669), // Verde escuro
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const CarrinhoVendaScreen()),
-                        ),
-                      ),
-                      _MenuCard(
-                        emoji: '📦',
-                        title: 'Compras',
-                        color: const Color(0xFF14B8A6), // Teal
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const ComprasMenuScreen()),
-                        ),
-                      ),
-                      _MenuCard(
-                        emoji: '💰',
-                        title: 'Receber Pagamento',
-                        color: const Color(0xFF16A34A), // Verde dinheiro
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const ContasReceberScreen()),
-                        ),
-                      ),
-                      _MenuCard(
-                        emoji: '📋',
-                        title: 'Produtos',
-                        color: const Color(0xFF2563EB), // Azul royal
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const ProdutosScreen()),
-                        ),
-                      ),
-                      _MenuCard(
-                        emoji: '📜',
-                        title: 'Histórico Completo',
-                        color: const Color(0xFFF59E0B), // Âmbar/Dourado
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const MovimentacoesScreen()),
-                        ),
-                      ),
-                      _MenuCard(
-                        emoji: '💼',
-                        title: 'Financeiro',
-                        color: const Color(0xFFEC4899), // Rosa/Pink
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const FinanceiroMenuScreen(),
+                        Text(
+                          auth.isAdmin
+                              ? 'Administrador'
+                              : auth.isVendedor
+                                  ? 'Proprietária'
+                                  : 'Operador',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  // Badge versão
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: AppTheme.radiusFull,
+                    ),
+                    child: const Text(
+                      'v1.2.8',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
-                      if (auth.isAdmin)
-                        _MenuCard(
-                          emoji: '👥',
-                          title: 'Gerenciar Usuários',
-                          color: const Color(0xFF7C3AED), // Violeta
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const UsuariosScreen()),
-                          ),
-                        ),
-                    ];
-                    
-                    return GridView.count(
-                      crossAxisCount: crossAxisCount,
-                      padding: const EdgeInsets.all(8),
-                      mainAxisSpacing: 6,
-                      crossAxisSpacing: 6,
-                      childAspectRatio: 1.25, // Mais largo que alto
-                      children: cards,
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -466,18 +347,152 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
     );
   }
+
+  Widget _buildBody(BuildContext context, AuthService auth) {
+    final cards = _buildCards(context, auth);
+
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 24),
+      children: [
+        // Card de resumo
+        const HomeSummaryCard(),
+        // Grid de menus
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final cols = constraints.maxWidth > 600 ? 3 : 2;
+              return GridView.count(
+                crossAxisCount: cols,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 1.15,
+                children: cards,
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildCards(BuildContext context, AuthService auth) {
+    return [
+      _MenuCard(
+        icon: Icons.point_of_sale_rounded,
+        title: 'Vendas',
+        subtitle: 'Registrar venda',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF059669), Color(0xFF10B981)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const VendasMenuScreen())),
+      ),
+      _MenuCard(
+        icon: Icons.shopping_cart_rounded,
+        title: 'Carrinho',
+        subtitle: 'Vários itens',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0284C7), Color(0xFF38BDF8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const CarrinhoVendaScreen())),
+      ),
+      _MenuCard(
+        icon: Icons.local_shipping_rounded,
+        title: 'Compras',
+        subtitle: 'Registrar compra',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0891B2), Color(0xFF22D3EE)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const ComprasMenuScreen())),
+      ),
+      _MenuCard(
+        icon: Icons.payments_rounded,
+        title: 'Receber',
+        subtitle: 'Cobranças',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF16A34A), Color(0xFF4ADE80)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const ContasReceberScreen())),
+      ),
+      _MenuCard(
+        icon: Icons.inventory_2_rounded,
+        title: 'Produtos',
+        subtitle: 'Estoque',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2563EB), Color(0xFF60A5FA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const ProdutosScreen())),
+      ),
+      _MenuCard(
+        icon: Icons.history_rounded,
+        title: 'Histórico',
+        subtitle: 'Movimentações',
+        gradient: const LinearGradient(
+          colors: [Color(0xFFD97706), Color(0xFFFBBF24)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const MovimentacoesScreen())),
+      ),
+      _MenuCard(
+        icon: Icons.account_balance_wallet_rounded,
+        title: 'Financeiro',
+        subtitle: 'Gestão financeira',
+        gradient: const LinearGradient(
+          colors: [Color(0xFFDB2777), Color(0xFFF472B6)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const FinanceiroMenuScreen())),
+      ),
+      if (auth.isAdmin)
+        _MenuCard(
+          icon: Icons.manage_accounts_rounded,
+          title: 'Usuários',
+          subtitle: 'Gerenciar',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF7C3AED), Color(0xFFA78BFA)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const UsuariosScreen())),
+        ),
+    ];
+  }
 }
 
 class _MenuCard extends StatefulWidget {
-  final String emoji;
+  final IconData icon;
   final String title;
-  final Color color;
+  final String subtitle;
+  final LinearGradient gradient;
   final VoidCallback onTap;
 
   const _MenuCard({
-    required this.emoji,
+    required this.icon,
     required this.title,
-    required this.color,
+    required this.subtitle,
+    required this.gradient,
     required this.onTap,
   });
 
@@ -485,120 +500,148 @@ class _MenuCard extends StatefulWidget {
   State<_MenuCard> createState() => _MenuCardState();
 }
 
-class _MenuCardState extends State<_MenuCard> {
-  bool _isPressed = false;
+class _MenuCardState extends State<_MenuCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pressCtrl;
+  late Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pressCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+      lowerBound: 0.0,
+      upperBound: 0.05,
+    );
+    _scaleAnim = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _pressCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pressCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final firstColor = widget.gradient.colors.first;
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapDown: (_) => _pressCtrl.forward(),
       onTapUp: (_) {
-        setState(() => _isPressed = false);
+        _pressCtrl.reverse();
         widget.onTap();
       },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedScale(
-        scale: _isPressed ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
+      onTapCancel: () => _pressCtrl.reverse(),
+      child: ScaleTransition(
+        scale: _scaleAnim,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [
-                widget.color,
-                widget.color.withOpacity(0.8),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: widget.gradient,
+            borderRadius: AppTheme.radiusXl,
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(0.4),
-                blurRadius: 12,
+                color: firstColor.withOpacity(0.35),
+                blurRadius: 16,
                 offset: const Offset(0, 6),
-                spreadRadius: 0,
-              ),
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+                spreadRadius: -2,
               ),
             ],
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: widget.onTap,
-              borderRadius: BorderRadius.circular(16),
-              splashColor: Colors.white.withOpacity(0.2),
-              highlightColor: Colors.white.withOpacity(0.1),
-              child: Stack(
-                children: [
-                  // Conteúdo do card
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+          child: Stack(
+            children: [
+              // Padrão decorativo no fundo
+              Positioned(
+                right: -16,
+                bottom: -16,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 8,
+                top: -20,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.06),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              // Conteúdo
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Ícone
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: AppTheme.radiusMd,
+                      ),
+                      child: Icon(widget.icon, color: Colors.white, size: 24),
+                    ),
+                    // Texto
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              widget.emoji,
-                              style: const TextStyle(fontSize: 36),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
                         Text(
                           widget.title,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
                             color: Colors.white,
-                            height: 1.2,
-                            letterSpacing: 0.3,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black26,
-                                offset: Offset(0, 1),
-                                blurRadius: 2,
-                              ),
-                            ],
+                            letterSpacing: 0.2,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          widget.subtitle,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.white.withOpacity(0.8),
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                  ),
-                  // Ícone de seta no canto
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: Colors.white.withOpacity(0.8),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              // Seta
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: AppTheme.radiusSm,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 10,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

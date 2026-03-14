@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,16 +12,37 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _loginController = TextEditingController();
   final _senhaController = TextEditingController();
   final _loginFocusNode = FocusNode();
   final _senhaFocusNode = FocusNode();
   bool _isLoading = false;
+  bool _obscureSenha = true;
+  late AnimationController _animCtrl;
+  late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _fadeAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut);
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic));
+    _animCtrl.forward();
+  }
 
   @override
   void dispose() {
+    _animCtrl.dispose();
     _loginController.dispose();
     _senhaController.dispose();
     _loginFocusNode.dispose();
@@ -30,70 +52,75 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
+
+    Future.delayed(const Duration(seconds: 5), () {
+      if (_isLoading && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.hourglass_top_rounded, color: Colors.white, size: 18),
+                SizedBox(width: 10),
+                Expanded(child: Text('Servidor iniciando, aguarde...')),
+              ],
+            ),
+            backgroundColor: AppTheme.warning,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: AppTheme.radiusMd),
+            duration: const Duration(seconds: 10),
+          ),
+        );
+      }
+    });
 
     try {
       final auth = Provider.of<AuthService>(context, listen: false);
-      
-      // Mostrar mensagem se demorar mais de 5 segundos
-      bool showingSlowMessage = false;
-      Future.delayed(const Duration(seconds: 5), () {
-        if (_isLoading && mounted && !showingSlowMessage) {
-          showingSlowMessage = true;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('⏳ Servidor iniciando, aguarde mais alguns segundos...'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 10),
-            ),
-          );
-        }
-      });
-      
       final success = await auth.login(
         _loginController.text,
         _senhaController.text,
       );
 
       if (!mounted) return;
-      
       setState(() => _isLoading = false);
 
       if (success) {
-        // Login bem-sucedido - navegar para home
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Usuário ou senha inválidos. Verifique suas credenciais.'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 4),
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const HomeScreen(),
+            transitionsBuilder: (_, anim, __, child) =>
+                FadeTransition(opacity: anim, child: child),
+            transitionDuration: const Duration(milliseconds: 400),
           ),
         );
+      } else {
+        _showError('Usuário ou senha inválidos.');
       }
     } catch (e) {
       if (!mounted) return;
-      
       setState(() => _isLoading = false);
-      
-      // Mensagem específica para timeout
-      final errorMessage = e.toString().contains('TimeoutException')
-          ? 'Servidor demorou muito para responder. Aguarde 30 segundos e tente novamente (servidor estava dormindo).'
-          : 'Erro ao conectar com o servidor. Verifique sua conexão.';
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 8),
-        ),
-      );
+      _showError(e.toString().contains('TimeoutException')
+          ? 'Servidor demorando para responder. Tente novamente.'
+          : 'Erro ao conectar. Verifique sua conexão.');
     }
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 10),
+            Expanded(child: Text(msg)),
+          ],
+        ),
+        backgroundColor: AppTheme.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: AppTheme.radiusMd),
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   @override
@@ -101,270 +128,269 @@ class _LoginScreenState extends State<LoginScreen> {
     return KeyboardListener(
       focusNode: FocusNode()..requestFocus(),
       onKeyEvent: (event) {
-        if (event is KeyDownEvent && 
-            event.logicalKey.keyLabel == 'Enter' && 
+        if (event is KeyDownEvent &&
+            event.logicalKey.keyLabel == 'Enter' &&
             !_isLoading) {
           _handleLogin();
         }
       },
       child: Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF9C27B0), // Lilás
-              const Color(0xFFBA68C8), // Lilás claro
-              const Color(0xFFE1BEE7), // Lilás bem claro
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Card(
-              elevation: 12,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+        body: Stack(
+          children: [
+            // Fundo com gradiente
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF4C1D95), Color(0xFF6D28D9), Color(0xFF8B5CF6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
+            ),
+            // Círculos decorativos
+            Positioned(
+              top: -80,
+              right: -60,
               child: Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.06),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -100,
+              left: -80,
+              child: Container(
+                width: 320,
+                height: 320,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.05),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 120,
+              left: -40,
+              child: Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.04),
+                ),
+              ),
+            ),
+            // Conteúdo
+            Center(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Logo com design mais elegante
-                      Stack(
-                        alignment: Alignment.center,
+                child: FadeTransition(
+                  opacity: _fadeAnim,
+                  child: SlideTransition(
+                    position: _slideAnim,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 420),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Círculo de fundo decorativo
-                          Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(0xFF9C27B0).withOpacity(0.1),
-                                  const Color(0xFFBA68C8).withOpacity(0.2),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                            ),
-                          ),
-                          // Logo principal
-                          Container(
-                            width: 110,
-                            height: 110,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xFF9C27B0),
-                                  Color(0xFFBA68C8),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF9C27B0).withOpacity(0.4),
-                                  blurRadius: 24,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.icecream_rounded,
-                              size: 48,
-                              color: Colors.white,
-                            ),
-                          ),
+                          // Logo
+                          _buildLogo(),
+                          const SizedBox(height: 32),
+                          // Card do formulário
+                          _buildFormCard(),
                         ],
                       ),
-                      const SizedBox(height: 24),
-                      // Nome da sorveteria com fonte elegante
-                      const Text(
-                        'Sorveteria',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w300,
-                          color: Color(0xFF9C27B0),
-                          letterSpacing: 2.5,
-                          fontFamily: 'serif',
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        'Camila',
-                        style: TextStyle(
-                          fontSize: 34,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF9C27B0),
-                          letterSpacing: 1.2,
-                          fontFamily: 'serif',
-                          height: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE1BEE7),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFF9C27B0).withOpacity(0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.store_rounded,
-                              size: 12,
-                              color: Color(0xFF9C27B0),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Sistema de Controle de Estoque',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _loginController,
-                        focusNode: _loginFocusNode,
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (_) {
-                          _senhaFocusNode.requestFocus();
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Login',
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.5,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF9C27B0),
-                              width: 2,
-                            ),
-                          ),
-                          prefixIcon: const Icon(
-                            Icons.person_rounded,
-                            color: Color(0xFF9C27B0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[50],
-                        ),
-                        validator: (value) =>
-                            value?.isEmpty ?? true ? 'Campo obrigatório' : null,
-                      ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _senhaController,
-                        focusNode: _senhaFocusNode,
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) {
-                          if (!_isLoading) {
-                            _handleLogin();
-                          }
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Senha',
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.5,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF9C27B0),
-                              width: 2,
-                            ),
-                          ),
-                          prefixIcon: const Icon(
-                            Icons.lock_rounded,
-                            color: Color(0xFF9C27B0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[50],
-                        ),
-                        obscureText: true,
-                        validator: (value) =>
-                            value?.isEmpty ?? true ? 'Campo obrigatório' : null,
-                      ),
-                      const SizedBox(height: 28),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _handleLogin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF9C27B0),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            elevation: 6,
-                            shadowColor: const Color(0xFF9C27B0).withOpacity(0.4),
-                          ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
-                                )
-                              : const Text(
-                                  'Entrar',
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return Column(
+      children: [
+        Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.icecream_rounded,
+            size: 52,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'Sorveteria',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w300,
+            color: Colors.white70,
+            letterSpacing: 4,
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'CAMILA',
+          style: TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: 3,
+            height: 1,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: AppTheme.radiusFull,
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+          ),
+          child: const Text(
+            'Sistema de Gestão',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFormCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppTheme.radiusXxl,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 40,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(28),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Bem-vindo de volta',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Entre com suas credenciais para continuar',
+              style: TextStyle(
+                fontSize: 13,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Campo Login
+            TextFormField(
+              controller: _loginController,
+              focusNode: _loginFocusNode,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => _senhaFocusNode.requestFocus(),
+              decoration: InputDecoration(
+                labelText: 'Usuário',
+                hintText: 'Digite seu usuário',
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primarySurface,
+                    borderRadius: AppTheme.radiusSm,
+                  ),
+                  child: const Icon(Icons.person_rounded, size: 18, color: AppTheme.primary),
+                ),
+              ),
+              validator: (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+            ),
+            const SizedBox(height: 16),
+            // Campo Senha
+            TextFormField(
+              controller: _senhaController,
+              focusNode: _senhaFocusNode,
+              textInputAction: TextInputAction.done,
+              obscureText: _obscureSenha,
+              onFieldSubmitted: (_) { if (!_isLoading) _handleLogin(); },
+              decoration: InputDecoration(
+                labelText: 'Senha',
+                hintText: 'Digite sua senha',
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primarySurface,
+                    borderRadius: AppTheme.radiusSm,
+                  ),
+                  child: const Icon(Icons.lock_rounded, size: 18, color: AppTheme.primary),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureSenha ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                    color: AppTheme.textTertiary,
+                    size: 20,
+                  ),
+                  onPressed: () => setState(() => _obscureSenha = !_obscureSenha),
+                ),
+              ),
+              validator: (v) => v?.isEmpty ?? true ? 'Campo obrigatório' : null,
+            ),
+            const SizedBox(height: 28),
+            // Botão
+            GradientButton(
+              label: 'Entrar',
+              icon: Icons.login_rounded,
+              isLoading: _isLoading,
+              onPressed: _isLoading ? null : _handleLogin,
+              colors: const [Color(0xFF5B21B6), Color(0xFF8B5CF6)],
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                'v1.2.8 • Sorveteria Camila',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppTheme.textTertiary,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

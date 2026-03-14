@@ -20,6 +20,13 @@ class _VendasPrazoListScreenState extends State<VendasPrazoListScreen> {
   RelatorioService? _relatorioService;
   String _filtroStatus = 'TODOS';
 
+  static const _cor = Color(0xFF10B981);
+  static const _gradiente = LinearGradient(
+    colors: [Color(0xFF059669), Color(0xFF34D399)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   final _formatoMoeda = NumberFormat.currency(locale: 'pt_BR', symbol: r'R$');
   final _formatoData = DateFormat('dd/MM/yyyy');
 
@@ -27,164 +34,216 @@ class _VendasPrazoListScreenState extends State<VendasPrazoListScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_relatorioService == null) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      _relatorioService = RelatorioService(authService);
-      _carregarVendas();
+      _relatorioService = RelatorioService(Provider.of<AuthService>(context, listen: false));
+      _carregar();
     }
   }
 
-  Future<void> _carregarVendas() async {
+  Future<void> _carregar() async {
     if (!mounted || _relatorioService == null) return;
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
+    setState(() { _isLoading = true; _errorMessage = null; });
     try {
       final resultado = await _relatorioService!.contasReceber(
         status: _filtroStatus == 'TODOS' ? null : _filtroStatus,
       );
-
       if (!mounted) return;
-
       setState(() {
         _vendas = resultado['vendas'] as List<VendaPrazo>;
         _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
-
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
+      setState(() { _errorMessage = e.toString(); _isLoading = false; });
     }
   }
+
+  // Totais para o resumo
+  double get _totalPendente => _vendas
+      .where((v) => v.status != 'PAGO' && v.status != 'quitada' && v.status != 'cancelada' && v.status != 'CANCELADA')
+      .fold(0, (s, v) => s + v.valorTotal);
+
+  int get _countPendente => _vendas
+      .where((v) => v.status != 'PAGO' && v.status != 'quitada' && v.status != 'cancelada' && v.status != 'CANCELADA')
+      .length;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text(
-          'Vendas a Prazo',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: const Text('Vendas a Prazo', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
         elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(24),
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF10B981), Color(0xFF34D399)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(24),
-            ),
-          ),
-        ),
+        flexibleSpace: Container(decoration: const BoxDecoration(gradient: _gradiente)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: _carregarVendas,
-            tooltip: 'Atualizar',
-          ),
+          IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _carregar, tooltip: 'Atualizar'),
         ],
       ),
       body: Column(
         children: [
+          // Card de resumo (só quando tem dados)
+          if (!_isLoading && _errorMessage == null && _vendas.isNotEmpty)
+            _buildResumoCard(),
           // Filtros
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'TODOS', label: Text('Todos')),
-                      ButtonSegment(value: 'PENDENTE', label: Text('Pendentes')),
-                      ButtonSegment(value: 'PAGO', label: Text('Pagos')),
-                    ],
-                    selected: {_filtroStatus},
-                    onSelectionChanged: (Set<String> newSelection) {
-                      setState(() {
-                        _filtroStatus = newSelection.first;
-                      });
-                      _carregarVendas();
-                    },
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(value: 'TODOS', label: Text('Todos', style: TextStyle(fontSize: 13))),
+                ButtonSegment(value: 'PENDENTE', label: Text('Pendentes', style: TextStyle(fontSize: 13))),
+                ButtonSegment(value: 'PAGO', label: Text('Pagos', style: TextStyle(fontSize: 13))),
+              ],
+              selected: {_filtroStatus},
+              style: ButtonStyle(
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              onSelectionChanged: (s) {
+                setState(() => _filtroStatus = s.first);
+                _carregar();
+              },
+            ),
+          ),
+          // Contador
+          if (!_isLoading && _errorMessage == null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                children: [
+                  Text(
+                    '${_vendas.length} venda${_vendas.length != 1 ? 's' : ''}',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500),
                   ),
+                ],
+              ),
+            ),
+          // Lista
+          Expanded(child: _buildBody()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResumoCard() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF059669), Color(0xFF34D399)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: _cor.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('A Receber', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                const SizedBox(height: 4),
+                Text(
+                  _formatoMoeda.format(_totalPendente),
+                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
           ),
-          // Lista
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage != null
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                            const SizedBox(height: 16),
-                            Text(_errorMessage!),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _carregarVendas,
-                              child: const Text('Tentar novamente'),
-                            ),
-                          ],
-                        ),
-                      )
-                    : _vendas.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey[300]),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Nenhuma venda encontrada',
-                                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                                ),
-                              ],
-                            ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: _carregarVendas,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: _vendas.length,
-                              itemBuilder: (context, index) {
-                                final venda = _vendas[index];
-                                return _VendaCard(
-                                  venda: venda,
-                                  formatoMoeda: _formatoMoeda,
-                                  formatoData: _formatoData,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => VendaDetalhesScreen(venda: venda),
-                                      ),
-                                    ).then((_) => _carregarVendas());
-                                  },
-                                );
-                              },
-                            ),
-                          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '$_countPendente',
+                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const Text('pendentes', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline_rounded, size: 64, color: Colors.red.shade300),
+              const SizedBox(height: 16),
+              Text('Erro ao carregar vendas',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+              const SizedBox(height: 8),
+              Text(_errorMessage!, style: TextStyle(color: Colors.grey.shade600), textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _carregar,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Tentar novamente'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _cor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_vendas.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey.shade300),
+            const SizedBox(height: 16),
+            Text(
+              'Nenhuma venda encontrada',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tente mudar o filtro de status',
+              style: TextStyle(color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _carregar,
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        itemCount: _vendas.length,
+        itemBuilder: (context, index) => _VendaCard(
+          venda: _vendas[index],
+          formatoMoeda: _formatoMoeda,
+          formatoData: _formatoData,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => VendaDetalhesScreen(venda: _vendas[index])),
+          ).then((_) => _carregar()),
+        ),
       ),
     );
   }
@@ -207,19 +266,19 @@ class _VendaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPago = venda.status == 'PAGO' || venda.status == 'quitada';
     final isCancelada = venda.status == 'cancelada' || venda.status == 'CANCELADA';
-    
+
+    final statusColor = isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange;
+    final statusLabel = isCancelada ? 'Cancelada' : isPago ? 'Pago' : 'Pendente';
+    final statusIcon = isCancelada ? Icons.cancel_outlined : isPago ? Icons.check_circle_outline : Icons.schedule_rounded;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: isCancelada ? Border.all(color: Colors.red, width: 2) : null,
+        border: isCancelada ? Border.all(color: Colors.red.shade200, width: 1.5) : null,
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2)),
         ],
       ),
       child: Material(
@@ -228,83 +287,79 @@ class _VendaCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.all(14),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: (isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
+                // Ícone de status
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(statusIcon, color: statusColor, size: 22),
+                ),
+                const SizedBox(width: 12),
+                // Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        venda.cliente?.nome ?? 'Cliente',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isCancelada ? Colors.grey : const Color(0xFF1F2937),
+                          decoration: isCancelada ? TextDecoration.lineThrough : null,
+                        ),
                       ),
-                      child: Icon(
-                        isCancelada ? Icons.cancel : isPago ? Icons.check_circle : Icons.schedule,
-                        color: isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 4),
+                      Row(
                         children: [
-                          Text(
-                            venda.cliente?.nome ?? 'Cliente',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              decoration: isCancelada ? TextDecoration.lineThrough : null,
-                              color: isCancelada ? Colors.grey : null,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
+                          Icon(Icons.calendar_today_outlined, size: 12, color: Colors.grey.shade500),
+                          const SizedBox(width: 4),
                           Text(
                             formatoData.format(venda.dataVenda),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
-                            ),
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                           ),
                         ],
                       ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Valor e status
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      formatoMoeda.format(venda.valorTotal),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isCancelada ? Colors.grey : const Color(0xFF10B981),
+                        decoration: isCancelada ? TextDecoration.lineThrough : null,
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          formatoMoeda.format(venda.valorTotal),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isCancelada ? Colors.grey : const Color(0xFF10B981),
-                            decoration: isCancelada ? TextDecoration.lineThrough : null,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: (isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            isCancelada ? 'Cancelada' : isPago ? 'Pago' : 'Pendente',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isCancelada ? Colors.red : isPago ? Colors.green : Colors.orange,
-                            ),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        statusLabel,
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: statusColor),
+                      ),
                     ),
                   ],
                 ),
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 20),
               ],
             ),
           ),
