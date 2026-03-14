@@ -28,12 +28,29 @@ class _VendaDetalhesScreenState extends State<VendaDetalhesScreen> {
   late VendaPrazo _venda;
   List<Pagamento> _pagamentos = [];
   bool _isLoadingPagamentos = false;
+  bool _isLoadingDetalhes = false;
 
   @override
   void initState() {
     super.initState();
     _venda = widget.venda;
+    _carregarDetalhesCompletos();
     _carregarPagamentos();
+  }
+
+  Future<void> _carregarDetalhesCompletos() async {
+    setState(() => _isLoadingDetalhes = true);
+    try {
+      final auth = Provider.of<AuthService>(context, listen: false);
+      final service = VendaPrazoService(auth);
+      final vendaCompleta = await service.buscarVenda(_venda.id);
+      setState(() {
+        _venda = vendaCompleta;
+        _isLoadingDetalhes = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingDetalhes = false);
+    }
   }
 
   Future<void> _carregarPagamentos() async {
