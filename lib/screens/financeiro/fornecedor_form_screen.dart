@@ -75,7 +75,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
 
   String? _validarEmail(String? value) {
     if (value != null && value.isNotEmpty) {
-      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      final emailRegex = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
       if (!emailRegex.hasMatch(value)) {
         return 'Email inválido';
       }
@@ -92,7 +92,6 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
 
     try {
       if (_isEdicao) {
-        // Atualizar fornecedor existente
         final dados = <String, dynamic>{};
         if (_nomeController.text != widget.fornecedor!.nome) {
           dados['nome'] = _nomeController.text;
@@ -117,7 +116,6 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
           await _fornecedorService.atualizarFornecedor(widget.fornecedor!.id!, dados);
         }
       } else {
-        // Criar novo fornecedor
         final fornecedor = Fornecedor(
           nome: _nomeController.text,
           cnpj: _cnpjController.text.replaceAll(RegExp(r'[^0-9]'), ''),
@@ -180,7 +178,6 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // Card de Informações Básicas
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -225,9 +222,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
                       labelText: 'Nome/Razão Social *',
                       hintText: 'Digite o nome da empresa',
                       prefixIcon: const Icon(Icons.business_outlined, color: Color(0xFFF59E0B)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -249,9 +244,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
                       labelText: 'CNPJ *',
                       hintText: '00.000.000/0000-00',
                       prefixIcon: const Icon(Icons.badge_outlined, color: Color(0xFFF59E0B)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -272,8 +265,6 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
-            // Card de Contato
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -318,9 +309,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
                       labelText: 'Telefone',
                       hintText: '(00) 00000-0000',
                       prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF10B981)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -342,9 +331,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
                       labelText: 'Email',
                       hintText: 'contato@empresa.com',
                       prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF10B981)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -363,8 +350,6 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
-            // Card de Endereço
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -409,9 +394,7 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
                       labelText: 'Endereço Completo',
                       hintText: 'Rua, número, bairro, cidade',
                       prefixIcon: const Icon(Icons.home_outlined, color: Color(0xFF8B5CF6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -430,8 +413,6 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            
-            // Botão Salvar
             Container(
               height: 56,
               decoration: BoxDecoration(
@@ -481,41 +462,6 @@ class _FornecedorFormScreenState extends State<FornecedorFormScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-
-// Formatador de CNPJ: 11.222.333/0001-81
-class _CnpjInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final text = newValue.text;
-    final buffer = StringBuffer();
-    
-    // Remove tudo que não é número
-    final numbers = text.replaceAll(RegExp(r'[^0-9]'), '');
-    
-    // Aplica a máscara: 11.222.333/0001-81
-    for (int i = 0; i < numbers.length && i < 14; i++) {
-      if (i == 2 || i == 5) {
-        buffer.write('.');
-      } else if (i == 8) {
-        buffer.write('/');
-      } else if (i == 12) {
-        buffer.write('-');
-      }
-      buffer.write(numbers[i]);
-    }
-    
-    final formatted = buffer.toString();
-    
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

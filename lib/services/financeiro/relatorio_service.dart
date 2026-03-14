@@ -33,9 +33,6 @@ class RelatorioService {
     DateTime? dataFim,
   }) async {
     try {
-      print('🔄 Buscando contas a receber...');
-      print('📋 Parâmetros: status=$status, dataInicio=$dataInicio, dataFim=$dataFim');
-      
       final queryParams = <String, String>{};
       if (status != null) queryParams['status'] = status;
       if (dataInicio != null) {
@@ -46,26 +43,11 @@ class RelatorioService {
       }
 
       final uri = Uri.parse('$_baseUrl/contas-receber').replace(queryParameters: queryParams);
-      print('🌐 URL: $uri');
-      
       final response = await http.get(uri, headers: _headers);
-      print('📡 Status da resposta: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
-        print('✅ Dados recebidos com sucesso');
-        print('📊 Estrutura: ${data.keys}');
-        
-        final vendas = (data['vendas'] as List? ?? []).map((v) {
-          try {
-            return VendaPrazo.fromJson(v);
-          } catch (e) {
-            print('❌ Erro ao processar venda: $e');
-            print('📄 Dados da venda: $v');
-            rethrow;
-          }
-        }).toList();
-        
+        final vendas = (data['vendas'] as List? ?? []).map((v) => VendaPrazo.fromJson(v)).toList();
         return {
           'vendas': vendas,
           'total_a_receber': _toDouble(data['total_a_receber']),
@@ -74,12 +56,9 @@ class RelatorioService {
           'contas_atrasadas': data['contas_atrasadas'] ?? 0,
         };
       } else {
-        final errorBody = utf8.decode(response.bodyBytes);
-        print('❌ Erro na API: ${response.statusCode} - $errorBody');
         throw Exception('Erro ${response.statusCode}: Falha ao buscar contas a receber');
       }
     } catch (e) {
-      print('❌ Erro em contasReceber: $e');
       if (e.toString().contains('SocketException') || e.toString().contains('TimeoutException')) {
         throw Exception('Erro de conexão. Verifique sua internet.');
       }
@@ -93,9 +72,6 @@ class RelatorioService {
     DateTime? dataFim,
   }) async {
     try {
-      print('🔄 Buscando contas a pagar...');
-      print('📋 Parâmetros: status=$status, dataInicio=$dataInicio, dataFim=$dataFim');
-      
       final queryParams = <String, String>{};
       if (status != null) queryParams['status'] = status;
       if (dataInicio != null) {
@@ -106,26 +82,11 @@ class RelatorioService {
       }
 
       final uri = Uri.parse('$_baseUrl/contas-pagar').replace(queryParameters: queryParams);
-      print('🌐 URL: $uri');
-      
       final response = await http.get(uri, headers: _headers);
-      print('📡 Status da resposta: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = json.decode(utf8.decode(response.bodyBytes));
-        print('✅ Dados recebidos com sucesso');
-        print('📊 Estrutura: ${data.keys}');
-        
-        final compras = (data['compras'] as List? ?? []).map((c) {
-          try {
-            return CompraPrazo.fromJson(c);
-          } catch (e) {
-            print('❌ Erro ao processar compra: $e');
-            print('📄 Dados da compra: $c');
-            rethrow;
-          }
-        }).toList();
-        
+        final compras = (data['compras'] as List? ?? []).map((c) => CompraPrazo.fromJson(c)).toList();
         return {
           'compras': compras,
           'total_a_pagar': _toDouble(data['total_a_pagar']),
@@ -134,12 +95,9 @@ class RelatorioService {
           'contas_atrasadas': data['contas_atrasadas'] ?? 0,
         };
       } else {
-        final errorBody = utf8.decode(response.bodyBytes);
-        print('❌ Erro na API: ${response.statusCode} - $errorBody');
         throw Exception('Erro ${response.statusCode}: Falha ao buscar contas a pagar');
       }
     } catch (e) {
-      print('❌ Erro em contasPagar: $e');
       if (e.toString().contains('SocketException') || e.toString().contains('TimeoutException')) {
         throw Exception('Erro de conexão. Verifique sua internet.');
       }

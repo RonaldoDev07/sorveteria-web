@@ -28,9 +28,6 @@ class ParcelaService {
     int limit = 100,
   }) async {
     try {
-      print('🔄 Listando parcelas...');
-      print('📋 Parâmetros: tipo=$tipo, status=$status, referenciaId=$referenciaId');
-      
       final queryParams = <String, String>{
         'skip': skip.toString(),
         'limit': limit.toString(),
@@ -44,31 +41,15 @@ class ParcelaService {
       }
 
       final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParams);
-      print('🌐 URL: $uri');
-      
       final response = await http.get(uri, headers: _headers);
-      print('📡 Status da resposta: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        print('✅ Parcelas recebidas: ${data.length}');
-        
-        return data.map((json) {
-          try {
-            return Parcela.fromJson(json);
-          } catch (e) {
-            print('❌ Erro ao processar parcela: $e');
-            print('📄 Dados da parcela: $json');
-            rethrow;
-          }
-        }).toList();
+        return data.map((json) => Parcela.fromJson(json)).toList();
       } else {
-        final errorBody = utf8.decode(response.bodyBytes);
-        print('❌ Erro na API: ${response.statusCode} - $errorBody');
         throw Exception('Erro ${response.statusCode}: Falha ao listar parcelas');
       }
     } catch (e) {
-      print('❌ Erro em listarParcelas: $e');
       if (e.toString().contains('SocketException') || e.toString().contains('TimeoutException')) {
         throw Exception('Erro de conexão. Verifique sua internet.');
       }
@@ -106,14 +87,10 @@ class ParcelaService {
         body: json.encode(body),
       ).timeout(const Duration(minutes: 5));
 
-      print('📥 Resposta baixa parcela - Status: ${response.statusCode}');
-      print('   Headers: ${response.headers}');
-
       // Status 307 = Temporary Redirect - seguir o redirect manualmente
       if (response.statusCode == 307 || response.statusCode == 308) {
         final location = response.headers['location'];
         if (location != null) {
-          print('🔄 Redirect detectado para: $location');
           final redirectResponse = await http.put(
             Uri.parse(location),
             headers: _headers,

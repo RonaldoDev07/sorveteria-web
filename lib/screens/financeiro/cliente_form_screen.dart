@@ -75,7 +75,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
 
   String? _validarEmail(String? value) {
     if (value != null && value.isNotEmpty) {
-      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      final emailRegex = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
       if (!emailRegex.hasMatch(value)) {
         return 'Email inválido';
       }
@@ -92,7 +92,6 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
 
     try {
       if (_isEdicao) {
-        // Atualizar cliente existente
         final dados = <String, dynamic>{};
         if (_nomeController.text != widget.cliente!.nome) {
           dados['nome'] = _nomeController.text;
@@ -117,7 +116,6 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
           await _clienteService.atualizarCliente(widget.cliente!.id!, dados);
         }
       } else {
-        // Criar novo cliente
         final cliente = Cliente(
           nome: _nomeController.text,
           cpfCnpj: _cpfCnpjController.text.replaceAll(RegExp(r'[^0-9]'), ''),
@@ -180,7 +178,6 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // Card de Informações Básicas
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -225,9 +222,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
                       labelText: 'Nome Completo *',
                       hintText: 'Digite o nome do cliente',
                       prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF3B82F6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -249,9 +244,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
                       labelText: 'CPF/CNPJ *',
                       hintText: '000.000.000-00',
                       prefixIcon: const Icon(Icons.badge_outlined, color: Color(0xFF3B82F6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -272,8 +265,6 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
-            // Card de Contato
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -318,9 +309,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
                       labelText: 'Telefone',
                       hintText: '(00) 00000-0000',
                       prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF10B981)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -342,9 +331,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
                       labelText: 'Email',
                       hintText: 'exemplo@email.com',
                       prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF10B981)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -363,8 +350,6 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            
-            // Card de Endereço
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -409,9 +394,7 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
                       labelText: 'Endereço Completo',
                       hintText: 'Rua, número, bairro, cidade',
                       prefixIcon: const Icon(Icons.home_outlined, color: Color(0xFF8B5CF6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -430,8 +413,6 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            
-            // Botão Salvar
             Container(
               height: 56,
               decoration: BoxDecoration(
@@ -481,53 +462,6 @@ class _ClienteFormScreenState extends State<ClienteFormScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-
-// Formatador de CPF/CNPJ: 040.697.722-43 ou 11.222.333/0001-81
-class _CpfCnpjInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final text = newValue.text;
-    final buffer = StringBuffer();
-    
-    // Remove tudo que não é número
-    final numbers = text.replaceAll(RegExp(r'[^0-9]'), '');
-    
-    if (numbers.length <= 11) {
-      // Formata como CPF: 040.697.722-43
-      for (int i = 0; i < numbers.length && i < 11; i++) {
-        if (i == 3 || i == 6) {
-          buffer.write('.');
-        } else if (i == 9) {
-          buffer.write('-');
-        }
-        buffer.write(numbers[i]);
-      }
-    } else {
-      // Formata como CNPJ: 11.222.333/0001-81
-      for (int i = 0; i < numbers.length && i < 14; i++) {
-        if (i == 2 || i == 5) {
-          buffer.write('.');
-        } else if (i == 8) {
-          buffer.write('/');
-        } else if (i == 12) {
-          buffer.write('-');
-        }
-        buffer.write(numbers[i]);
-      }
-    }
-    
-    final formatted = buffer.toString();
-    
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }
